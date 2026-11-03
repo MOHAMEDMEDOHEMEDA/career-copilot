@@ -103,6 +103,7 @@ Each milestone ends with a gate. Do not start the next until the gate passes.
 - **M6 Hardening:** rate limits, usage caps, CORS, log scrubbing, deletion tested, pagination, security review. Gate: no open high-severity findings.
 - **M7 Release:** deploy backend, migrations, build configs, real-device test, TestFlight or demo video, README with screenshots, architecture diagram, demo script. Gate: a newcomer can follow the README and run the demo.
 - **M8 Mock interviews (v1.1).**
+- **M9 Market study and monetization decision (optional, after M7):** complete `docs/market-study.md` (competitor teardown, waitlist test, interviews, revenue model). Gate: go / pivot / stay-portfolio decision recorded against the decision rule set beforehand. Only if "go": add in-app purchases, privacy policy, and usage-based cost controls before charging anyone.
 
 If time runs short, cut in this order: interviews, SwiftData caching, extra eval cases. Never cut security, isolation tests, or the README.
 
