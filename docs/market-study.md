@@ -1,6 +1,6 @@
 # Career Copilot AI: Market Study
 
-Optional, post-M7. Purpose: decide with evidence whether to turn the portfolio app into a paid product.
+Optional, after release (M9). Purpose: decide with evidence whether to turn the portfolio app into a paid product.
 Rule: do not publish revenue, user, or market claims unless verified. Mark every number as **verified** or **assumption**.
 
 Last updated: ____  Owner: ____

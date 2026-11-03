@@ -92,18 +92,35 @@ Endpoints under `/api/v1`: `auth`, `users`, `resumes`, `resume-analysis`, `job-m
 Clear repo structure, backend Dockerfile, Docker Compose for local development, Alembic migrations, `/health` endpoint, CI (ruff, mypy, pytest), instructions to run iOS against local or deployed backends, a deployment guide, architecture diagram, API docs, README (setup, features, limitations, screenshots), and a short demo script.
 
 ## 8. Milestones
-Each milestone ends with a gate. Do not start the next until the gate passes.
+Build order: backend first, then AI, then the iOS app. Each milestone ends with a gate. Do not start the next until the gate passes.
 
-- **M0 Foundation:** repo, docs, contracts for auth and resumes, `.env.example`, docker-compose, `/health`, CI. Gate: compose runs, health returns 200, CI green.
-- **M1 Auth and data layer:** auth flows, profile, migrations, error format, request IDs, safe logging. Gate: auth tests pass, including expired and reused tokens.
-- **M2 Resume pipeline and analysis:** upload, extraction, provider layer, analysis schema, usage tracking, background job. Gate: tests for corrupt, oversized, and scanned PDFs, malformed model output, timeouts, injection, and cross-user access.
-- **M3 iOS vertical slice:** networking, Keychain, auth screens, resume upload, analysis results, all states. Gate: full flow works in the simulator, unit tests pass. Review everything before continuing.
-- **M4 Job matching:** schema, evidence, absent-vs-not-possessed wording, iOS screen. Gate: mocked tests pass, no fabricated experience.
-- **M5 RAG and evals:** documents, chunking, embeddings, retrieval, cited answers, chat UI, eval dataset and script. Gate: retrieval tests pass, results and limitations documented.
-- **M6 Hardening:** rate limits, usage caps, CORS, log scrubbing, deletion tested, pagination, security review. Gate: no open high-severity findings.
-- **M7 Release:** deploy backend, migrations, build configs, real-device test, TestFlight or demo video, README with screenshots, architecture diagram, demo script. Gate: a newcomer can follow the README and run the demo.
-- **M8 Mock interviews (v1.1).**
-- **M9 Market study and monetization decision (optional, after M7):** complete `docs/market-study.md` (competitor teardown, waitlist test, interviews, revenue model). Gate: go / pivot / stay-portfolio decision recorded against the decision rule set beforehand. Only if "go": add in-app purchases, privacy policy, and usage-based cost controls before charging anyone.
+### Phase A: Backend foundation
+- **M0 Foundation:** repo, docs, OpenAPI contracts for auth and resumes, `.env.example`, docker-compose, `/health`, CI. Gate: compose runs, health returns 200, CI green.
+- **M1 Auth and data layer:** register, login, refresh, logout, profile, migrations, error format, request IDs, safe logging. Gate: auth tests pass, including expired and reused tokens.
+- **M2 Resume pipeline:** upload, PDF validation and extraction, scanned-PDF message, resume CRUD and deletion, background job framework with a status endpoint, usage-tracking tables, rate limits, smoke-test script. Gate: tests for corrupt, oversized, and scanned PDFs and cross-user access; everything works through `/docs`. Deploy the backend to a hosted URL and tag the OpenAPI spec.
+- **M2.5 iOS spike (half day):** minimal app that logs in, stores the token in Keychain, and calls one endpoint on the hosted backend. Gate: token refresh and base URL configuration work. Do this before starting Phase B.
+
+### Phase B: AI layer
+- **M3 Resume analysis:** LLM provider interface, structured outputs, analysis schema, prompt-injection tests, malformed-output and timeout tests, mocked responses. Gate: tests pass, plus one manual run with the real provider.
+- **M4 Job matching:** schema, evidence, absent-vs-not-possessed wording. Gate: mocked tests pass, no fabricated experience.
+- **M5 RAG and evals:** curated documents, chunking, embeddings, retrieval, cited answers, "not enough information" behavior, eval dataset and script. Gate: retrieval tests pass, results and limitations documented. Tag the OpenAPI spec.
+
+### Phase C: iOS app
+- **M6 iOS foundation:** networking layer with models generated from the OpenAPI spec, Keychain, auth screens, resume upload and list. Gate: flow works in the simulator, unit tests pass.
+- **M7 iOS features:** analysis results, job matching, RAG chat with sources, profile and settings, all loading, empty, offline, retry, and error states.
+- **M8 iOS tests and device run:** ViewModel and networking tests, real-device run against the hosted backend. Gate: full flow works on a device.
+
+### Phase D: Hardening and release
+- **M9 Hardening and release:** usage caps, CORS, log scrubbing, deletion tested end to end, pagination, security review, deployment guide, README with screenshots, architecture diagram, demo script, TestFlight or demo video. Gate: no open high-severity findings; a newcomer can follow the README and run the demo.
+
+### Optional
+- **M10 Mock interviews (v1.1).**
+- **M11 Market study and monetization decision:** complete `docs/market-study.md`. Gate: go / pivot / stay-portfolio decision recorded against the decision rule set beforehand. Only if "go": add in-app purchases, privacy policy, and usage-based cost controls before charging anyone.
+
+### Cross-phase rules
+- Freeze and tag the OpenAPI spec at the end of each backend milestone; the iOS client is generated from it.
+- Keep a smoke-test script that runs the full flow (register, upload, analyze, match, chat) and run it after every backend change.
+- Review backend diffs closely: auth, SQL, and upload handling.
 
 If time runs short, cut in this order: interviews, SwiftData caching, extra eval cases. Never cut security, isolation tests, or the README.
 
