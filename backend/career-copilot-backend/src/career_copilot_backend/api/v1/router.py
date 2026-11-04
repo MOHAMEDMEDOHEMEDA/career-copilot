@@ -2,7 +2,9 @@ from fastapi import APIRouter
 
 from career_copilot_backend.api.v1.routes.auth import router as auth_router
 from career_copilot_backend.api.v1.routes.health import router as health_router
+from career_copilot_backend.api.v1.routes.resumes import router as resumes_router
 
 api_router = APIRouter()
 api_router.include_router(health_router, tags=["health"])
 api_router.include_router(auth_router, prefix="/auth", tags=["auth"])
+api_router.include_router(resumes_router, prefix="/resumes", tags=["resumes"])
