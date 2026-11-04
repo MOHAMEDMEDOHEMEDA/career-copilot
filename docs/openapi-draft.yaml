@@ -1,0 +1,197 @@
+openapi: 3.1.0
+info:
+  title: Career Copilot API (proposed auth and resume contracts)
+  version: 0.1.0-draft
+  description: Draft contracts only. These operations are not implemented.
+servers:
+  - url: /api/v1
+paths:
+  /auth/register:
+    post:
+      operationId: register
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/Credentials' }
+      responses:
+        '201':
+          description: Account created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/User' }
+        '409': { $ref: '#/components/responses/Error' }
+        '422': { $ref: '#/components/responses/Error' }
+  /auth/login:
+    post:
+      operationId: login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/Credentials' }
+      responses:
+        '200': { $ref: '#/components/responses/Tokens' }
+        '401': { $ref: '#/components/responses/Error' }
+        '422': { $ref: '#/components/responses/Error' }
+  /auth/refresh:
+    post:
+      operationId: refresh
+      requestBody: { $ref: '#/components/requestBodies/RefreshToken' }
+      responses:
+        '200': { $ref: '#/components/responses/Tokens' }
+        '401': { $ref: '#/components/responses/Error' }
+        '422': { $ref: '#/components/responses/Error' }
+  /auth/logout:
+    post:
+      operationId: logout
+      requestBody: { $ref: '#/components/requestBodies/RefreshToken' }
+      responses:
+        '204': { description: Refresh token revoked }
+        '422': { $ref: '#/components/responses/Error' }
+  /resumes:
+    get:
+      operationId: listResumes
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 100, default: 20 } }
+        - { name: offset, in: query, schema: { type: integer, minimum: 0, default: 0 } }
+      responses:
+        '200':
+          description: Resume page
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ResumePage' }
+        '401': { $ref: '#/components/responses/Error' }
+        '422': { $ref: '#/components/responses/Error' }
+    post:
+      operationId: uploadResume
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [file]
+              properties:
+                file: { type: string, format: binary, description: PDF file up to 10 MiB }
+      responses:
+        '201': { $ref: '#/components/responses/Resume' }
+        '400': { $ref: '#/components/responses/Error' }
+        '401': { $ref: '#/components/responses/Error' }
+        '413': { $ref: '#/components/responses/Error' }
+        '422': { $ref: '#/components/responses/Error' }
+  /resumes/{resume_id}:
+    parameters:
+      - { name: resume_id, in: path, required: true, schema: { type: string, format: uuid } }
+    get:
+      operationId: getResume
+      security: [{ bearerAuth: [] }]
+      responses:
+        '200': { $ref: '#/components/responses/Resume' }
+        '401': { $ref: '#/components/responses/Error' }
+        '404': { $ref: '#/components/responses/Error' }
+    patch:
+      operationId: updateResume
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ResumeUpdate' }
+      responses:
+        '200': { $ref: '#/components/responses/Resume' }
+        '401': { $ref: '#/components/responses/Error' }
+        '404': { $ref: '#/components/responses/Error' }
+        '422': { $ref: '#/components/responses/Error' }
+    delete:
+      operationId: deleteResume
+      security: [{ bearerAuth: [] }]
+      responses:
+        '204': { description: Resume and associated data deleted }
+        '401': { $ref: '#/components/responses/Error' }
+        '404': { $ref: '#/components/responses/Error' }
+components:
+  securitySchemes:
+    bearerAuth: { type: http, scheme: bearer, bearerFormat: JWT }
+  requestBodies:
+    RefreshToken:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [refresh_token]
+            properties:
+              refresh_token: { type: string, minLength: 1 }
+  responses:
+    Error:
+      description: Request failed
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+    Tokens:
+      description: Token pair
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/TokenPair' }
+    Resume:
+      description: Resume
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Resume' }
+  schemas:
+    Credentials:
+      type: object
+      required: [email, password]
+      properties:
+        email: { type: string, format: email, maxLength: 254 }
+        password: { type: string, minLength: 8, maxLength: 128 }
+    User:
+      type: object
+      required: [id, email, created_at]
+      properties:
+        id: { type: string, format: uuid }
+        email: { type: string, format: email }
+        created_at: { type: string, format: date-time }
+    TokenPair:
+      type: object
+      required: [access_token, refresh_token, token_type, expires_in]
+      properties:
+        access_token: { type: string }
+        refresh_token: { type: string }
+        token_type: { type: string, const: bearer }
+        expires_in: { type: integer, minimum: 1, description: Access token lifetime in seconds }
+    Resume:
+      type: object
+      required: [id, filename, text, created_at, updated_at]
+      properties:
+        id: { type: string, format: uuid }
+        filename: { type: string }
+        text: { type: string }
+        created_at: { type: string, format: date-time }
+        updated_at: { type: string, format: date-time }
+    ResumeUpdate:
+      type: object
+      minProperties: 1
+      additionalProperties: false
+      properties:
+        text: { type: string, minLength: 1 }
+    ResumePage:
+      type: object
+      required: [items, limit, offset]
+      properties:
+        items: { type: array, items: { $ref: '#/components/schemas/Resume' } }
+        limit: { type: integer }
+        offset: { type: integer }
+    Error:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: object
+          required: [code, message]
+          properties:
+            code: { type: string }
+            message: { type: string }

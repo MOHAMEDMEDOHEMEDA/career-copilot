@@ -1,0 +1,28 @@
+# Backend API contracts (draft)
+
+These contracts describe planned endpoints under `/api/v1`; they are not yet implemented. Final OpenAPI schemas must be agreed and implemented before the iOS client uses them.
+
+All errors use `{"error":{"code":"...","message":"..."}}`. Authentication uses a bearer access token. List responses include `items`, `limit`, and `offset`.
+
+## Authentication
+
+| Method and path | Request | Successful response |
+| --- | --- | --- |
+| `POST /auth/register` | email and password | `201` user profile |
+| `POST /auth/login` | email and password | `200` access token, refresh token, token type and expiry |
+| `POST /auth/refresh` | refresh token | `200` rotated token pair |
+| `POST /auth/logout` | refresh token | `204`; refresh token revoked |
+
+## Resumes
+
+All resume operations require authentication and enforce ownership.
+
+| Method and path | Request | Successful response |
+| --- | --- | --- |
+| `POST /resumes` | multipart PDF upload | `201` resume |
+| `GET /resumes` | `limit`, `offset` | `200` paginated resumes |
+| `GET /resumes/{resume_id}` | resume ID | `200` resume |
+| `PATCH /resumes/{resume_id}` | editable resume fields | `200` updated resume |
+| `DELETE /resumes/{resume_id}` | resume ID | `204` |
+
+Proposed field schemas and response codes are in `docs/openapi-draft.yaml`. The initial PDF upload limit is 10 MiB. Proposed application error codes are `validation_error` (422), `invalid_credentials` (401), `invalid_refresh_token` (401), `email_already_registered` (409), `not_found` (404), `invalid_pdf` (400), `pdf_requires_ocr` (400), and `file_too_large` (413). The generic HTTP handler currently uses `http_error`; feature-specific codes are planned for the corresponding milestones.

@@ -1,0 +1,17 @@
+name: Backend
+on:
+  push:
+  pull_request:
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend/career-copilot-backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+      - run: uv sync --locked --dev
+      - run: uv run ruff check .
+      - run: uv run mypy src
+      - run: uv run pytest
