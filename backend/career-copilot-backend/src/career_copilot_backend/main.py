@@ -1,3 +1,6 @@
+import logging
+from uuid import uuid4
+
 from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
@@ -13,6 +16,23 @@ app = FastAPI(
 )
 
 app.include_router(api_router, prefix=settings.api_v1_prefix)
+
+logger = logging.getLogger("career_copilot.requests")
+
+
+@app.middleware("http")
+async def request_context(request: Request, call_next):
+    request_id = str(uuid4())
+    request.state.request_id = request_id
+    response = await call_next(request)
+    response.headers["X-Request-ID"] = request_id
+    logger.info(
+        "request_id=%s method=%s status=%s",
+        request_id,
+        request.method,
+        response.status_code,
+    )
+    return response
 
 
 @app.exception_handler(HTTPException)

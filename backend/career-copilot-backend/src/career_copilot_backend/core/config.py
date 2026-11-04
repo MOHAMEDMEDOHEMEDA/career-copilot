@@ -8,6 +8,9 @@ class Settings(BaseSettings):
     environment: str = "development"
     api_v1_prefix: str = "/api/v1"
     database_url: str = "postgresql+psycopg://career_copilot:career_copilot@localhost:5432/career_copilot"
+    jwt_secret: str = ""
+    access_token_minutes: int = 15
+    refresh_token_days: int = 30
 
     model_config = SettingsConfigDict(
         env_file=".env",
