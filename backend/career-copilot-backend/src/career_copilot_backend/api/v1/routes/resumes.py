@@ -26,6 +26,7 @@ from career_copilot_backend.services.resumes import (
     list_resumes,
     save_resume,
 )
+from career_copilot_backend.services.usage import record_upload_attempt
 
 router = APIRouter()
 Database = Annotated[Session, Depends(get_db)]
@@ -52,6 +53,12 @@ CurrentUser = Annotated[User, Depends(current_user)]
 async def upload_resume(
     session: Database, user: CurrentUser, file: Annotated[UploadFile, File()]
 ) -> ResumeResponse:
+    if not record_upload_attempt(session, user.id):
+        raise HTTPException(
+            status_code=429,
+            detail="Upload limit exceeded",
+            headers={"Retry-After": "3600"},
+        )
     content = await file.read(MAX_PDF_BYTES + 1)
     try:
         text = extract_pdf_text(content, file.content_type)

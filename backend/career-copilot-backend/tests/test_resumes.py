@@ -1,6 +1,8 @@
 import test_auth
 from test_pdf import make_pdf
 
+from career_copilot_backend.core.config import settings
+
 client = test_auth.client
 
 
@@ -78,3 +80,30 @@ def test_upload_rejects_invalid_and_scanned_pdfs(client) -> None:
     )
     assert scanned.status_code == 400
     assert "OCR" in scanned.json()["error"]["message"]
+
+
+def test_upload_rate_limit_is_per_user(client, monkeypatch) -> None:
+    test_client, _ = client
+    monkeypatch.setattr(settings, "upload_limit_per_hour", 1)
+    authorization = []
+    for email in ("first@example.com", "second@example.com"):
+        credentials = {"email": email, "password": "secure-password"}
+        test_client.post("/api/v1/auth/register", json=credentials)
+        token = test_client.post("/api/v1/auth/login", json=credentials).json()[
+            "access_token"
+        ]
+        authorization.append({"Authorization": f"Bearer {token}"})
+    for index in (0, 1):
+        response = test_client.post(
+            "/api/v1/resumes",
+            headers=authorization[index],
+            files={"file": ("resume.pdf", make_pdf(True), "application/pdf")},
+        )
+        assert response.status_code == 201
+    limited = test_client.post(
+        "/api/v1/resumes",
+        headers=authorization[0],
+        files={"file": ("resume.pdf", make_pdf(True), "application/pdf")},
+    )
+    assert limited.status_code == 429
+    assert limited.headers["retry-after"] == "3600"

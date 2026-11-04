@@ -11,6 +11,7 @@ class Settings(BaseSettings):
     jwt_secret: str = ""
     access_token_minutes: int = 15
     refresh_token_days: int = 30
+    upload_limit_per_hour: int = 20
 
     model_config = SettingsConfigDict(
         env_file=".env",

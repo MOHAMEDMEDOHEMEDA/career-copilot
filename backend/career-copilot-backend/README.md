@@ -40,5 +40,7 @@ uv run ruff check .
 uv run mypy src
 ```
 
+To smoke-test an already running backend, use `uv run python scripts/smoke_test.py --base-url http://localhost:8000`. The script creates a synthetic account, removes its uploaded resume, and leaves the account in place because account deletion is not yet implemented. Analysis, matching, and chat are not implemented, so this is not yet the full cross-phase smoke test.
+
 The proposed auth and resume API is documented in `../../docs/backend-contracts.md`.
 Those endpoints are not implemented yet.

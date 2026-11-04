@@ -37,3 +37,6 @@ build-backend = "uv_build"
 [tool.mypy]
 python_version = "3.12"
 check_untyped_defs = true
+
+[tool.ruff.lint.per-file-ignores]
+"src/career_copilot_backend/services/jobs.py" = ["BLE001"]
