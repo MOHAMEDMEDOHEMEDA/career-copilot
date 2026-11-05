@@ -6,6 +6,8 @@ All errors use `{"error":{"code":"...","message":"..."}}`. Authentication uses a
 
 ## Authentication
 
+The current Google exchange adds `POST /api/v1/auth/google` with an `id_token` request and the existing token-pair response. `POST /api/v1/auth/google/link` accepts the same request and requires a bearer access token; it returns `204` on success and `409` on an identity conflict. Both return `401` for an invalid Google token and `503` if verification is unavailable. Email matches do not automatically link accounts. The original draft table below predates these additions; use the running `/openapi.json` for the current implemented schema.
+
 | Method and path | Request | Successful response |
 | --- | --- | --- |
 | `POST /auth/register` | email and password | `201` user profile |

@@ -48,9 +48,28 @@ async def http_error_handler(request: Request, exc: HTTPException) -> JSONRespon
 async def validation_error_handler(
     request: Request, exc: RequestValidationError
 ) -> JSONResponse:
+    messages = []
+    for error in exc.errors():
+        location = error.get("loc", ())
+        field = location[-1] if location else None
+        error_type = error.get("type")
+        if field == "email":
+            message = "Enter a valid email address."
+        elif field == "password":
+            message = "Password must be between 8 and 128 characters."
+        elif field == "file":
+            message = "Choose a PDF file to upload."
+        elif field == "resume_id":
+            message = "The resume ID is invalid."
+        else:
+            message = "Check the submitted information and try again."
+        if error_type == "missing" and field == "password":
+            message = "Enter your password."
+        if message not in messages:
+            messages.append(message)
     return JSONResponse(
         status_code=422,
-        content={"error": {"code": "validation_error", "message": "Invalid request"}},
+        content={"error": {"code": "validation_error", "message": " ".join(messages)}},
     )
 
 

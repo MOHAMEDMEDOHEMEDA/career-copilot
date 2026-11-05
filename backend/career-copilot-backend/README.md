@@ -13,6 +13,7 @@ uv run uvicorn career_copilot_backend.main:app --reload
 ```
 
 Set `JWT_SECRET` in `.env` to a unique random value of at least 32 characters before using login. Never use the example value outside local development.
+For Google Sign-In, set `GOOGLE_SERVER_CLIENT_ID` (or `GOOGLE_CLIENT_ID`) to the Google OAuth web client ID. The iOS app sends a Google ID token to `/api/v1/auth/google`; existing accounts must first sign in and explicitly link using `/api/v1/auth/google/link`. No Google client secret is required by this token-exchange flow.
 Compose also reads `JWT_SECRET` from this `.env` file. Run migrations before using authentication.
 
 The API is available at `http://localhost:8000`. Interactive documentation is

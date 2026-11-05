@@ -34,7 +34,7 @@ def register_user(session: Session, email: str, password: str) -> User:
 
 def authenticate_user(session: Session, email: str, password: str) -> User | None:
     user = session.scalar(select(User).where(User.email == email.lower()))
-    if user is None:
+    if user is None or user.password_hash is None:
         return None
     try:
         password_hasher.verify(user.password_hash, password)

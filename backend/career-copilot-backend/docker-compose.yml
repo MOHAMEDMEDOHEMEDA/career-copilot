@@ -7,6 +7,7 @@ services:
       DATABASE_URL: postgresql+psycopg://career_copilot:career_copilot@db:5432/career_copilot
       JWT_SECRET: ${JWT_SECRET:-}
       OPENROUTER_API_KEY: ${OPENROUTER_API_KEY:-}
+      GOOGLE_SERVER_CLIENT_ID: ${GOOGLE_SERVER_CLIENT_ID:-${GOOGLE_CLIENT_ID:-}}
     depends_on:
       db:
         condition: service_healthy
