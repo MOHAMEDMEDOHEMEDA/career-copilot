@@ -29,7 +29,7 @@ def find_job(session: Session, user_id: UUID, job_id: UUID) -> Job | None:
 
 def run_next_job(
     sessions: sessionmaker[Session],
-    handlers: Mapping[str, Callable[[UUID], None]],
+    handlers: Mapping[str, Callable[[UUID], dict | None]],
     lease_seconds: int = 300,
 ) -> bool:
     if not handlers or lease_seconds <= 0:
@@ -62,15 +62,16 @@ def run_next_job(
         job_id, kind = job.id, job.kind
         session.commit()
     try:
-        handlers[kind](job_id)
+        result = handlers[kind](job_id)
         status = "completed"
     except Exception:
+        result = None
         status = "failed"
     with sessions() as session:
         session.execute(
             update(Job)
             .where(Job.id == job_id, Job.lease_id == lease_id, Job.status == "running")
-            .values(status=status, lease_id=None, lease_expires_at=None)
+            .values(status=status, result=result, lease_id=None, lease_expires_at=None)
         )
         session.commit()
     return True

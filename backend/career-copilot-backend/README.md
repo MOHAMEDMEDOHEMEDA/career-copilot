@@ -42,5 +42,7 @@ uv run mypy src
 
 To smoke-test an already running backend, use `uv run python scripts/smoke_test.py --base-url http://localhost:8000`. The script creates a synthetic account, removes its uploaded resume, and leaves the account in place because account deletion is not yet implemented. Analysis, matching, and chat are not implemented, so this is not yet the full cross-phase smoke test.
 
-The proposed auth and resume API is documented in `../../docs/backend-contracts.md`.
-Those endpoints are not implemented yet.
+The initial draft auth and resume API is documented in `../../docs/backend-contracts.md`.
+Use `/docs` for the current implemented endpoints.
+
+Analysis uses OpenRouter's free router. Set `OPENROUTER_API_KEY` in `.env`; never commit the key. After migrating, run `uv run python -m career_copilot_backend.services.analysis_jobs` alongside the API, or start Compose with `docker compose --profile analysis up --build`. Submit a resume ID to `POST /api/v1/resume-analysis`, then poll `GET /api/v1/jobs/{id}`. Use synthetic resumes until third-party data handling has been reviewed. The worker must be running to process queued jobs.

@@ -4,6 +4,8 @@ from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict
 
+from career_copilot_backend.schemas.analysis import ResumeAnalysis
+
 
 class JobResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
@@ -14,3 +16,4 @@ class JobResponse(BaseModel):
     status: Literal["queued", "running", "completed", "failed"]
     created_at: datetime
     updated_at: datetime
+    result: ResumeAnalysis | None = None

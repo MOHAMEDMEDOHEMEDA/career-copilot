@@ -1,5 +1,6 @@
 from functools import lru_cache
 
+from pydantic import SecretStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -12,6 +13,8 @@ class Settings(BaseSettings):
     access_token_minutes: int = 15
     refresh_token_days: int = 30
     upload_limit_per_hour: int = 20
+    analysis_limit_per_hour: int = 5
+    openrouter_api_key: SecretStr = SecretStr("")
 
     model_config = SettingsConfigDict(
         env_file=".env",

@@ -6,6 +6,17 @@ services:
     environment:
       DATABASE_URL: postgresql+psycopg://career_copilot:career_copilot@db:5432/career_copilot
       JWT_SECRET: ${JWT_SECRET:-}
+      OPENROUTER_API_KEY: ${OPENROUTER_API_KEY:-}
+    depends_on:
+      db:
+        condition: service_healthy
+  worker:
+    profiles: ["analysis"]
+    build: .
+    command: ["python", "-m", "career_copilot_backend.services.analysis_jobs"]
+    environment:
+      DATABASE_URL: postgresql+psycopg://career_copilot:career_copilot@db:5432/career_copilot
+      OPENROUTER_API_KEY: ${OPENROUTER_API_KEY:-}
     depends_on:
       db:
         condition: service_healthy
