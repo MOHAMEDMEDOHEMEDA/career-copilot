@@ -11,7 +11,6 @@ final class AppViewModel: ObservableObject {
     @Published var email = ""
     @Published var password = ""
     @Published var profile: Profile?
-    @Published var resumes: [Resume] = []
     @Published var message: String?
     @Published var notice: String?
     @Published var isLoading = false
@@ -22,13 +21,7 @@ final class AppViewModel: ObservableObject {
     }
 
     private func client() throws -> APIClient {
-        guard let url = URL(string: baseURL), let scheme = url.scheme,
-              let host = url.host,
-              scheme == "https" || (scheme == "http" && ["localhost", "127.0.0.1", "::1"].contains(host)),
-              url.user == nil, url.password == nil, url.query == nil, url.fragment == nil else {
-            throw URLError(.badURL)
-        }
-        return APIClient(baseURL: url)
+        try APIClient.configured(baseURL: baseURL)
     }
 
     func authenticate() async {
@@ -41,7 +34,6 @@ final class AppViewModel: ObservableObject {
             try TokenStore.save(tokens, baseURL: api.baseURL)
             password = ""
             profile = try await api.profile()
-            resumes = try await api.resumes()
         } catch { message = error.localizedDescription }
     }
 
@@ -75,7 +67,6 @@ final class AppViewModel: ObservableObject {
                 let tokens = try await api.googleLogin(idToken: idToken)
                 try TokenStore.save(tokens, baseURL: api.baseURL)
                 profile = try await api.profile()
-                resumes = try await api.resumes()
             }
         } catch {
             let googleError = error as NSError
@@ -102,37 +93,6 @@ final class AppViewModel: ObservableObject {
             let api = try client()
             guard try TokenStore.load(baseURL: api.baseURL) != nil else { return }
             profile = try await api.profile()
-            await loadResumes()
-        } catch { message = error.localizedDescription }
-    }
-
-    func loadResumes() async {
-        isLoading = true
-        defer { isLoading = false }
-        do { resumes = try await client().resumes() }
-        catch { message = error.localizedDescription }
-    }
-
-    func upload(_ url: URL) async {
-        isLoading = true
-        defer { isLoading = false }
-        let access = url.startAccessingSecurityScopedResource()
-        defer { if access { url.stopAccessingSecurityScopedResource() } }
-        do {
-            let size = try url.resourceValues(forKeys: [.fileSizeKey]).fileSize ?? 0
-            guard size <= 10 * 1024 * 1024 else { throw APIClient.APIError.fileTooLarge }
-            let data = try Data(contentsOf: url)
-            let resume = try await client().uploadPDF(data: data, filename: url.lastPathComponent)
-            resumes.append(resume)
-        } catch { message = error.localizedDescription }
-    }
-
-    func delete(_ resume: Resume) async {
-        isLoading = true
-        defer { isLoading = false }
-        do {
-            try await client().deleteResume(id: resume.id)
-            resumes.removeAll { $0.id == resume.id }
         } catch { message = error.localizedDescription }
     }
 
@@ -144,7 +104,6 @@ final class AppViewModel: ObservableObject {
             GIDSignIn.sharedInstance.signOut()
             try TokenStore.clear()
             profile = nil
-            resumes = []
         } catch { message = error.localizedDescription }
     }
 }

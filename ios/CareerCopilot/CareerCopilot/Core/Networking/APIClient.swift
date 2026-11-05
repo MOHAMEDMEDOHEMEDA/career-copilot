@@ -21,6 +21,17 @@ private struct ErrorEnvelope: Decodable {
 
 struct APIClient {
     let baseURL: URL
+    var session: URLSession = .shared
+
+    static func configured(baseURL: String) throws -> APIClient {
+        guard let url = URL(string: baseURL), let scheme = url.scheme,
+              let host = url.host,
+              scheme == "https" || (scheme == "http" && ["localhost", "127.0.0.1", "::1"].contains(host)),
+              url.user == nil, url.password == nil, url.query == nil, url.fragment == nil else {
+            throw URLError(.badURL)
+        }
+        return APIClient(baseURL: url)
+    }
 
     func login(email: String, password: String) async throws -> TokenPair {
         try await post("api/v1/auth/login", body: ["email": email, "password": password])
@@ -70,6 +81,14 @@ struct APIClient {
     func deleteResume(id: UUID) async throws {
         let (data, response) = try await authorizedRequest(path: "api/v1/resumes/\(id.uuidString)", method: "DELETE")
         try validate(response, data: data)
+    }
+
+    func updateResume(id: UUID, text: String) async throws -> Resume {
+        let body = try JSONEncoder().encode(["text": text])
+        return try await authenticated(
+            path: "api/v1/resumes/\(id.uuidString)", method: "PATCH", body: body,
+            contentType: "application/json"
+        )
     }
 
     func logout() async throws {
@@ -123,7 +142,7 @@ struct APIClient {
     }
 
     private func send(_ request: URLRequest) async throws -> (Data, HTTPURLResponse) {
-        let (data, response) = try await URLSession.shared.data(for: request)
+        let (data, response) = try await session.data(for: request)
         guard let response = response as? HTTPURLResponse else { throw APIError.invalidResponse }
         return (data, response)
     }

@@ -2,6 +2,7 @@ import SwiftUI
 
 struct ResumeListView: View {
     @ObservedObject var model: AppViewModel
+    @ObservedObject var resumeModel: ResumeViewModel
     @Binding var showImporter: Bool
     @Binding var resumeToDelete: Resume?
 
@@ -34,7 +35,7 @@ struct ResumeListView: View {
                         .foregroundStyle(.white)
                         .background(.white.opacity(0.12), in: RoundedRectangle(cornerRadius: 16))
                     }
-                    .disabled(model.isLoading)
+                    .disabled(resumeModel.isLoading)
                 }
                 .padding(22)
                 .background(LinearGradient(colors: [.init(white: 0.25), .black], startPoint: .topLeading, endPoint: .bottomTrailing), in: RoundedRectangle(cornerRadius: 28))
@@ -42,13 +43,41 @@ struct ResumeListView: View {
                 HStack {
                     Text("Your resumes").font(.title3.bold())
                     Spacer()
-                    Text("\(model.resumes.count) \(model.resumes.count == 1 ? "document" : "documents")")
-                        .font(.subheadline).foregroundStyle(.secondary)
+                    if resumeModel.loadError == nil {
+                        Text("\(resumeModel.resumes.count) \(resumeModel.resumes.count == 1 ? "document" : "documents")")
+                            .font(.subheadline).foregroundStyle(.secondary)
+                    }
                 }
 
-                if model.isLoading && model.resumes.isEmpty {
+                if resumeModel.isLoading && !resumeModel.resumes.isEmpty {
+                    ProgressView("Updating resumes")
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                }
+
+                if let error = resumeModel.loadError, !resumeModel.resumes.isEmpty {
+                    VStack(alignment: .leading, spacing: 8) {
+                        Label("Couldn’t refresh resumes", systemImage: "wifi.exclamationmark")
+                            .font(.subheadline.weight(.semibold))
+                        Text(error).font(.footnote).foregroundStyle(.secondary)
+                        Button("Try again") { Task { await resumeModel.loadResumes() } }
+                            .disabled(resumeModel.isLoading)
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(16).careerCard()
+                }
+
+                if resumeModel.isLoading && resumeModel.resumes.isEmpty {
                     ProgressView("Loading resumes").frame(maxWidth: .infinity).padding()
-                } else if model.resumes.isEmpty {
+                } else if let error = resumeModel.loadError, resumeModel.resumes.isEmpty {
+                    ContentUnavailableView {
+                        Label("Couldn’t load resumes", systemImage: "wifi.exclamationmark")
+                    } description: {
+                        Text(error)
+                    } actions: {
+                        Button("Try again") { Task { await resumeModel.loadResumes() } }
+                            .buttonStyle(.borderedProminent)
+                    }
+                } else if resumeModel.resumes.isEmpty {
                     VStack(alignment: .leading, spacing: 12) {
                         GradientIcon(symbol: "doc.text", colors: [CareerStyle.coral, .pink])
                         Text("A fresh start").font(.headline)
@@ -59,16 +88,10 @@ struct ResumeListView: View {
                     .padding(20).careerCard()
                 } else {
                     LazyVStack(spacing: 12) {
-                        ForEach(model.resumes) { resume in
+                        ForEach(resumeModel.resumes) { resume in
                             HStack(spacing: 12) {
                                 NavigationLink {
-                                    ScrollView {
-                                        Text(resume.text)
-                                            .frame(maxWidth: .infinity, alignment: .leading)
-                                            .textSelection(.enabled).padding()
-                                    }
-                                    .navigationTitle(resume.filename)
-                                    .navigationBarTitleDisplayMode(.inline)
+                                    ResumeDetailView(model: resumeModel, resume: resume)
                                 } label: {
                                     HStack(spacing: 12) {
                                         GradientIcon(symbol: "doc.text.fill")
@@ -82,12 +105,14 @@ struct ResumeListView: View {
                                     .contentShape(Rectangle())
                                 }
                                 .buttonStyle(.plain)
+                                .disabled(resumeModel.isLoading)
                                 Menu {
                                     Button("Delete", systemImage: "trash", role: .destructive) { resumeToDelete = resume }
                                 } label: {
                                     Image(systemName: "ellipsis").frame(width: 44, height: 44)
                                 }
                                 .accessibilityLabel("Options for \(resume.filename)")
+                                .disabled(resumeModel.isLoading)
                             }
                             .padding(16).careerCard()
                         }
@@ -99,14 +124,14 @@ struct ResumeListView: View {
             .frame(maxWidth: .infinity)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .refreshable { await model.loadResumes() }
+        .refreshable { await resumeModel.loadResumes() }
         .toolbar {
             ToolbarItem(placement: .topBarLeading) {
-                Button("Sign out") { Task { await model.signOut() } }.disabled(model.isLoading)
+                Button("Sign out") { Task { await model.signOut() } }.disabled(resumeModel.isLoading || model.isLoading)
             }
             ToolbarItem(placement: .topBarTrailing) {
                 Button { showImporter = true } label: { Image(systemName: "plus") }
-                    .disabled(model.isLoading)
+                    .disabled(resumeModel.isLoading)
                     .accessibilityLabel("Upload resume")
             }
         }
@@ -117,16 +142,18 @@ struct ResumeListView: View {
 #Preview("Resumes") {
     let model = AppViewModel()
     model.profile = Profile(email: "alex@example.com")
-    model.resumes = [Resume(id: UUID(), filename: "Software Engineer Resume.pdf", text: "Synthetic resume text.")]
+    let resumeModel = ResumeViewModel()
+    resumeModel.resumes = [Resume(id: UUID(), filename: "Software Engineer Resume.pdf", text: "Synthetic resume text.")]
     return ScreenPreview {
-        ResumeListView(model: model, showImporter: .constant(false), resumeToDelete: .constant(nil))
+        ResumeListView(model: model, resumeModel: resumeModel, showImporter: .constant(false), resumeToDelete: .constant(nil))
     }
 }
 
 #Preview("Empty resumes") {
     let model = AppViewModel()
     model.profile = Profile(email: "alex@example.com")
+    let resumeModel = ResumeViewModel()
     return ScreenPreview {
-        ResumeListView(model: model, showImporter: .constant(false), resumeToDelete: .constant(nil))
+        ResumeListView(model: model, resumeModel: resumeModel, showImporter: .constant(false), resumeToDelete: .constant(nil))
     }
 }
