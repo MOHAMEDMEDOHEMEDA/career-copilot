@@ -12,6 +12,10 @@ from career_copilot_backend.llm.alternatives import (
 from career_copilot_backend.llm.provider import LLMProvider
 from career_copilot_backend.models import Job, Resume
 from career_copilot_backend.services.analysis import analyze_resume
+from career_copilot_backend.services.chat_answers import (
+    process_chat_answer,
+    run_next_chat_answer,
+)
 from career_copilot_backend.services.job_match import match_job
 from career_copilot_backend.services.jobs import run_next_job
 
@@ -27,13 +31,17 @@ def process_analysis(
         if resume is None or resume.user_id != job.user_id:
             raise ValueError("Resume not found")
         text = resume.text
-        allow_fallbacks = bool((job.input_data or {}).get("allow_provider_fallbacks", False))
+        allow_fallbacks = bool(
+            (job.input_data or {}).get("allow_provider_fallbacks", False)
+        )
     if isinstance(provider, FallbackProvider):
         provider = provider.for_consent(allow_fallbacks)
     return asyncio.run(analyze_resume(provider, text)).model_dump()
 
 
-def process_job_match(sessions: sessionmaker[Session], provider: LLMProvider, job_id: UUID) -> dict:
+def process_job_match(
+    sessions: sessionmaker[Session], provider: LLMProvider, job_id: UUID
+) -> dict:
     with sessions() as session:
         job = session.get(Job, job_id)
         if job is None or not job.input_data:
@@ -58,10 +66,16 @@ def main() -> None:
                 "resume_analysis": lambda job_id: process_analysis(
                     SessionLocal, provider, job_id
                 ),
-                "job_match": lambda job_id: process_job_match(SessionLocal, provider, job_id),
+                "job_match": lambda job_id: process_job_match(
+                    SessionLocal, provider, job_id
+                ),
             },
         )
-        if not processed:
+        chat_processed = run_next_chat_answer(
+            SessionLocal,
+            lambda job_id: process_chat_answer(SessionLocal, provider, job_id),
+        )
+        if not processed and not chat_processed:
             time.sleep(2)
 
 

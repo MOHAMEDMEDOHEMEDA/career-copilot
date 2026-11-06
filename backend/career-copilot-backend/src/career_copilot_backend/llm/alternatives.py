@@ -10,6 +10,7 @@ from career_copilot_backend.llm.openrouter import OpenRouterProvider
 from career_copilot_backend.llm.provider import LLMProvider, ProviderError
 from career_copilot_backend.schemas.analysis import ResumeAnalysis
 from career_copilot_backend.schemas.job_match import JobMatch
+from career_copilot_backend.schemas.rag import ModelAnswer
 
 MAX_RESPONSE_BYTES = 512_000
 ATTEMPT_TIMEOUT_SECONDS = 45
@@ -135,6 +136,8 @@ class FallbackProvider:
                         ResumeAnalysis.model_validate_json(output)
                     elif output_schema.get("title") == "JobMatch":
                         JobMatch.model_validate_json(output)
+                    elif output_schema.get("title") == "ModelAnswer":
+                        ModelAnswer.model_validate_json(output)
                     else:
                         json.loads(output)
                 except (ValidationError, ValueError) as exc:

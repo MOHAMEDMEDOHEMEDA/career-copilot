@@ -4,6 +4,9 @@ struct ChatThreadView: View {
     @ObservedObject var model: ChatViewModel
     let conversation: ChatConversation
     @FocusState private var composerFocused: Bool
+    @State private var confirmAnswer = false
+    @State private var pendingQuestionID: UUID?
+    @State private var retrying = false
 
     var body: some View {
         ScrollViewReader { proxy in
@@ -14,7 +17,7 @@ struct ChatThreadView: View {
                             .frame(width: 40, height: 40).background(ChatStyle.surface, in: Circle())
                         VStack(alignment: .leading, spacing: 8) {
                             Text("Your career chat").font(.headline).foregroundStyle(.white)
-                            Text("Save your questions here. AI replies and cited sources are coming soon.").font(.subheadline).foregroundStyle(ChatStyle.muted)
+                            Text("Ask a career question. Answers use a small set of project-authored guidance and include sources when available.").font(.subheadline).foregroundStyle(ChatStyle.muted)
                         }
                         .padding(16).background(ChatStyle.surface, in: RoundedRectangle(cornerRadius: 20))
                     }
@@ -25,14 +28,45 @@ struct ChatThreadView: View {
                             Button("Refresh messages") { Task { await model.loadMessages(conversationID: conversation.id) } }.foregroundStyle(ChatStyle.cyan)
                         }.padding(14).background(ChatStyle.surface, in: RoundedRectangle(cornerRadius: 16))
                     }
+                    if model.isRequestingAnswer {
+                        ProgressView("Requesting an answer").tint(.white).foregroundStyle(ChatStyle.muted)
+                    } else if let job = model.answerJob, job.status == .queued || job.status == .running, !model.answerPollingPaused {
+                        ProgressView(job.status == .running ? "Preparing an answer" : "Waiting for an answer").tint(.white).foregroundStyle(ChatStyle.muted)
+                    }
+                    if let answerError = model.answerError {
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text(answerError).foregroundStyle(.white)
+                            if model.answerPollingPaused {
+                                Button("Check status") { model.checkAnswerStatus() }.foregroundStyle(ChatStyle.cyan)
+                            } else if model.answerJob?.status == .failed {
+                                Button("Retry answer") { retrying = true; confirmAnswer = true }.foregroundStyle(ChatStyle.cyan)
+                            }
+                        }.padding(14).background(ChatStyle.surface, in: RoundedRectangle(cornerRadius: 16))
+                    }
                     ForEach(model.messages) { message in
                         HStack(alignment: .bottom) {
                             if message.role == .user { Spacer(minLength: 40) }
-                            Text(message.content)
-                                .foregroundStyle(.white)
-                                .textSelection(.enabled)
-                                .padding(15)
-                                .background(message.role == .user ? Color(red: 0.04, green: 0.32, blue: 0.46) : ChatStyle.surface, in: RoundedRectangle(cornerRadius: 20))
+                            VStack(alignment: .leading, spacing: 10) {
+                                Text(message.content).foregroundStyle(.white).textSelection(.enabled)
+                                if let citations = message.citations, !citations.isEmpty {
+                                    Text("Sources").font(.caption.bold()).foregroundStyle(ChatStyle.muted)
+                                    ForEach(citations) { citation in
+                                        DisclosureGroup(citation.title) {
+                                            VStack(alignment: .leading, spacing: 6) {
+                                                Text(citation.origin).font(.caption).foregroundStyle(ChatStyle.muted)
+                                                Text(citation.excerpt).font(.footnote).foregroundStyle(.white).textSelection(.enabled)
+                                            }.padding(.top, 4)
+                                        }.font(.subheadline).foregroundStyle(.white).tint(ChatStyle.cyan)
+                                    }
+                                }
+                                if message.role == .user && !model.hasAnswer(for: message.id) {
+                                    Button("Get answer") { pendingQuestionID = message.id; retrying = false; confirmAnswer = true }
+                                        .font(.caption.weight(.semibold)).foregroundStyle(ChatStyle.cyan)
+                                        .disabled(model.isRequestingAnswer || model.answerJob?.status == .queued || model.answerJob?.status == .running)
+                                }
+                            }
+                            .padding(15)
+                            .background(message.role == .user ? Color(red: 0.04, green: 0.32, blue: 0.46) : ChatStyle.surface, in: RoundedRectangle(cornerRadius: 20))
                             if message.role == .assistant { Spacer(minLength: 40) }
                         }.id(message.id)
                     }
@@ -56,7 +90,26 @@ struct ChatThreadView: View {
         .toolbarColorScheme(.dark, for: .navigationBar)
         .tint(ChatStyle.cyan)
         .task { await model.open(conversation) }
+        .task(id: model.answerPollingToken) { await model.pollAnswer(conversationID: conversation.id) }
         .onDisappear { model.close(conversationID: conversation.id) }
+        .confirmationDialog("Send this question for an answer?", isPresented: $confirmAnswer, titleVisibility: .visible) {
+            Button("Send for an answer") {
+                let questionID = pendingQuestionID
+                let shouldRetry = retrying
+                pendingQuestionID = nil
+                retrying = false
+                Task {
+                    if shouldRetry { await model.retryAnswer(conversationID: conversation.id) }
+                    else if let questionID { await model.requestAnswer(conversationID: conversation.id, questionID: questionID) }
+                    else if let message = await model.send(conversationID: conversation.id) {
+                        await model.requestAnswer(conversationID: conversation.id, questionID: message.id)
+                    }
+                }
+            }
+            Button("Cancel", role: .cancel) { pendingQuestionID = nil; retrying = false }
+        } message: {
+            Text("Your question and retrieved guidance may be sent to OpenRouter and Google Gemini, or processed by local Ollama. Google’s free tier may use content to improve its products. Use synthetic data until privacy is reviewed.")
+        }
     }
 
     private var composer: some View {
@@ -71,18 +124,20 @@ struct ChatThreadView: View {
                     .padding(14)
                     .background(ChatStyle.surface, in: RoundedRectangle(cornerRadius: 22))
                 Button {
-                    Task { await model.send(conversationID: conversation.id) }
+                    pendingQuestionID = nil
+                    retrying = false
+                    confirmAnswer = true
                 } label: {
                     if model.isSending { ProgressView().tint(.black).frame(width: 48, height: 48) }
                     else { Image(systemName: "arrow.up").font(.headline).frame(width: 48, height: 48) }
                 }
-                .accessibilityLabel("Save message")
+                .accessibilityLabel("Send question")
                 .foregroundStyle(.black)
                 .background(ChatStyle.cyan, in: Circle())
-                .disabled(model.isSending || model.isLoading || !model.hasLoadedMessages || model.hasMoreMessages || model.needsRefreshBeforeSending || model.draft.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || model.draft.count > 4000)
+                .disabled(model.isSending || model.isLoading || model.isRequestingAnswer || model.answerJob?.status == .queued || model.answerJob?.status == .running || !model.hasLoadedMessages || model.hasMoreMessages || model.needsRefreshBeforeSending || model.draft.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || model.draft.count > 4000)
                 .opacity(model.isSending || model.isLoading ? 0.6 : 1)
             }
-            Text("Messages are saved. AI replies are coming soon. \(model.draft.count)/4000")
+            Text("Review AI answers and their sources. \(model.draft.count)/4000")
                 .font(.caption).foregroundStyle(ChatStyle.muted)
         }
         .frame(maxWidth: 700).frame(maxWidth: .infinity)

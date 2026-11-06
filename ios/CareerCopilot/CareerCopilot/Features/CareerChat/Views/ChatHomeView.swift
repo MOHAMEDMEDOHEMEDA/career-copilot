@@ -26,7 +26,7 @@ struct ChatHomeView: View {
                     Image(systemName: "sparkles.rectangle.stack.fill")
                         .font(.title2).foregroundStyle(ChatStyle.cyan)
                     Text("Your space to think ahead").font(.title3.bold()).foregroundStyle(.white)
-                    Text("Save questions about your career. AI answers and sources are coming soon.").font(.subheadline).foregroundStyle(ChatStyle.muted)
+                    Text("Ask career questions and explore answers with sources.").font(.subheadline).foregroundStyle(ChatStyle.muted)
                     Button { newTitle = ""; showNewChat = true } label: {
                         Label("Start a chat", systemImage: "plus").fontWeight(.semibold).frame(maxWidth: .infinity).padding(14)
                     }
@@ -112,4 +112,7 @@ struct ChatPreviewService: ChatServicing {
     func deleteConversation(id: UUID) async throws {}
     func chatMessages(conversationID: UUID, offset: Int) async throws -> ChatPage<ChatMessage> { ChatPage(items: [], limit: 100, offset: offset) }
     func saveChatMessage(conversationID: UUID, content: String) async throws -> ChatMessage { ChatMessage(id: UUID(), conversationID: conversationID, sequence: 1, role: .user, content: content, createdAt: "") }
+    func requestChatAnswer(conversationID: UUID, questionID: UUID) async throws -> ChatAnswerJob { throw CancellationError() }
+    func chatAnswerJob(conversationID: UUID, jobID: UUID) async throws -> ChatAnswerJob { throw CancellationError() }
+    func retryChatAnswer(conversationID: UUID, jobID: UUID) async throws -> ChatAnswerJob { throw CancellationError() }
 }

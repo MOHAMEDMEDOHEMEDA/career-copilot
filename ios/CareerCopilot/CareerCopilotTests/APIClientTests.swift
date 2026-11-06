@@ -519,6 +519,20 @@ private actor FakeMatchService: JobMatchServicing {
 
 @MainActor
 final class ChatViewModelTests: XCTestCase {
+    func testAnswerJobLoadsCitedAssistantReply() async {
+        let conversation = ChatConversation(id: UUID(), title: "Synthetic", createdAt: "", updatedAt: "")
+        let service = FakeChatService(conversation: conversation)
+        let model = ChatViewModel(clientFactory: { _ in service })
+        await model.open(conversation)
+        model.draft = "Synthetic question"
+        guard let question = await model.send(conversationID: conversation.id) else { return XCTFail("Expected question") }
+        await model.requestAnswer(conversationID: conversation.id, questionID: question.id)
+        await model.pollAnswer(conversationID: conversation.id)
+        XCTAssertEqual(model.answerJob?.status, .completed)
+        XCTAssertTrue(model.hasAnswer(for: question.id))
+        XCTAssertEqual(model.messages.last?.citations?.first?.title, "Synthetic source")
+    }
+
     func testDraftSurvivesLeavingAndReturningToConversation() async {
         let conversation = ChatConversation(id: UUID(), title: "Synthetic", createdAt: "", updatedAt: "")
         let service = FakeChatService(conversation: conversation)
@@ -573,6 +587,8 @@ private actor FakeChatService: ChatServicing {
     private var messages: [ChatMessage] = []
     private var failSend = false
     private(set) var sendAttempts = 0
+    private let answerJobID = UUID()
+    private var answerQuestionID: UUID?
     init(conversation: ChatConversation) { self.conversation = conversation }
     func setFailSend(_ value: Bool) { failSend = value }
     func conversations(offset: Int) async throws -> ChatPage<ChatConversation> { ChatPage(items: [conversation], limit: 20, offset: offset) }
@@ -586,4 +602,18 @@ private actor FakeChatService: ChatServicing {
         messages.append(message)
         return message
     }
+    func requestChatAnswer(conversationID: UUID, questionID: UUID) async throws -> ChatAnswerJob {
+        answerQuestionID = questionID
+        return ChatAnswerJob(id: answerJobID, conversationID: conversationID, questionID: questionID, status: .queued, answerMessageID: nil, errorCode: nil)
+    }
+    func chatAnswerJob(conversationID: UUID, jobID: UUID) async throws -> ChatAnswerJob {
+        guard let questionID = answerQuestionID else { throw URLError(.badServerResponse) }
+        let citation = ChatCitation(chunkID: "source:0", sourceID: "source", title: "Synthetic source", origin: "Test", excerpt: "Synthetic evidence")
+        var message = ChatMessage(id: UUID(), conversationID: conversationID, sequence: messages.count + 1, role: .assistant, content: "Synthetic answer", createdAt: "")
+        message.replyToID = questionID
+        message.citations = [citation]
+        messages.append(message)
+        return ChatAnswerJob(id: jobID, conversationID: conversationID, questionID: questionID, status: .completed, answerMessageID: message.id, errorCode: nil)
+    }
+    func retryChatAnswer(conversationID: UUID, jobID: UUID) async throws -> ChatAnswerJob { throw URLError(.unsupportedURL) }
 }

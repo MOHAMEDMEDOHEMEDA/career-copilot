@@ -152,6 +152,21 @@ struct APIClient {
         return try await authenticated(path: "api/v1/chat/conversations/\(conversationID.uuidString)/messages", method: "POST", body: body, contentType: "application/json")
     }
 
+    func requestChatAnswer(conversationID: UUID, questionID: UUID) async throws -> ChatAnswerJob {
+        struct Body: Encodable { let message_id: String; let allow_provider_fallbacks = true }
+        let body = try JSONEncoder().encode(Body(message_id: questionID.uuidString))
+        return try await authenticated(path: "api/v1/chat/conversations/\(conversationID.uuidString)/answers", method: "POST", body: body, contentType: "application/json")
+    }
+
+    func chatAnswerJob(conversationID: UUID, jobID: UUID) async throws -> ChatAnswerJob {
+        try await authenticated(path: "api/v1/chat/conversations/\(conversationID.uuidString)/answers/\(jobID.uuidString)")
+    }
+
+    func retryChatAnswer(conversationID: UUID, jobID: UUID) async throws -> ChatAnswerJob {
+        let body = Data("{\"allow_provider_fallbacks\":true}".utf8)
+        return try await authenticated(path: "api/v1/chat/conversations/\(conversationID.uuidString)/answers/\(jobID.uuidString)/retry", method: "POST", body: body, contentType: "application/json")
+    }
+
     func logout() async throws {
         try await sessions.signOut(baseURL: baseURL) { refreshToken in
             var request = URLRequest(url: endpoint("api/v1/auth/logout"))

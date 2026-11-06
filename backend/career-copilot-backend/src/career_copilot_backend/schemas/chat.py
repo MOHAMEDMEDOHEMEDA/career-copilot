@@ -4,6 +4,8 @@ from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
+from career_copilot_backend.schemas.rag import Citation
+
 
 class ConversationCreate(BaseModel):
     model_config = ConfigDict(extra="forbid")
@@ -45,7 +47,31 @@ class MessageResponse(BaseModel):
     sequence: int
     role: Literal["user", "assistant"]
     content: str
+    citations: list[Citation] = Field(default_factory=list)
+    insufficient_information: bool | None = None
+    reply_to_id: UUID | None = None
     created_at: datetime
+
+
+class AnswerRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    message_id: UUID
+    allow_provider_fallbacks: bool = False
+
+
+class AnswerRetry(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    allow_provider_fallbacks: bool = False
+
+
+class AnswerJobResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    id: UUID
+    conversation_id: UUID
+    question_id: UUID
+    status: Literal["queued", "running", "completed", "failed"]
+    answer_message_id: UUID | None = None
+    error_code: str | None = None
 
 
 class ConversationPage(BaseModel):

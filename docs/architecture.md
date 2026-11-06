@@ -38,4 +38,14 @@ At the user's request, provider failures trigger at most one attempt each in ord
 
 ## Chat foundation
 
-Conversations belong to one user and store a title and ordered messages. Access requires authentication and an ownership check. Message sequence numbers are assigned while locking the conversation row; lists are paginated. Deleting a conversation deletes its messages, and database foreign keys cascade when a user is deleted. Message content and titles are stored until deletion and must not be logged. Only user-authored messages can be created by the API at this stage; retrieval, citations, and AI replies are not implemented.
+Conversations belong to one user and store a title and ordered messages. Access requires authentication and an ownership check. Message sequence numbers are assigned while locking the conversation row; lists are paginated. Deleting a conversation deletes its messages, and database foreign keys cascade when a user is deleted. Message content and titles are stored until deletion and must not be logged. Users can submit their own messages; assistant messages are created by answer jobs.
+
+## Knowledge base foundation
+
+The local corpus is stored in `career_copilot_backend/knowledge/corpus.json`. Sources are labeled as project-authored guidance, but their provenance and accuracy have not been independently reviewed. Each source has a stable identifier, title, origin, and text. Paragraphs form deterministic, source-labelled chunks with size limits; malformed or duplicate source identifiers are rejected. Local Ollama `nomic-embed-text:latest` produces 768-dimensional vectors from the source title and text, stored in pgvector. Indexing computes embeddings in batches before replacing the prior corpus in one transaction. Retrieval uses cosine distance and a conservative threshold that requires evaluation; the corpus must be reindexed if the embedding model changes.
+
+On the expanded 87-chunk corpus, `scripts/eval_retrieval.py` returned the expected top source or no result for all 6 synthetic questions. This tiny smoke evaluation is not a quality guarantee; retrieval and answer grounding need further evaluation.
+
+## Cited chat answers
+
+An authenticated user can queue one answer job per saved question after the client discloses possible provider use. Repeated queue requests return the same job; failed jobs require an explicit retry. The worker leases jobs without automatically requeueing them, embeds the question locally, and retrieves bounded source chunks. With no matching source it stores an insufficient-information reply without calling an LLM. Otherwise the LLM receives the question and chunks as untrusted data; the backend validates its output and resolves allowed citation IDs to stored source snapshots before writing the assistant message. Ownership is checked for job creation, polling, and retry. Provider fallback is available only when the request explicitly consents. Citation-ID validation does not prove that every generated statement is supported.

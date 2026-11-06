@@ -9,6 +9,7 @@ services:
       OPENROUTER_API_KEY: ${OPENROUTER_API_KEY:-}
       GEMINI_API_KEY: ${GEMINI_API_KEY:-}
       OLLAMA_ENABLED: ${OLLAMA_ENABLED:-true}
+      OLLAMA_BASE_URL: http://host.docker.internal:11434
       GOOGLE_SERVER_CLIENT_ID: ${GOOGLE_SERVER_CLIENT_ID:-${GOOGLE_CLIENT_ID:-}}
     depends_on:
       db:

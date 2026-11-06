@@ -10,7 +10,7 @@ The resume details screen offers analysis after an explicit confirmation. The ba
 
 This is an early foundation, not a production release. Hosted deployment, full accessibility and offline handling, broader automated iOS tests, device verification, privacy disclosures, and AI chat answers still need work.
 
-The signed-in app has Workspace, Chat, and Settings tabs. In Chat, users can create and delete conversations and save their own messages. The screen does not yet generate AI replies; knowledge retrieval and cited answers remain to be implemented. Conversations and messages are stored on the backend until deleted. Unsent drafts are kept in memory while signed in.
+The signed-in app has Workspace, Chat, and Settings tabs. In Chat, users can create and delete conversations, ask questions, and view answers with source excerpts. The initial knowledge base is a small set of project-authored example guidance; the AI can make mistakes and retrieval has known limitations. Questions and retrieved guidance may be sent to OpenRouter and Google Gemini after confirmation, with local Ollama available as a fallback. Use synthetic data until privacy and retention have been reviewed. Conversations and messages are stored on the backend until deleted. Unsent drafts are kept in memory while signed in.
 
 The resume details screen also offers job matching. Paste a synthetic job description and confirm before processing both inputs with the configured providers. Skill evidence is checked against the resume, but all AI output needs review. The temporary job description is deleted from the job when processing completes or its lease expires. Matching results are held in the app session; restoring matching history after relaunch is not implemented.
 

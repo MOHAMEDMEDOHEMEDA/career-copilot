@@ -46,4 +46,16 @@ All routes require bearer authentication. Conversations and their messages are p
 | `POST /api/v1/chat/conversations/{id}/messages` | `content` (1–4000 characters) | `201` saved user message |
 | `GET /api/v1/chat/conversations/{id}/messages` | `limit`, `offset` | `200` paginated messages in conversation order |
 
-Conversations expose `id`, `title`, `created_at`, and `updated_at`. Messages expose `id`, `conversation_id`, `sequence`, `role`, `content`, and `created_at`. Message content is untrusted, stored until the conversation is deleted, and excluded from application logs. Future AI answers will require a separate contract, explicit provider disclosure, and source citations.
+Conversations expose `id`, `title`, `created_at`, and `updated_at`. Messages expose `id`, `conversation_id`, `sequence`, `role`, `content`, and `created_at`. Message content is untrusted, stored until the conversation is deleted, and excluded from application logs. Assistant answers use the separate job contract below, including provider disclosure and source citations.
+
+### Planned RAG answer contract
+
+The initial knowledge base contains project-authored career guidance, split into stable source-labelled chunks. The answer-generation service returns an `answer`, an `insufficient_information` flag, and `citations` containing stored chunk IDs, source titles, origin, and excerpts. It rejects citations that were not retrieved. If retrieval finds no relevant chunks, it returns a fixed insufficient-information answer without calling a model. Chat questions and retrieved text are untrusted. This corpus is illustrative career guidance, not a comprehensive or independently verified authority.
+
+| Method and path | Request | Successful response |
+| --- | --- | --- |
+| `POST /api/v1/chat/conversations/{id}/answers` | `message_id`, `allow_provider_fallbacks` (default false) | `202` answer job; repeated requests for the same question return the existing job |
+| `GET /api/v1/chat/conversations/{id}/answers/{job_id}` | owned conversation and job | `200` job status and optional assistant message ID |
+| `POST /api/v1/chat/conversations/{id}/answers/{job_id}/retry` | explicit retry and fallback consent | `202` requeued failed job; active or completed jobs return `409` |
+
+Jobs report `queued`, `running`, `completed`, or `failed`, with a safe error code and optional `answer_message_id`. Jobs are processed by the separately running worker and never automatically requeued. Assistant messages include a snapshot of `citations` (chunk ID, source ID, title, origin, and excerpt) and an `insufficient_information` flag. A question may have at most one assistant answer. All operations require ownership; only the updated app's explicit confirmation opts a job into cloud fallback.

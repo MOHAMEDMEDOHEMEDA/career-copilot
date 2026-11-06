@@ -7,6 +7,9 @@ protocol ChatServicing {
     func deleteConversation(id: UUID) async throws
     func chatMessages(conversationID: UUID, offset: Int) async throws -> ChatPage<ChatMessage>
     func saveChatMessage(conversationID: UUID, content: String) async throws -> ChatMessage
+    func requestChatAnswer(conversationID: UUID, questionID: UUID) async throws -> ChatAnswerJob
+    func chatAnswerJob(conversationID: UUID, jobID: UUID) async throws -> ChatAnswerJob
+    func retryChatAnswer(conversationID: UUID, jobID: UUID) async throws -> ChatAnswerJob
 }
 extension APIClient: ChatServicing {}
 
@@ -22,6 +25,11 @@ final class ChatViewModel: ObservableObject {
     @Published private(set) var hasLoadedMessages = false
     @Published var error: String?
     @Published var draft = ""
+    @Published private(set) var answerJob: ChatAnswerJob?
+    @Published private(set) var answerError: String?
+    @Published private(set) var isRequestingAnswer = false
+    @Published private(set) var answerPollingToken: UUID?
+    @Published private(set) var answerPollingPaused = false
     var baseURL: String
     private let clientFactory: (String) throws -> any ChatServicing
     private var generation = UUID()
@@ -47,6 +55,7 @@ final class ChatViewModel: ObservableObject {
         hasMoreMessages = false
         needsRefreshBeforeSending = false
         hasLoadedMessages = false
+        clearAnswerState()
     }
 
     func loadConversations(reset: Bool = true) async {
@@ -102,6 +111,7 @@ final class ChatViewModel: ObservableObject {
         hasMoreMessages = false
         needsRefreshBeforeSending = false
         hasLoadedMessages = false
+        clearAnswerState()
         await loadMessages(conversationID: conversation.id)
     }
 
@@ -118,6 +128,7 @@ final class ChatViewModel: ObservableObject {
         hasMoreMessages = false
         needsRefreshBeforeSending = false
         hasLoadedMessages = false
+        clearAnswerState()
     }
 
     func loadMessages(conversationID: UUID, reset: Bool = true) async {
@@ -137,24 +148,116 @@ final class ChatViewModel: ObservableObject {
         } catch { if operation == generation && activeConversationID == conversationID && !Task.isCancelled { self.error = error.localizedDescription } }
     }
 
-    func send(conversationID: UUID) async {
+    @discardableResult
+    func send(conversationID: UUID) async -> ChatMessage? {
         let content = draft.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !content.isEmpty, content.count <= 4000, !isSending, !isLoading, !hasMoreMessages, hasLoadedMessages, !needsRefreshBeforeSending, activeConversationID == conversationID else { return }
+        guard !content.isEmpty, content.count <= 4000, !isSending, !isLoading, !hasMoreMessages, hasLoadedMessages, !needsRefreshBeforeSending, activeConversationID == conversationID else { return nil }
         let operation = generation
         isSending = true
         defer { if operation == generation { isSending = false } }
         do {
             let message = try await clientFactory(baseURL).saveChatMessage(conversationID: conversationID, content: content)
-            guard operation == generation, activeConversationID == conversationID, !Task.isCancelled else { return }
+            guard operation == generation, activeConversationID == conversationID, !Task.isCancelled else { return nil }
             guard message.conversationID == conversationID, message.role == .user else { throw URLError(.badServerResponse) }
             messages.append(message)
             if draft.trimmingCharacters(in: .whitespacesAndNewlines) == content { draft = "" }
             error = nil
+            return message
         } catch {
             if operation == generation && activeConversationID == conversationID && !Task.isCancelled {
                 needsRefreshBeforeSending = true
                 self.error = "Couldn’t save the message: \(error.localizedDescription). It may have been saved; refresh before sending again."
             }
+            return nil
         }
+    }
+
+    func hasAnswer(for questionID: UUID) -> Bool {
+        messages.contains { $0.replyToID == questionID && $0.role == .assistant }
+    }
+
+    func requestAnswer(conversationID: UUID, questionID: UUID) async {
+        guard !isRequestingAnswer, activeConversationID == conversationID else { return }
+        let operation = generation
+        isRequestingAnswer = true
+        answerError = nil
+        defer { if operation == generation { isRequestingAnswer = false } }
+        do {
+            let job = try await clientFactory(baseURL).requestChatAnswer(conversationID: conversationID, questionID: questionID)
+            guard operation == generation, activeConversationID == conversationID, !Task.isCancelled else { return }
+            guard job.conversationID == conversationID, job.questionID == questionID else { throw URLError(.badServerResponse) }
+            await applyAnswerJob(job)
+        } catch {
+            if operation == generation && !Task.isCancelled { answerError = "Couldn’t request an answer: \(error.localizedDescription). You can ask again to check the existing job." }
+        }
+    }
+
+    func retryAnswer(conversationID: UUID) async {
+        guard let current = answerJob, current.status == .failed, !isRequestingAnswer, activeConversationID == conversationID else { return }
+        let operation = generation
+        isRequestingAnswer = true
+        answerError = nil
+        defer { if operation == generation { isRequestingAnswer = false } }
+        do {
+            let job = try await clientFactory(baseURL).retryChatAnswer(conversationID: conversationID, jobID: current.id)
+            guard operation == generation, activeConversationID == conversationID, !Task.isCancelled else { return }
+            guard job.id == current.id, job.conversationID == conversationID, job.questionID == current.questionID else { throw URLError(.badServerResponse) }
+            await applyAnswerJob(job)
+        } catch { if operation == generation && !Task.isCancelled { answerError = error.localizedDescription } }
+    }
+
+    func checkAnswerStatus() {
+        guard let answerJob, answerJob.status == .queued || answerJob.status == .running else { return }
+        answerPollingPaused = false
+        answerError = nil
+        answerPollingToken = UUID()
+    }
+
+    func pollAnswer(conversationID: UUID) async {
+        guard let current = answerJob, current.conversationID == conversationID, current.status == .queued || current.status == .running else { return }
+        let operation = generation
+        do {
+            for _ in 0..<90 {
+                try Task.checkCancellation()
+                let job = try await clientFactory(baseURL).chatAnswerJob(conversationID: conversationID, jobID: current.id)
+                guard operation == generation, activeConversationID == conversationID, !Task.isCancelled else { return }
+                guard job.id == current.id, job.conversationID == conversationID, job.questionID == current.questionID else { throw URLError(.badServerResponse) }
+                await applyAnswerJob(job, startPolling: false)
+                if job.status == .completed || job.status == .failed { return }
+                try await Task.sleep(nanoseconds: 2_000_000_000)
+            }
+            if operation == generation && !Task.isCancelled { answerPollingPaused = true; answerError = "The answer is taking longer than expected." }
+        } catch is CancellationError {
+            return
+        } catch {
+            if operation == generation && !Task.isCancelled { answerPollingPaused = true; answerError = "Couldn’t check answer status: \(error.localizedDescription)" }
+        }
+    }
+
+    private func applyAnswerJob(_ job: ChatAnswerJob, startPolling: Bool = true) async {
+        answerJob = job
+        answerPollingPaused = false
+        switch job.status {
+        case .queued, .running:
+            if startPolling { answerPollingToken = UUID() }
+        case .completed:
+            answerError = nil
+            await loadMessages(conversationID: job.conversationID)
+        case .failed:
+            switch job.errorCode {
+            case "rate_limited": answerError = "The AI provider is rate-limited. You can retry later."
+            case "invalid_output": answerError = "The answer or its citations could not be verified."
+            case "timeout": answerError = "The answer timed out. You can retry."
+            default: answerError = "The answer couldn’t be completed. You can retry."
+            }
+        }
+    }
+
+    private func clearAnswerState() {
+        answerJob = nil
+        answerError = nil
+        isRequestingAnswer = false
+        answerPollingToken = nil
+        answerPollingPaused = false
     }
 }

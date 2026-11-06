@@ -19,6 +19,7 @@ dependencies = [
     "pypdf>=5.0.0",
     "requests>=2.32.0",
     "sqlalchemy>=2.0.0",
+    "pgvector>=0.5.1",
 ]
 
 [dependency-groups]
