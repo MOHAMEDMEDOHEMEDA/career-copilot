@@ -32,3 +32,18 @@ Proposed field schemas and response codes are in `docs/openapi-draft.yaml`. The 
 Job matching: `POST /api/v1/job-matches` takes `resume_id` and `job_description`, returning a job with HTTP 202. Poll `GET /api/v1/jobs/{id}` for a typed result. Only the resume owner can submit or retrieve the job. A result includes `required_skills_found` (skill and exact `resume_evidence`), `required_skills_not_demonstrated`, `experience_alignment`, `recommendations`, and `interview_topics`. Provider failures are represented by safe error codes. See the running API's OpenAPI document for the complete schema.
 
 Analysis and matching requests accept `allow_provider_fallbacks` (default `false`). Set it to `true` only after informing the user that configured fallback providers may receive the input. Legacy requests use OpenRouter alone.
+
+## Career chat foundation
+
+All routes require bearer authentication. Conversations and their messages are private to their owner; inaccessible conversation IDs return `404`. Lists use `limit` (1–100, default 20) and `offset` (default 0). These endpoints store user-written messages only; they do not yet generate AI replies.
+
+| Method and path | Request | Successful response |
+| --- | --- | --- |
+| `POST /api/v1/chat/conversations` | optional `title` (1–100 characters) | `201` conversation |
+| `GET /api/v1/chat/conversations` | `limit`, `offset` | `200` paginated conversations |
+| `GET /api/v1/chat/conversations/{id}` | conversation ID | `200` conversation |
+| `DELETE /api/v1/chat/conversations/{id}` | conversation ID | `204`; deletes its messages |
+| `POST /api/v1/chat/conversations/{id}/messages` | `content` (1–4000 characters) | `201` saved user message |
+| `GET /api/v1/chat/conversations/{id}/messages` | `limit`, `offset` | `200` paginated messages in conversation order |
+
+Conversations expose `id`, `title`, `created_at`, and `updated_at`. Messages expose `id`, `conversation_id`, `sequence`, `role`, `content`, and `created_at`. Message content is untrusted, stored until the conversation is deleted, and excluded from application logs. Future AI answers will require a separate contract, explicit provider disclosure, and source citations.

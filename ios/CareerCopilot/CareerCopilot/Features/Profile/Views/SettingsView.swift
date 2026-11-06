@@ -2,6 +2,7 @@ import SwiftUI
 
 struct SettingsView: View {
     @ObservedObject var model: AppViewModel
+    var showsDoneButton = true
 
     var body: some View {
         NavigationStack {
@@ -20,11 +21,15 @@ struct SettingsView: View {
                         Text(profile.email)
                         Button("Link Google account") { Task { await model.googleSignIn(link: true) } }
                             .disabled(model.isLoading)
+                        Button("Sign out", role: .destructive) { Task { await model.signOut() } }
+                            .disabled(model.isLoading)
                     }
                 }
             }
             .navigationTitle("Settings")
-            .toolbar { Button("Done") { dismiss() } }
+            .toolbar {
+                if showsDoneButton { Button("Done") { dismiss() } }
+            }
             .alert("Account linked", isPresented: Binding(
                 get: { model.notice != nil },
                 set: { if !$0 { model.notice = nil } }

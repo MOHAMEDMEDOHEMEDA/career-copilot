@@ -516,3 +516,74 @@ private actor FakeMatchService: JobMatchServicing {
     }
     func matchJob(id: UUID) async throws -> MatchJob { jobs.removeFirst() }
 }
+
+@MainActor
+final class ChatViewModelTests: XCTestCase {
+    func testDraftSurvivesLeavingAndReturningToConversation() async {
+        let conversation = ChatConversation(id: UUID(), title: "Synthetic", createdAt: "", updatedAt: "")
+        let service = FakeChatService(conversation: conversation)
+        let model = ChatViewModel(clientFactory: { _ in service })
+        await model.open(conversation)
+        model.draft = "Unfinished synthetic question"
+        model.close(conversationID: conversation.id)
+        await model.open(conversation)
+        XCTAssertEqual(model.draft, "Unfinished synthetic question")
+        model.reset()
+        await model.open(conversation)
+        XCTAssertEqual(model.draft, "")
+    }
+
+    func testSavesMessageAndClearsPrivateStateOnReset() async {
+        let conversation = ChatConversation(id: UUID(), title: "Synthetic", createdAt: "", updatedAt: "")
+        let service = FakeChatService(conversation: conversation)
+        let model = ChatViewModel(clientFactory: { _ in service })
+        await model.open(conversation)
+        model.draft = "Synthetic question"
+        await model.send(conversationID: conversation.id)
+        XCTAssertEqual(model.messages.first?.content, "Synthetic question")
+        XCTAssertEqual(model.draft, "")
+        model.reset()
+        XCTAssertTrue(model.messages.isEmpty)
+        XCTAssertTrue(model.conversations.isEmpty)
+        XCTAssertFalse(model.hasLoadedMessages)
+    }
+
+    func testUncertainSendRequiresRefreshBeforeAnotherSubmission() async {
+        let conversation = ChatConversation(id: UUID(), title: "Synthetic", createdAt: "", updatedAt: "")
+        let service = FakeChatService(conversation: conversation)
+        let model = ChatViewModel(clientFactory: { _ in service })
+        await model.open(conversation)
+        await service.setFailSend(true)
+        model.draft = "Synthetic question"
+        await model.send(conversationID: conversation.id)
+        XCTAssertTrue(model.needsRefreshBeforeSending)
+        await model.send(conversationID: conversation.id)
+        let attempts = await service.sendAttempts
+        XCTAssertEqual(attempts, 1)
+        await service.setFailSend(false)
+        await model.loadMessages(conversationID: conversation.id)
+        XCTAssertFalse(model.needsRefreshBeforeSending)
+        await model.send(conversationID: conversation.id)
+        XCTAssertEqual(model.messages.count, 1)
+    }
+}
+
+private actor FakeChatService: ChatServicing {
+    let conversation: ChatConversation
+    private var messages: [ChatMessage] = []
+    private var failSend = false
+    private(set) var sendAttempts = 0
+    init(conversation: ChatConversation) { self.conversation = conversation }
+    func setFailSend(_ value: Bool) { failSend = value }
+    func conversations(offset: Int) async throws -> ChatPage<ChatConversation> { ChatPage(items: [conversation], limit: 20, offset: offset) }
+    func createConversation(title: String) async throws -> ChatConversation { conversation }
+    func deleteConversation(id: UUID) async throws {}
+    func chatMessages(conversationID: UUID, offset: Int) async throws -> ChatPage<ChatMessage> { ChatPage(items: messages, limit: 100, offset: offset) }
+    func saveChatMessage(conversationID: UUID, content: String) async throws -> ChatMessage {
+        sendAttempts += 1
+        if failSend { throw URLError(.notConnectedToInternet) }
+        let message = ChatMessage(id: UUID(), conversationID: conversationID, sequence: messages.count + 1, role: .user, content: content, createdAt: "")
+        messages.append(message)
+        return message
+    }
+}

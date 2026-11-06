@@ -129,6 +129,29 @@ struct APIClient {
         try await authenticated(path: "api/v1/jobs/\(id.uuidString)")
     }
 
+    func conversations(offset: Int) async throws -> ChatPage<ChatConversation> {
+        try await authenticated(path: "api/v1/chat/conversations?limit=20&offset=\(offset)")
+    }
+
+    func createConversation(title: String) async throws -> ChatConversation {
+        let body = try JSONEncoder().encode(["title": title])
+        return try await authenticated(path: "api/v1/chat/conversations", method: "POST", body: body, contentType: "application/json")
+    }
+
+    func deleteConversation(id: UUID) async throws {
+        let (data, response) = try await authorizedRequest(path: "api/v1/chat/conversations/\(id.uuidString)", method: "DELETE")
+        try validate(response, data: data)
+    }
+
+    func chatMessages(conversationID: UUID, offset: Int) async throws -> ChatPage<ChatMessage> {
+        try await authenticated(path: "api/v1/chat/conversations/\(conversationID.uuidString)/messages?limit=100&offset=\(offset)")
+    }
+
+    func saveChatMessage(conversationID: UUID, content: String) async throws -> ChatMessage {
+        let body = try JSONEncoder().encode(["content": content])
+        return try await authenticated(path: "api/v1/chat/conversations/\(conversationID.uuidString)/messages", method: "POST", body: body, contentType: "application/json")
+    }
+
     func logout() async throws {
         try await sessions.signOut(baseURL: baseURL) { refreshToken in
             var request = URLRequest(url: endpoint("api/v1/auth/logout"))

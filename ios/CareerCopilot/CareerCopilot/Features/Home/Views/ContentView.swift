@@ -4,29 +4,53 @@ import UniformTypeIdentifiers
 struct ContentView: View {
     @StateObject private var model = AppViewModel()
     @StateObject private var resumeModel = ResumeViewModel()
+    @StateObject private var chatModel = ChatViewModel()
     @State private var showImporter = false
     @State private var showSettings = false
     @State private var resumeToDelete: Resume?
+    @State private var selectedTab: AppTab = .workspace
+
+    private enum AppTab: Hashable {
+        case workspace, chat, settings
+    }
 
     var body: some View {
-        NavigationStack {
-            Group {
-                if model.profile == nil {
+        Group {
+            if model.profile == nil {
+                NavigationStack {
                     AuthenticationView(model: model)
-                } else {
-                    ResumeListView(model: model, resumeModel: resumeModel, showImporter: $showImporter, resumeToDelete: $resumeToDelete)
+                        .toolbar {
+                            ToolbarItem(placement: .topBarTrailing) {
+                                Button { showSettings = true } label: { Image(systemName: "gearshape") }
+                                    .accessibilityLabel("Settings")
+                            }
+                        }
+                }
+            } else {
+                TabView(selection: $selectedTab) {
+                    NavigationStack {
+                        ResumeListView(model: model, resumeModel: resumeModel, showImporter: $showImporter, resumeToDelete: $resumeToDelete)
+                            .navigationTitle("Workspace")
+                            .navigationBarTitleDisplayMode(.inline)
+                    }
+                    .tabItem { Label("Workspace", systemImage: "house") }
+                    .tag(AppTab.workspace)
+
+                    NavigationStack {
+                        ChatHomeView(model: chatModel)
+                    }
+                    .tabItem { Label("Chat", systemImage: "bubble.left.and.bubble.right") }
+                    .tag(AppTab.chat)
+
+                    SettingsView(model: model, showsDoneButton: false)
+                        .tabItem { Label("Settings", systemImage: "gearshape") }
+                        .tag(AppTab.settings)
                 }
             }
+        }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(CareerStyle.canvas)
             .tint(CareerStyle.accent)
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button { showSettings = true } label: { Image(systemName: "gearshape") }
-                        .accessibilityLabel("Settings")
-                }
-            }
             .sheet(isPresented: $showSettings) { SettingsView(model: model) }
             .confirmationDialog("Delete this resume?", isPresented: Binding(
                 get: { resumeToDelete != nil },
@@ -56,11 +80,11 @@ struct ContentView: View {
             }
             .task { await model.restoreSession() }
             .task(id: model.profile?.email) {
-                guard model.profile != nil else { resumeModel.reset(); return }
+                guard model.profile != nil else { resumeModel.reset(); chatModel.reset(); selectedTab = .workspace; return }
                 resumeModel.baseURL = model.baseURL
+                chatModel.baseURL = model.baseURL
                 await resumeModel.loadResumes()
             }
-        }
     }
 }
 

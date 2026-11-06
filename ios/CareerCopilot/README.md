@@ -8,7 +8,9 @@ Google Sign-In needs an iOS OAuth client ID matching the app's bundle identifier
 
 The resume details screen offers analysis after an explicit confirmation. The backend queues a job, and the app checks its status for up to three minutes. If checking pauses, use **Check status**; leaving the screen does not cancel the server job. Previous jobs and results are available from the analysis screen after signing back in. Results reflect the resume when the job ran and are deleted with the resume. Analysis may send extracted resume text to OpenRouter and Google Gemini, or process it locally with Ollama: use synthetic resumes until privacy and retention are reviewed. Run the backend analysis worker alongside the API (for Docker, use `docker compose --profile analysis up --build`).
 
-This is an early foundation, not a production release. Hosted deployment, full accessibility and offline handling, broader automated iOS tests, device verification, privacy disclosures, and the chat screen still need work.
+This is an early foundation, not a production release. Hosted deployment, full accessibility and offline handling, broader automated iOS tests, device verification, privacy disclosures, and AI chat answers still need work.
+
+The signed-in app has Workspace, Chat, and Settings tabs. In Chat, users can create and delete conversations and save their own messages. The screen does not yet generate AI replies; knowledge retrieval and cited answers remain to be implemented. Conversations and messages are stored on the backend until deleted. Unsent drafts are kept in memory while signed in.
 
 The resume details screen also offers job matching. Paste a synthetic job description and confirm before processing both inputs with the configured providers. Skill evidence is checked against the resume, but all AI output needs review. The temporary job description is deleted from the job when processing completes or its lease expires. Matching results are held in the app session; restoring matching history after relaunch is not implemented.
 
