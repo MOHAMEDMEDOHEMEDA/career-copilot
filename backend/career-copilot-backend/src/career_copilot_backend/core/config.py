@@ -15,6 +15,10 @@ class Settings(BaseSettings):
     upload_limit_per_hour: int = 20
     analysis_limit_per_hour: int = 5
     openrouter_api_key: SecretStr = SecretStr("")
+    gemini_api_key: SecretStr = SecretStr("")
+    ollama_enabled: bool = True
+    ollama_base_url: str = "http://127.0.0.1:11434"
+    ollama_model: str = "llama3.2:latest"
     google_server_client_id: str = Field(
         default="",
         validation_alias=AliasChoices("GOOGLE_SERVER_CLIENT_ID", "GOOGLE_CLIENT_ID"),

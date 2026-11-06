@@ -5,6 +5,7 @@ from test_analysis import FakeProvider, valid_output
 from test_pdf import make_pdf
 
 from career_copilot_backend.core.config import settings
+from career_copilot_backend.llm.openrouter import ProviderError
 from career_copilot_backend.services.analysis_jobs import process_analysis
 from career_copilot_backend.services.jobs import run_next_job
 
@@ -54,13 +55,31 @@ def test_analysis_job_flow_and_isolation(client, monkeypatch):
     completed = test_client.get(f"/api/v1/jobs/{job_id}", headers=headers[0]).json()
     assert completed["status"] == "completed"
     assert completed["result"]["summary"] == "Developer"
+    history = test_client.get(f"/api/v1/jobs?resume_id={resume['id']}", headers=headers[0])
+    assert history.status_code == 200
+    assert [item["id"] for item in history.json()["items"]] == [job_id]
+    assert test_client.get(f"/api/v1/jobs?resume_id={resume['id']}", headers=headers[1]).status_code == 404
     assert len(provider.calls) == 1
-    assert (
-        test_client.delete(
-            f"/api/v1/resumes/{resume['id']}", headers=headers[0]
-        ).status_code
-        == 204
-    )
+    assert test_client.delete(f"/api/v1/resumes/{resume['id']}", headers=headers[0]).status_code == 204
+
+
+def test_provider_rate_limit_is_sanitized_and_not_retried(client, monkeypatch):
+    test_client, engine = client
+    monkeypatch.setattr(settings, "openrouter_api_key", SecretStr("fake-key"))
+    credentials = {"email": "rate@example.com", "password": "secure-password"}
+    test_client.post("/api/v1/auth/register", json=credentials)
+    token = test_client.post("/api/v1/auth/login", json=credentials).json()["access_token"]
+    headers = {"Authorization": f"Bearer {token}"}
+    resume = test_client.post("/api/v1/resumes", headers=headers, files={"file": ("resume.pdf", make_pdf(True), "application/pdf")}).json()
+    job = test_client.post("/api/v1/resume-analysis", headers=headers, json={"resume_id": resume["id"]}).json()
+    sessions = sessionmaker(bind=engine, expire_on_commit=False)
+    def fail(_job_id):
+        raise ProviderError("sensitive provider response", code="rate_limited")
+    assert run_next_job(sessions, {"resume_analysis": fail})
+    assert not run_next_job(sessions, {"resume_analysis": fail})
+    result = test_client.get(f"/api/v1/jobs/{job['id']}", headers=headers).json()
+    assert result["error_code"] == "rate_limited"
+    assert "sensitive provider response" not in str(result)
 
 
 def test_malformed_analysis_marks_job_failed_without_result(client, monkeypatch):

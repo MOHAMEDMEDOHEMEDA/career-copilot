@@ -3,14 +3,11 @@ import json
 import httpx
 
 from career_copilot_backend.core.config import settings
+from career_copilot_backend.llm.provider import ProviderError
 
 OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
 FREE_MODEL = "openrouter/free"
 MAX_RESPONSE_BYTES = 512_000
-
-
-class ProviderError(Exception):
-    pass
 
 
 def configured_openrouter() -> "OpenRouterProvider":
@@ -73,8 +70,14 @@ class OpenRouterProvider:
                 "POST", OPENROUTER_URL, json=payload, headers=headers
             ) as response:
                 if response.status_code != 200:
+                    code = "rate_limited" if response.status_code == 429 else "provider_error"
+                    if response.status_code in (401, 403):
+                        code = "provider_auth"
+                    elif response.status_code >= 500 or response.status_code == 404:
+                        code = "provider_unavailable"
                     raise ProviderError(
-                        f"OpenRouter request failed (HTTP {response.status_code})"
+                        f"OpenRouter request failed (HTTP {response.status_code})",
+                        code=code,
                     )
                 chunks = bytearray()
                 async for chunk in response.aiter_bytes():
@@ -85,11 +88,13 @@ class OpenRouterProvider:
                         )
             body = json.loads(chunks)
             if body["choices"][0].get("finish_reason") == "length":
-                raise ProviderError("OpenRouter exhausted the output token limit")
+                raise ProviderError("OpenRouter exhausted the output token limit", code="output_limit")
             content = body["choices"][0]["message"]["content"]
             if not isinstance(content, str):
                 raise ProviderError("OpenRouter returned an invalid response")
             return content
+        except httpx.TimeoutException as exc:
+            raise ProviderError("OpenRouter request timed out", code="timeout") from exc
         except (
             httpx.HTTPError,
             json.JSONDecodeError,

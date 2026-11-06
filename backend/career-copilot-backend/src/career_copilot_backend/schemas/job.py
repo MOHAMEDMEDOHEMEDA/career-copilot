@@ -5,6 +5,7 @@ from uuid import UUID
 from pydantic import BaseModel, ConfigDict
 
 from career_copilot_backend.schemas.analysis import ResumeAnalysis
+from career_copilot_backend.schemas.job_match import JobMatch
 
 
 class JobResponse(BaseModel):
@@ -16,4 +17,11 @@ class JobResponse(BaseModel):
     status: Literal["queued", "running", "completed", "failed"]
     created_at: datetime
     updated_at: datetime
-    result: ResumeAnalysis | None = None
+    result: ResumeAnalysis | JobMatch | None = None
+    error_code: str | None = None
+
+
+class JobPage(BaseModel):
+    items: list[JobResponse]
+    limit: int
+    offset: int

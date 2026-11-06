@@ -20,6 +20,8 @@ final class ResumeViewModel: ObservableObject {
     var baseURL: String
     private let clientFactory: (String) throws -> any ResumeServicing
     private var generation = UUID()
+    private var analysisModels: [UUID: AnalysisViewModel] = [:]
+    private var matchModels: [UUID: JobMatchViewModel] = [:]
 
     init(
         baseURL: String = UserDefaults.standard.string(forKey: "baseURL") ?? "http://localhost:8000",
@@ -69,6 +71,8 @@ final class ResumeViewModel: ObservableObject {
             try await clientFactory(baseURL).deleteResume(id: resume.id)
             guard isCurrent(operation) else { return }
             resumes.removeAll { $0.id == resume.id }
+            analysisModels[resume.id] = nil
+            matchModels[resume.id] = nil
         } catch {
             if isCurrent(operation) { message = error.localizedDescription }
         }
@@ -81,6 +85,8 @@ final class ResumeViewModel: ObservableObject {
             let updated = try await clientFactory(baseURL).updateResume(id: resume.id, text: text)
             guard isCurrent(operation) else { return false }
             if let index = resumes.firstIndex(where: { $0.id == resume.id }) { resumes[index] = updated }
+            analysisModels[resume.id] = nil
+            matchModels[resume.id] = nil
             return true
         } catch {
             if isCurrent(operation) { message = error.localizedDescription }
@@ -94,6 +100,24 @@ final class ResumeViewModel: ObservableObject {
         resumes = []
         message = nil
         loadError = nil
+        analysisModels.removeAll()
+        matchModels.removeAll()
+    }
+
+    func analysisModel(for resumeID: UUID) -> AnalysisViewModel? {
+        if let existing = analysisModels[resumeID] { return existing }
+        guard let client = try? APIClient.configured(baseURL: baseURL) else { return nil }
+        let model = AnalysisViewModel(resumeID: resumeID, service: client)
+        analysisModels[resumeID] = model
+        return model
+    }
+
+    func matchModel(for resumeID: UUID) -> JobMatchViewModel? {
+        if let existing = matchModels[resumeID] { return existing }
+        guard let client = try? APIClient.configured(baseURL: baseURL) else { return nil }
+        let model = JobMatchViewModel(resumeID: resumeID, service: client)
+        matchModels[resumeID] = model
+        return model
     }
 
     private func beginOperation() -> UUID? {

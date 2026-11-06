@@ -21,10 +21,33 @@ struct ResumeDetailView: View {
                     .disabled(model.isLoading)
             } else {
                 ScrollView {
-                    Text(draft)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .textSelection(.enabled)
-                        .padding()
+                    VStack(alignment: .leading, spacing: 20) {
+                        NavigationLink {
+                            if let analysisModel = model.analysisModel(for: resume.id) {
+                                AnalysisView(model: analysisModel)
+                            } else {
+                                ContentUnavailableView("Invalid backend URL", systemImage: "exclamationmark.triangle")
+                            }
+                        } label: {
+                            Label("Analyze resume", systemImage: "sparkles")
+                                .frame(maxWidth: .infinity)
+                        }
+                        .buttonStyle(.borderedProminent)
+                        NavigationLink {
+                            if let matchModel = model.matchModel(for: resume.id) {
+                                JobMatchView(model: matchModel)
+                            } else {
+                                ContentUnavailableView("Invalid backend URL", systemImage: "exclamationmark.triangle")
+                            }
+                        } label: {
+                            Label("Match a job", systemImage: "briefcase")
+                                .frame(maxWidth: .infinity)
+                        }.buttonStyle(.bordered)
+                        Text(draft)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .textSelection(.enabled)
+                    }
+                    .padding()
                 }
             }
         }

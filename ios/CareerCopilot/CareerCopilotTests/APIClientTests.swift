@@ -70,6 +70,38 @@ final class APIClientTests: XCTestCase {
         XCTAssertThrowsError(try APIClient.configured(baseURL: "http://example.com"))
         XCTAssertThrowsError(try APIClient.configured(baseURL: "https://user:password@example.com"))
     }
+
+    func testAnalysisAndMatchingRequestsIncludeFallbackConsent() async throws {
+        let baseURL = try XCTUnwrap(URL(string: "https://example.com"))
+        let coordinator = SessionCoordinator(store: MemorySessionStore())
+        try await coordinator.startSession(TokenPair(accessToken: "access", refreshToken: "refresh"), baseURL: baseURL)
+        let resumeID = UUID()
+        MockURLProtocol.handler = { request in
+            let body: Data
+            if let data = request.httpBody { body = data }
+            else {
+                let stream = try XCTUnwrap(request.httpBodyStream)
+                stream.open()
+                defer { stream.close() }
+                var bytes = [UInt8](repeating: 0, count: 1024), data = Data()
+                while stream.hasBytesAvailable {
+                    let count = stream.read(&bytes, maxLength: bytes.count)
+                    if count < 0 { throw stream.streamError ?? URLError(.cannotDecodeContentData) }
+                    if count == 0 { break }
+                    data.append(contentsOf: bytes.prefix(count))
+                }
+                body = data
+            }
+            let values = try XCTUnwrap(JSONSerialization.jsonObject(with: body) as? [String: Any])
+            XCTAssertEqual(values["allow_provider_fallbacks"] as? Bool, true)
+            XCTAssertEqual(values["resume_id"] as? String, resumeID.uuidString)
+            let json = "{\"id\":\"00000000-0000-0000-0000-000000000001\",\"resume_id\":\"\(resumeID.uuidString)\",\"status\":\"queued\",\"result\":null,\"error_code\":null}"
+            return (202, Data(json.utf8))
+        }
+        let client = APIClient(baseURL: baseURL, session: session, sessions: coordinator)
+        _ = try await client.startAnalysis(resumeID: resumeID)
+        _ = try await client.startMatch(resumeID: resumeID, description: "Synthetic role")
+    }
 }
 
 private final class MockURLProtocol: URLProtocol {
@@ -342,4 +374,145 @@ private actor RefreshGate {
 private actor RevokedToken {
     private(set) var value: String?
     func set(_ token: String) { value = token }
+}
+
+@MainActor
+final class AnalysisViewModelTests: XCTestCase {
+    func testHistoryRestoresACompletedResult() async {
+        let resumeID = UUID(), jobID = UUID()
+        let result = ResumeAnalysis(summary: "Saved synthetic result", technicalSkills: [], softSkills: [], experience: [], education: [], strengths: [], improvementSuggestions: [], missingOrUnclearInformation: [], bulletRewrites: [])
+        let saved = AnalysisJob(id: jobID, resumeID: resumeID, status: .completed, result: result)
+        let service = FakeAnalysisService(jobs: [], history: [saved])
+        let model = AnalysisViewModel(resumeID: resumeID, service: service, wait: {})
+        await model.loadHistory()
+        guard let job = model.history.first else { return XCTFail("Expected saved job") }
+        model.select(job)
+        guard case .completed(let analysis) = model.state else { return XCTFail("Expected saved result") }
+        XCTAssertEqual(analysis.summary, "Saved synthetic result")
+        let submissions = await service.submissions
+        XCTAssertEqual(submissions, 0)
+    }
+
+    func testQueuedJobReachesCompletedWithoutResubmitting() async {
+        let resumeID = UUID(), jobID = UUID()
+        let result = ResumeAnalysis(summary: "Synthetic summary", technicalSkills: ["Swift"], softSkills: [], experience: [], education: [], strengths: [], improvementSuggestions: [], missingOrUnclearInformation: [], bulletRewrites: [])
+        let service = FakeAnalysisService(jobs: [
+            AnalysisJob(id: jobID, resumeID: resumeID, status: .queued, result: nil),
+            AnalysisJob(id: jobID, resumeID: resumeID, status: .running, result: nil),
+            AnalysisJob(id: jobID, resumeID: resumeID, status: .completed, result: result)
+        ])
+        let model = AnalysisViewModel(resumeID: resumeID, service: service, wait: {})
+        await model.start()
+        await model.poll()
+        guard case .completed(let analysis) = model.state else { return XCTFail("Expected completed analysis") }
+        XCTAssertEqual(analysis.summary, "Synthetic summary")
+        let submissions = await service.submissions
+        XCTAssertEqual(submissions, 1)
+    }
+
+    func testPollingStopsAndCanBeCheckedAgainWithoutSubmitting() async {
+        let resumeID = UUID(), jobID = UUID()
+        let job = AnalysisJob(id: jobID, resumeID: resumeID, status: .queued, result: nil)
+        let service = FakeAnalysisService(jobs: [job, job, job])
+        let model = AnalysisViewModel(resumeID: resumeID, service: service, maxPolls: 1, wait: {})
+        await model.start()
+        await model.poll()
+        guard case .paused = model.state else { return XCTFail("Expected polling to pause") }
+        model.checkStatus()
+        await model.poll()
+        let submissions = await service.submissions
+        let checks = await service.checks
+        XCTAssertEqual(submissions, 1)
+        XCTAssertEqual(checks, 2)
+    }
+
+    func testUnexpectedJobDoesNotDisplayAnotherResumeResult() async {
+        let resumeID = UUID(), jobID = UUID()
+        let service = FakeAnalysisService(jobs: [
+            AnalysisJob(id: jobID, resumeID: resumeID, status: .queued, result: nil),
+            AnalysisJob(id: jobID, resumeID: UUID(), status: .completed, result: nil)
+        ])
+        let model = AnalysisViewModel(resumeID: resumeID, service: service, wait: {})
+        await model.start()
+        await model.poll()
+        guard case .paused = model.state else { return XCTFail("Expected unexpected job to be rejected") }
+    }
+
+    func testBackendResultDecodesSnakeCaseFields() throws {
+        let data = Data(#"{"id":"00000000-0000-0000-0000-000000000001","resume_id":"00000000-0000-0000-0000-000000000002","status":"completed","result":{"summary":"Synthetic","technical_skills":["Swift"],"soft_skills":[],"experience":[],"education":[],"strengths":[],"improvement_suggestions":["Clarify"],"missing_or_unclear_information":[],"bullet_rewrites":[{"original":"Built app","rewrite":"Built a Swift app"}]}}"#.utf8)
+        let job = try JSONDecoder().decode(AnalysisJob.self, from: data)
+        XCTAssertEqual(job.result?.technicalSkills, ["Swift"])
+        XCTAssertEqual(job.result?.improvementSuggestions, ["Clarify"])
+        XCTAssertEqual(job.result?.bulletRewrites.first?.rewrite, "Built a Swift app")
+    }
+}
+
+private actor FakeAnalysisService: AnalysisServicing {
+    private var jobs: [AnalysisJob]
+    private let history: [AnalysisJob]
+    private(set) var submissions = 0
+    private(set) var checks = 0
+    init(jobs: [AnalysisJob], history: [AnalysisJob] = []) { self.jobs = jobs; self.history = history }
+    func startAnalysis(resumeID: UUID) async throws -> AnalysisJob {
+        submissions += 1
+        return jobs.removeFirst()
+    }
+    func analysisJob(id: UUID) async throws -> AnalysisJob {
+        checks += 1
+        return jobs.removeFirst()
+    }
+    func analysisHistory(resumeID: UUID, offset: Int) async throws -> [AnalysisJob] { history }
+}
+
+@MainActor
+final class JobMatchViewModelTests: XCTestCase {
+    func testUnsupportedEvidenceExplainsWhyMatchWasRejected() async {
+        let resumeID = UUID(), jobID = UUID()
+        let service = FakeMatchService(jobs: [
+            MatchJob(id: jobID, resumeID: resumeID, status: .queued, result: nil, errorCode: nil),
+            MatchJob(id: jobID, resumeID: resumeID, status: .failed, result: nil, errorCode: "unsupported_evidence")
+        ])
+        let model = JobMatchViewModel(resumeID: resumeID, service: service, wait: {})
+        model.description = "Synthetic role"
+        await model.start()
+        await model.poll()
+        guard case .failed(let message) = model.state else { return XCTFail("Expected a failure") }
+        XCTAssertTrue(message.contains("quote"))
+    }
+
+    func testMatchFinishesWithoutResubmitting() async {
+        let resumeID = UUID(), jobID = UUID()
+        let result = JobMatch(requiredSkillsFound: [.init(skill: "Swift", resumeEvidence: "Built with Swift")], requiredSkillsNotDemonstrated: ["Python"], experienceAlignment: "Relevant app project", recommendations: [], interviewTopics: [])
+        let service = FakeMatchService(jobs: [
+            MatchJob(id: jobID, resumeID: resumeID, status: .queued, result: nil, errorCode: nil),
+            MatchJob(id: jobID, resumeID: resumeID, status: .completed, result: result, errorCode: nil)
+        ])
+        let model = JobMatchViewModel(resumeID: resumeID, service: service, wait: {})
+        model.description = "Synthetic developer role"
+        await model.start()
+        await model.poll()
+        guard case .completed(let match) = model.state else { return XCTFail("Expected match result") }
+        XCTAssertEqual(match.requiredSkillsFound.first?.resumeEvidence, "Built with Swift")
+        let submissions = await service.submissions
+        XCTAssertEqual(submissions, 1)
+    }
+
+    func testEmptyDescriptionDoesNotSubmit() async {
+        let service = FakeMatchService(jobs: [])
+        let model = JobMatchViewModel(resumeID: UUID(), service: service, wait: {})
+        await model.start()
+        let submissions = await service.submissions
+        XCTAssertEqual(submissions, 0)
+    }
+}
+
+private actor FakeMatchService: JobMatchServicing {
+    private var jobs: [MatchJob]
+    private(set) var submissions = 0
+    init(jobs: [MatchJob]) { self.jobs = jobs }
+    func startMatch(resumeID: UUID, description: String) async throws -> MatchJob {
+        submissions += 1
+        return jobs.removeFirst()
+    }
+    func matchJob(id: UUID) async throws -> MatchJob { jobs.removeFirst() }
 }

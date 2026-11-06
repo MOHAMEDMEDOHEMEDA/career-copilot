@@ -14,6 +14,17 @@ private struct ResumePage: Decodable {
     let items: [Resume]
 }
 
+private struct AnalysisRequest: Encodable {
+    let resume_id: String
+    let allow_provider_fallbacks = true
+}
+
+private struct MatchRequest: Encodable {
+    let resume_id: String
+    let job_description: String
+    let allow_provider_fallbacks = true
+}
+
 private struct ErrorEnvelope: Decodable {
     struct Detail: Decodable { let message: String }
     let error: Detail
@@ -90,6 +101,32 @@ struct APIClient {
             path: "api/v1/resumes/\(id.uuidString)", method: "PATCH", body: body,
             contentType: "application/json"
         )
+    }
+
+    func startAnalysis(resumeID: UUID) async throws -> AnalysisJob {
+        let body = try JSONEncoder().encode(AnalysisRequest(resume_id: resumeID.uuidString))
+        return try await authenticated(
+            path: "api/v1/resume-analysis", method: "POST", body: body,
+            contentType: "application/json"
+        )
+    }
+
+    func analysisJob(id: UUID) async throws -> AnalysisJob {
+        try await authenticated(path: "api/v1/jobs/\(id.uuidString)")
+    }
+
+    func analysisHistory(resumeID: UUID, offset: Int) async throws -> [AnalysisJob] {
+        let page: AnalysisJobPage = try await authenticated(path: "api/v1/jobs?resume_id=\(resumeID.uuidString)&limit=20&offset=\(offset)")
+        return page.items
+    }
+
+    func startMatch(resumeID: UUID, description: String) async throws -> MatchJob {
+        let body = try JSONEncoder().encode(MatchRequest(resume_id: resumeID.uuidString, job_description: description))
+        return try await authenticated(path: "api/v1/job-matches", method: "POST", body: body, contentType: "application/json")
+    }
+
+    func matchJob(id: UUID) async throws -> MatchJob {
+        try await authenticated(path: "api/v1/jobs/\(id.uuidString)")
     }
 
     func logout() async throws {
