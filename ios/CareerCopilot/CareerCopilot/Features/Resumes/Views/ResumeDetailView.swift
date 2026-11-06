@@ -18,6 +18,7 @@ struct ResumeDetailView: View {
                 TextEditor(text: $draft)
                     .padding(.horizontal)
                     .accessibilityLabel("Resume text")
+                    .disabled(model.isLoading)
             } else {
                 ScrollView {
                     Text(draft)

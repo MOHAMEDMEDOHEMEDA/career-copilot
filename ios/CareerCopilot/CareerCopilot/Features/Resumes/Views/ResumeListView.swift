@@ -35,7 +35,7 @@ struct ResumeListView: View {
                         .foregroundStyle(.white)
                         .background(.white.opacity(0.12), in: RoundedRectangle(cornerRadius: 16))
                     }
-                    .disabled(resumeModel.isLoading)
+                    .disabled(resumeModel.isLoading || model.isLoading)
                 }
                 .padding(22)
                 .background(LinearGradient(colors: [.init(white: 0.25), .black], startPoint: .topLeading, endPoint: .bottomTrailing), in: RoundedRectangle(cornerRadius: 28))
@@ -60,7 +60,7 @@ struct ResumeListView: View {
                             .font(.subheadline.weight(.semibold))
                         Text(error).font(.footnote).foregroundStyle(.secondary)
                         Button("Try again") { Task { await resumeModel.loadResumes() } }
-                            .disabled(resumeModel.isLoading)
+                            .disabled(resumeModel.isLoading || model.isLoading)
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(16).careerCard()
@@ -105,14 +105,14 @@ struct ResumeListView: View {
                                     .contentShape(Rectangle())
                                 }
                                 .buttonStyle(.plain)
-                                .disabled(resumeModel.isLoading)
+                                .disabled(resumeModel.isLoading || model.isLoading)
                                 Menu {
                                     Button("Delete", systemImage: "trash", role: .destructive) { resumeToDelete = resume }
                                 } label: {
                                     Image(systemName: "ellipsis").frame(width: 44, height: 44)
                                 }
                                 .accessibilityLabel("Options for \(resume.filename)")
-                                .disabled(resumeModel.isLoading)
+                                .disabled(resumeModel.isLoading || model.isLoading)
                             }
                             .padding(16).careerCard()
                         }
@@ -131,7 +131,7 @@ struct ResumeListView: View {
             }
             ToolbarItem(placement: .topBarTrailing) {
                 Button { showImporter = true } label: { Image(systemName: "plus") }
-                    .disabled(resumeModel.isLoading)
+                    .disabled(resumeModel.isLoading || model.isLoading)
                     .accessibilityLabel("Upload resume")
             }
         }

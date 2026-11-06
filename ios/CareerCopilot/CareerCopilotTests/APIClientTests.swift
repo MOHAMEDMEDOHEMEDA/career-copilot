@@ -163,6 +163,23 @@ final class ResumeViewModelTests: XCTestCase {
         XCTAssertEqual(model.resumes.first?.text, "Original")
         XCTAssertNotNil(model.message)
     }
+
+    func testOverlappingLoadAndResetIgnoreLateResults() async {
+        let resume = Resume(id: UUID(), filename: "Synthetic.pdf", text: "Original")
+        let service = DelayedResumeService(resume: resume)
+        let model = ResumeViewModel(baseURL: "https://example.com", clientFactory: { _ in service })
+        let first = Task { await model.loadResumes() }
+        await service.waitUntilStarted()
+        await model.loadResumes()
+        let callCount = await service.calls
+        XCTAssertEqual(callCount, 1)
+        XCTAssertTrue(model.isLoading)
+        model.reset()
+        await service.release()
+        await first.value
+        XCTAssertTrue(model.resumes.isEmpty)
+        XCTAssertFalse(model.isLoading)
+    }
 }
 
 private final class FakeResumeService: ResumeServicing {
@@ -188,4 +205,141 @@ private final class FakeResumeService: ResumeServicing {
         resume = Resume(id: id, filename: resume.filename, text: text)
         return resume
     }
+}
+
+private actor DelayedResumeService: ResumeServicing {
+    let resume: Resume
+    private var continuation: CheckedContinuation<Void, Never>?
+    private var startContinuation: CheckedContinuation<Void, Never>?
+    private var started = false
+    private(set) var calls = 0
+
+    init(resume: Resume) { self.resume = resume }
+
+    func resumes() async throws -> [Resume] {
+        calls += 1
+        started = true
+        startContinuation?.resume()
+        startContinuation = nil
+        await withCheckedContinuation { continuation = $0 }
+        return [resume]
+    }
+
+    func waitUntilStarted() async {
+        if started { return }
+        await withCheckedContinuation { startContinuation = $0 }
+    }
+
+    func release() { continuation?.resume(); continuation = nil }
+    func uploadPDF(data: Data, filename: String) async throws -> Resume { resume }
+    func deleteResume(id: UUID) async throws {}
+    func updateResume(id: UUID, text: String) async throws -> Resume { resume }
+}
+
+final class SessionCoordinatorTests: XCTestCase {
+    func testConcurrentRefreshUsesOneRequest() async throws {
+        let store = MemorySessionStore()
+        let coordinator = SessionCoordinator(store: store)
+        let url = try XCTUnwrap(URL(string: "https://example.com"))
+        try await coordinator.startSession(TokenPair(accessToken: "old", refreshToken: "old-refresh"), baseURL: url)
+        let snapshot = try await coordinator.snapshot(baseURL: url)
+        let original = try XCTUnwrap(snapshot)
+        let gate = RefreshGate()
+        let first = Task { try await coordinator.refreshed(original, baseURL: url) { try await gate.refresh($0) } }
+        await gate.waitUntilStarted()
+        let second = Task { try await coordinator.refreshed(original, baseURL: url) { try await gate.refresh($0) } }
+        await gate.release()
+        let firstResult = try await first.value
+        let secondResult = try await second.value
+        let calls = await gate.calls
+        XCTAssertEqual(calls, 1)
+        XCTAssertEqual(firstResult.tokens.refreshToken, "new-refresh")
+        XCTAssertEqual(secondResult.tokens.refreshToken, "new-refresh")
+    }
+
+    func testSignOutWaitsForRefreshAndRevokesRotatedToken() async throws {
+        let coordinator = SessionCoordinator(store: MemorySessionStore())
+        let url = try XCTUnwrap(URL(string: "https://example.com"))
+        try await coordinator.startSession(TokenPair(accessToken: "old", refreshToken: "old-refresh"), baseURL: url)
+        let snapshot = try await coordinator.snapshot(baseURL: url)
+        let original = try XCTUnwrap(snapshot)
+        let gate = RefreshGate()
+        let revoked = RevokedToken()
+        let refresh = Task { try await coordinator.refreshed(original, baseURL: url) { try await gate.refresh($0) } }
+        await gate.waitUntilStarted()
+        let logout = Task { try await coordinator.signOut(baseURL: url) { await revoked.set($0) } }
+        var signingOut = false
+        for _ in 0..<1_000 {
+            if try await coordinator.snapshot(baseURL: url) == nil { signingOut = true; break }
+            await Task.yield()
+        }
+        XCTAssertTrue(signingOut)
+        await gate.release()
+        try await logout.value
+        do {
+            _ = try await refresh.value
+            XCTFail("A refresh started before logout must not restore the session")
+        } catch {}
+        let token = await revoked.value
+        let remaining = try await coordinator.snapshot(baseURL: url)
+        XCTAssertEqual(token, "new-refresh")
+        XCTAssertNil(remaining)
+    }
+
+    func testOldRefreshCannotReplaceANewSession() async throws {
+        let coordinator = SessionCoordinator(store: MemorySessionStore())
+        let url = try XCTUnwrap(URL(string: "https://example.com"))
+        try await coordinator.startSession(TokenPair(accessToken: "first", refreshToken: "first-refresh"), baseURL: url)
+        let snapshot = try await coordinator.snapshot(baseURL: url)
+        let original = try XCTUnwrap(snapshot)
+        let gate = RefreshGate()
+        let refresh = Task { try await coordinator.refreshed(original, baseURL: url) { try await gate.refresh($0) } }
+        await gate.waitUntilStarted()
+        try await coordinator.startSession(TokenPair(accessToken: "second", refreshToken: "second-refresh"), baseURL: url)
+        await gate.release()
+        do {
+            _ = try await refresh.value
+            XCTFail("The earlier session must not overwrite the new session")
+        } catch {}
+        let current = try await coordinator.snapshot(baseURL: url)
+        XCTAssertEqual(current?.tokens.refreshToken, "second-refresh")
+    }
+}
+
+private final class MemorySessionStore: SessionTokenStoring {
+    private var tokens: TokenPair?
+    func load(baseURL: URL) throws -> TokenPair? { tokens }
+    func save(_ tokens: TokenPair, baseURL: URL) throws { self.tokens = tokens }
+    func clear() throws { tokens = nil }
+}
+
+private actor RefreshGate {
+    private var continuation: CheckedContinuation<Void, Never>?
+    private var startContinuation: CheckedContinuation<Void, Never>?
+    private var started = false
+    private(set) var calls = 0
+
+    func refresh(_ token: String) async throws -> TokenPair {
+        calls += 1
+        started = true
+        startContinuation?.resume()
+        startContinuation = nil
+        await withCheckedContinuation { continuation = $0 }
+        return TokenPair(accessToken: "new", refreshToken: "new-refresh")
+    }
+
+    func waitUntilStarted() async {
+        if started { return }
+        await withCheckedContinuation { startContinuation = $0 }
+    }
+
+    func release() {
+        continuation?.resume()
+        continuation = nil
+    }
+}
+
+private actor RevokedToken {
+    private(set) var value: String?
+    func set(_ token: String) { value = token }
 }

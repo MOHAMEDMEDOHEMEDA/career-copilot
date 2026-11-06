@@ -22,6 +22,7 @@ private struct ErrorEnvelope: Decodable {
 struct APIClient {
     let baseURL: URL
     var session: URLSession = .shared
+    var sessions: SessionCoordinator = .shared
 
     static func configured(baseURL: String) throws -> APIClient {
         guard let url = URL(string: baseURL), let scheme = url.scheme,
@@ -92,13 +93,14 @@ struct APIClient {
     }
 
     func logout() async throws {
-        guard let tokens = try TokenStore.load(baseURL: baseURL) else { return }
-        var request = URLRequest(url: endpoint("api/v1/auth/logout"))
-        request.httpMethod = "POST"
-        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        request.httpBody = try JSONEncoder().encode(["refresh_token": tokens.refreshToken])
-        let (data, response) = try await send(request)
-        try validate(response, data: data)
+        try await sessions.signOut(baseURL: baseURL) { refreshToken in
+            var request = URLRequest(url: endpoint("api/v1/auth/logout"))
+            request.httpMethod = "POST"
+            request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+            request.httpBody = try JSONEncoder().encode(["refresh_token": refreshToken])
+            let (data, response) = try await send(request)
+            try validate(response, data: data)
+        }
     }
 
     private func authenticated<T: Decodable>(path: String, method: String = "GET", body: Data? = nil, contentType: String? = nil) async throws -> T {
@@ -108,7 +110,7 @@ struct APIClient {
     }
 
     private func authorizedRequest(path: String, method: String, body: Data? = nil, contentType: String? = nil) async throws -> (Data, HTTPURLResponse) {
-        guard let tokens = try TokenStore.load(baseURL: baseURL) else { throw APIError.signedOut }
+        guard let snapshot = try await sessions.snapshot(baseURL: baseURL) else { throw APIError.signedOut }
         func request(_ token: String) async throws -> (Data, HTTPURLResponse) {
             var request = URLRequest(url: endpoint(path))
             request.httpMethod = method
@@ -117,11 +119,15 @@ struct APIClient {
             if let contentType { request.setValue(contentType, forHTTPHeaderField: "Content-Type") }
             return try await send(request)
         }
-        let (data, response) = try await request(tokens.accessToken)
+        let (data, response) = try await request(snapshot.tokens.accessToken)
+        guard await sessions.isCurrent(snapshot) else { throw APIError.signedOut }
         guard response.statusCode == 401 else { return (data, response) }
-        let updated: TokenPair = try await post("api/v1/auth/refresh", body: ["refresh_token": tokens.refreshToken])
-        try TokenStore.save(updated, baseURL: baseURL)
-        return try await request(updated.accessToken)
+        let updated = try await sessions.refreshed(snapshot, baseURL: baseURL) { refreshToken in
+            try await post("api/v1/auth/refresh", body: ["refresh_token": refreshToken])
+        }
+        let retry = try await request(updated.tokens.accessToken)
+        guard await sessions.isCurrent(updated) else { throw APIError.signedOut }
+        return retry
     }
 
     private func endpoint(_ path: String) -> URL {

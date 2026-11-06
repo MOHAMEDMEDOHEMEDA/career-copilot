@@ -31,7 +31,7 @@ final class AppViewModel: ObservableObject {
             let api = try client()
             if isRegistering { try await api.register(email: email, password: password) }
             let tokens = try await api.login(email: email, password: password)
-            try TokenStore.save(tokens, baseURL: api.baseURL)
+            try await api.sessions.startSession(tokens, baseURL: api.baseURL)
             password = ""
             profile = try await api.profile()
         } catch { message = error.localizedDescription }
@@ -65,7 +65,7 @@ final class AppViewModel: ObservableObject {
                 notice = "Google account linked."
             } else {
                 let tokens = try await api.googleLogin(idToken: idToken)
-                try TokenStore.save(tokens, baseURL: api.baseURL)
+                try await api.sessions.startSession(tokens, baseURL: api.baseURL)
                 profile = try await api.profile()
             }
         } catch {
@@ -91,7 +91,7 @@ final class AppViewModel: ObservableObject {
     func restoreSession() async {
         do {
             let api = try client()
-            guard try TokenStore.load(baseURL: api.baseURL) != nil else { return }
+            guard try await api.sessions.snapshot(baseURL: api.baseURL) != nil else { return }
             profile = try await api.profile()
         } catch { message = error.localizedDescription }
     }
@@ -102,7 +102,6 @@ final class AppViewModel: ObservableObject {
         do {
             try await client().logout()
             GIDSignIn.sharedInstance.signOut()
-            try TokenStore.clear()
             profile = nil
         } catch { message = error.localizedDescription }
     }
