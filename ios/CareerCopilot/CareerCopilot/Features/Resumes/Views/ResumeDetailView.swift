@@ -43,9 +43,13 @@ struct ResumeDetailView: View {
                             Label("Match a job", systemImage: "briefcase")
                                 .frame(maxWidth: .infinity)
                         }.buttonStyle(.bordered)
-                        Text(draft)
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .textSelection(.enabled)
+                        if draft.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                            ContentUnavailableView("No resume text", systemImage: "doc.text", description: Text("Edit this resume to add its text."))
+                        } else {
+                            Text(draft)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .textSelection(.enabled)
+                        }
                     }
                     .padding()
                 }
@@ -57,10 +61,13 @@ struct ResumeDetailView: View {
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 if isEditing {
-                    Button("Save") {
+                    Button {
                         Task {
                             if await model.update(resume, text: draft) { isEditing = false }
                         }
+                    } label: {
+                        if model.isLoading { ProgressView().accessibilityLabel("Saving resume") }
+                        else { Text("Save") }
                     }
                     .disabled(model.isLoading || draft.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
                 } else {

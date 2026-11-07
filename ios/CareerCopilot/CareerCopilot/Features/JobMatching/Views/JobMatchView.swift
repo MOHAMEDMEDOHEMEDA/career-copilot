@@ -15,10 +15,10 @@ struct JobMatchView: View {
                     Text("Paste a job description").font(.title2.bold())
                     Text("Compare its requirements with your resume. Use synthetic data until privacy and retention have been reviewed.").foregroundStyle(.secondary)
                     TextEditor(text: $model.description).frame(minHeight: 200).padding(8).careerCard().accessibilityLabel("Job description")
-                    Text("\(model.description.count) / 20,000 characters").font(.caption).foregroundStyle(.secondary)
+                    Text("\(model.description.unicodeScalars.count) / 20,000 characters").font(.caption).foregroundStyle(.secondary)
                     Button("Compare with resume") { confirm = true }
                         .buttonStyle(.borderedProminent)
-                        .disabled(model.description.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || model.description.count > 20_000)
+                        .disabled(model.description.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || model.description.unicodeScalars.count > 20_000)
                 case .submitting:
                     ProgressView("Starting comparison")
                 case .waiting(let status):

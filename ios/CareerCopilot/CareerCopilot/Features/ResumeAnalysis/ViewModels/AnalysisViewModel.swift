@@ -135,9 +135,13 @@ final class AnalysisViewModel: ObservableObject {
             else { state = .failed("The analysis finished without a result.") }
         case .failed:
             switch job.errorCode {
-            case "rate_limited": state = .failed("The available AI providers are rate-limited. Check their limits and try again later.")
+            case "rate_limited": state = .failed("An AI provider is rate-limited. Check its limits and try again later.")
             case "timeout": state = .failed("The analysis timed out. You can start a new analysis when you’re ready.")
-            case "provider_error": state = .failed("The AI provider is unavailable. Try again later.")
+            case "provider_error", "provider_unavailable": state = .failed("An AI provider is unavailable. Check your connection and try again later.")
+            case "provider_auth": state = .failed("An AI provider rejected the request. Check the backend provider settings.")
+            case "invalid_output": state = .failed("The AI response could not be validated. You can start a new analysis when you’re ready.")
+            case "output_limit": state = .failed("The AI response was too long. Try a shorter resume.")
+            case "invalid_input": state = .failed("The resume is empty or too long to analyze. Review its text and try again.")
             default: state = .failed("Analysis failed. You can start a new analysis when you’re ready.")
             }
         }

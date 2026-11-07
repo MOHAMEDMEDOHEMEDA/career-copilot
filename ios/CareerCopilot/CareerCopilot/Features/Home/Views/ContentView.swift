@@ -16,7 +16,10 @@ struct ContentView: View {
 
     var body: some View {
         Group {
-            if model.profile == nil {
+            if model.isRestoringSession {
+                ProgressView("Restoring your session")
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+            } else if model.profile == nil {
                 NavigationStack {
                     AuthenticationView(model: model)
                         .toolbar {

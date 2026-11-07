@@ -14,32 +14,43 @@ final class AppViewModel: ObservableObject {
     @Published var message: String?
     @Published var notice: String?
     @Published var isLoading = false
+    @Published private(set) var isRestoringSession = true
+    @Published private(set) var canRetrySessionRestore = false
     @Published var isRegistering = false
+    private let clientFactory: (String) throws -> APIClient
 
-    init() {
+    init(clientFactory: @escaping (String) throws -> APIClient = { try APIClient.configured(baseURL: $0) }) {
+        self.clientFactory = clientFactory
         baseURL = UserDefaults.standard.string(forKey: "baseURL") ?? "http://localhost:8000"
     }
 
     private func client() throws -> APIClient {
-        try APIClient.configured(baseURL: baseURL)
+        try clientFactory(baseURL)
     }
 
     func authenticate() async {
         isLoading = true
         defer { isLoading = false }
+        var sessionStarted = false
         do {
             let api = try client()
             if isRegistering { try await api.register(email: email, password: password) }
             let tokens = try await api.login(email: email, password: password)
             try await api.sessions.startSession(tokens, baseURL: api.baseURL)
+            sessionStarted = true
             password = ""
             profile = try await api.profile()
-        } catch { message = error.localizedDescription }
+            canRetrySessionRestore = false
+        } catch {
+            if sessionStarted { canRetrySessionRestore = true }
+            message = error.localizedDescription
+        }
     }
 
     func googleSignIn(link: Bool = false) async {
         isLoading = true
         defer { isLoading = false }
+        var sessionStarted = false
         do {
             guard let clientID = Bundle.main.object(forInfoDictionaryKey: "GIDClientID") as? String,
                   !clientID.isEmpty,
@@ -66,13 +77,16 @@ final class AppViewModel: ObservableObject {
             } else {
                 let tokens = try await api.googleLogin(idToken: idToken)
                 try await api.sessions.startSession(tokens, baseURL: api.baseURL)
+                sessionStarted = true
                 profile = try await api.profile()
+                canRetrySessionRestore = false
             }
         } catch {
             let googleError = error as NSError
             if googleError.domain == kGIDSignInErrorDomain && googleError.code == GIDSignInError.canceled.rawValue {
                 return
             }
+            if sessionStarted { canRetrySessionRestore = true }
             message = error.localizedDescription
         }
     }
@@ -89,11 +103,21 @@ final class AppViewModel: ObservableObject {
     }
 
     func restoreSession() async {
+        isRestoringSession = true
+        defer { isRestoringSession = false }
         do {
             let api = try client()
-            guard try await api.sessions.snapshot(baseURL: api.baseURL) != nil else { return }
+            guard try await api.sessions.snapshot(baseURL: api.baseURL) != nil else {
+                canRetrySessionRestore = false
+                return
+            }
             profile = try await api.profile()
-        } catch { message = error.localizedDescription }
+            canRetrySessionRestore = false
+        } catch {
+            guard !Task.isCancelled else { return }
+            canRetrySessionRestore = true
+            message = error.localizedDescription
+        }
     }
 
     func signOut() async {
@@ -103,6 +127,7 @@ final class AppViewModel: ObservableObject {
             try await client().logout()
             GIDSignIn.sharedInstance.signOut()
             profile = nil
+            canRetrySessionRestore = false
         } catch { message = error.localizedDescription }
     }
 }

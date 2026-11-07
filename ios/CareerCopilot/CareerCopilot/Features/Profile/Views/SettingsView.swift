@@ -19,6 +19,7 @@ struct SettingsView: View {
                 if let profile = model.profile {
                     Section("Account") {
                         Text(profile.email)
+                        if model.isLoading { ProgressView("Updating account") }
                         Button("Link Google account") { Task { await model.googleSignIn(link: true) } }
                             .disabled(model.isLoading)
                         Button("Sign out", role: .destructive) { Task { await model.signOut() } }

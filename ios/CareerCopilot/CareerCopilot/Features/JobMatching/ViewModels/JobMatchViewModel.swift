@@ -33,7 +33,7 @@ final class JobMatchViewModel: ObservableObject {
     }
 
     func start() async {
-        guard !description.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty, description.count <= 20_000 else {
+        guard !description.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty, description.unicodeScalars.count <= 20_000 else {
             state = .failed("Enter a job description of up to 20,000 characters.")
             return
         }
@@ -91,7 +91,7 @@ final class JobMatchViewModel: ObservableObject {
             else { state = .failed("Matching finished without a result.") }
         case .failed:
             switch job.errorCode {
-            case "rate_limited": state = .failed("The available AI providers are rate-limited. Check their limits and try again later.")
+            case "rate_limited": state = .failed("An AI provider is rate-limited. Check its limits and try again later.")
             case "timeout": state = .failed("Matching timed out. You can try again later.")
             case "unsupported_evidence": state = .failed("The AI returned a quote that could not be verified in your resume, so the result was rejected. You can try again.")
             case "invalid_output": state = .failed("The AI returned an invalid result, so it was not shown. You can try again.")

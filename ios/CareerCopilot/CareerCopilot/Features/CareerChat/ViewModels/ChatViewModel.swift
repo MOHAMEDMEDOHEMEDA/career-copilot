@@ -35,6 +35,7 @@ final class ChatViewModel: ObservableObject {
     private var generation = UUID()
     private var activeConversationID: UUID?
     private var drafts: [UUID: String] = [:]
+    private var answerJobs: [UUID: ChatAnswerJob] = [:]
 
     init(baseURL: String = UserDefaults.standard.string(forKey: "baseURL") ?? "http://localhost:8000", clientFactory: @escaping (String) throws -> any ChatServicing = { try APIClient.configured(baseURL: $0) }) {
         self.baseURL = baseURL
@@ -49,6 +50,7 @@ final class ChatViewModel: ObservableObject {
         error = nil
         activeConversationID = nil
         drafts.removeAll()
+        answerJobs.removeAll()
         isLoading = false
         isSending = false
         hasMoreConversations = false
@@ -99,11 +101,13 @@ final class ChatViewModel: ObservableObject {
             guard operation == generation, !Task.isCancelled else { return }
             conversations.removeAll { $0.id == conversation.id }
             drafts[conversation.id] = nil
+            answerJobs[conversation.id] = nil
             error = nil
         } catch { if operation == generation && !Task.isCancelled { self.error = error.localizedDescription } }
     }
 
     func open(_ conversation: ChatConversation) async {
+        let previousJob = answerJobs[conversation.id]
         activeConversationID = conversation.id
         messages = []
         draft = drafts[conversation.id] ?? ""
@@ -113,6 +117,10 @@ final class ChatViewModel: ObservableObject {
         hasLoadedMessages = false
         clearAnswerState()
         await loadMessages(conversationID: conversation.id)
+        guard activeConversationID == conversation.id, !Task.isCancelled else { return }
+        if let previousJob, previousJob.status != .completed {
+            await applyAnswerJob(previousJob)
+        }
     }
 
     func close(conversationID: UUID) {
@@ -151,7 +159,7 @@ final class ChatViewModel: ObservableObject {
     @discardableResult
     func send(conversationID: UUID) async -> ChatMessage? {
         let content = draft.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !content.isEmpty, content.count <= 4000, !isSending, !isLoading, !hasMoreMessages, hasLoadedMessages, !needsRefreshBeforeSending, activeConversationID == conversationID else { return nil }
+        guard !content.isEmpty, content.unicodeScalars.count <= 4000, !isSending, !isLoading, !hasMoreMessages, hasLoadedMessages, !needsRefreshBeforeSending, activeConversationID == conversationID else { return nil }
         let operation = generation
         isSending = true
         defer { if operation == generation { isSending = false } }
@@ -236,6 +244,7 @@ final class ChatViewModel: ObservableObject {
 
     private func applyAnswerJob(_ job: ChatAnswerJob, startPolling: Bool = true) async {
         answerJob = job
+        answerJobs[job.conversationID] = job
         answerPollingPaused = false
         switch job.status {
         case .queued, .running:
@@ -248,6 +257,10 @@ final class ChatViewModel: ObservableObject {
             case "rate_limited": answerError = "The AI provider is rate-limited. You can retry later."
             case "invalid_output": answerError = "The answer or its citations could not be verified."
             case "timeout": answerError = "The answer timed out. You can retry."
+            case "provider_unavailable": answerError = "An AI provider or local knowledge search is unavailable. Check the backend and Ollama, then retry."
+            case "provider_auth": answerError = "An AI provider rejected the request. Check the backend provider settings."
+            case "invalid_input": answerError = "The question is empty or too long. Review it and try again."
+            case "output_limit": answerError = "The AI response was too long. Try a shorter question."
             default: answerError = "The answer couldn’t be completed. You can retry."
             }
         }

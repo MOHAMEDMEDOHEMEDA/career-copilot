@@ -68,7 +68,7 @@ struct AnalysisView: View {
         VStack(alignment: .leading, spacing: 12) {
             Text("Previous analyses").font(.headline)
             Text("Results reflect the resume as it was when analyzed.").font(.footnote).foregroundStyle(.secondary)
-            if model.loadingHistory { ProgressView() }
+            if model.loadingHistory { ProgressView("Loading history") }
             if let error = model.historyError {
                 Text("Couldn’t load history: \(error)").font(.footnote)
                 Button("Try again") { Task { await model.loadHistory() } }
@@ -79,7 +79,7 @@ struct AnalysisView: View {
                 Button { model.select(job) } label: {
                     VStack(alignment: .leading) {
                         Text(job.status.rawValue.capitalized)
-                        if let date = job.createdAt { Text(date).font(.caption).foregroundStyle(.secondary) }
+                        if let date = job.createdAt { Text(displayDate(date)).font(.caption).foregroundStyle(.secondary) }
                     }.frame(maxWidth: .infinity, alignment: .leading)
                 }.buttonStyle(.bordered)
             }
@@ -87,6 +87,15 @@ struct AnalysisView: View {
                 Button("Load more") { Task { await model.loadHistory(reset: false) } }
             }
         }.frame(maxWidth: .infinity, alignment: .leading).padding(20).careerCard()
+    }
+
+    private func displayDate(_ value: String) -> String {
+        let formatter = ISO8601DateFormatter()
+        formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+        let fractional = formatter.date(from: value)
+        formatter.formatOptions = [.withInternetDateTime]
+        guard let date = fractional ?? formatter.date(from: value) else { return value }
+        return date.formatted(date: .abbreviated, time: .shortened)
     }
 
     private var intro: some View {

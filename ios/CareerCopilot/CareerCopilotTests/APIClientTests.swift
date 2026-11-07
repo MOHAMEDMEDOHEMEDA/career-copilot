@@ -69,6 +69,56 @@ final class APIClientTests: XCTestCase {
         XCTAssertNoThrow(try APIClient.configured(baseURL: "http://localhost:8000"))
         XCTAssertThrowsError(try APIClient.configured(baseURL: "http://example.com"))
         XCTAssertThrowsError(try APIClient.configured(baseURL: "https://user:password@example.com"))
+        XCTAssertThrowsError(try APIClient.configured(baseURL: "not-a-url")) { error in
+            XCTAssertEqual(error.localizedDescription, "Enter a valid HTTPS backend URL, or use localhost for the simulator.")
+        }
+    }
+
+    func testNetworkFailuresHaveActionableMessages() async throws {
+        let client = APIClient(baseURL: try XCTUnwrap(URL(string: "https://example.com")), session: session)
+        for (code, expected) in [
+            (URLError.notConnectedToInternet, "Can’t reach the server. Check your connection or make sure the backend is running, then try again."),
+            (URLError.timedOut, "The connection timed out. Check your connection and try again.")
+        ] {
+            MockURLProtocol.handler = { _ in throw URLError(code) }
+            do {
+                _ = try await client.login(email: "person@example.com", password: "synthetic-password")
+                XCTFail("Expected a connection error")
+            } catch {
+                XCTAssertEqual(error.localizedDescription, expected)
+            }
+        }
+    }
+
+    @MainActor
+    func testOfflineSessionRestorationCanBeRetried() async throws {
+        let url = try XCTUnwrap(URL(string: "https://example.com"))
+        let coordinator = SessionCoordinator(store: MemorySessionStore())
+        try await coordinator.startSession(TokenPair(accessToken: "access", refreshToken: "refresh"), baseURL: url)
+        let session = try XCTUnwrap(self.session)
+        let model = AppViewModel(clientFactory: { _ in APIClient(baseURL: url, session: session, sessions: coordinator) })
+        MockURLProtocol.handler = { _ in throw URLError(.notConnectedToInternet) }
+        await model.restoreSession()
+        XCTAssertFalse(model.isRestoringSession)
+        XCTAssertTrue(model.canRetrySessionRestore)
+        XCTAssertNil(model.profile)
+        XCTAssertNotNil(model.message)
+
+        model.message = nil
+        MockURLProtocol.handler = { _ in (200, Data(#"{"email":"person@example.com"}"#.utf8)) }
+        await model.restoreSession()
+        XCTAssertEqual(model.profile?.email, "person@example.com")
+        XCTAssertFalse(model.canRetrySessionRestore)
+        XCTAssertFalse(model.isRestoringSession)
+    }
+
+    @MainActor
+    func testSessionCheckCanBeRetriedWhenConfigurationFails() async {
+        let model = AppViewModel(clientFactory: { _ in throw APIClient.APIError.invalidBackendURL })
+        await model.restoreSession()
+        XCTAssertTrue(model.canRetrySessionRestore)
+        XCTAssertFalse(model.isRestoringSession)
+        XCTAssertEqual(model.message, "Enter a valid HTTPS backend URL, or use localhost for the simulator.")
     }
 
     func testAnalysisAndMatchingRequestsIncludeFallbackConsent() async throws {
@@ -466,6 +516,16 @@ private actor FakeAnalysisService: AnalysisServicing {
 
 @MainActor
 final class JobMatchViewModelTests: XCTestCase {
+    func testDescriptionLimitCountsUnicodeScalars() async {
+        let service = FakeMatchService(jobs: [])
+        let model = JobMatchViewModel(resumeID: UUID(), service: service, wait: {})
+        model.description = String(repeating: "👨‍👩‍👧‍👦", count: 3000)
+        XCTAssertGreaterThan(model.description.unicodeScalars.count, 20_000)
+        await model.start()
+        let submissions = await service.submissions
+        XCTAssertEqual(submissions, 0)
+    }
+
     func testUnsupportedEvidenceExplainsWhyMatchWasRejected() async {
         let resumeID = UUID(), jobID = UUID()
         let service = FakeMatchService(jobs: [
@@ -519,6 +579,35 @@ private actor FakeMatchService: JobMatchServicing {
 
 @MainActor
 final class ChatViewModelTests: XCTestCase {
+    func testActiveAnswerCanResumeAfterLeavingChat() async {
+        let conversation = ChatConversation(id: UUID(), title: "Synthetic", createdAt: "", updatedAt: "")
+        let service = FakeChatService(conversation: conversation)
+        let model = ChatViewModel(clientFactory: { _ in service })
+        await model.open(conversation)
+        model.draft = "Synthetic question"
+        guard let question = await model.send(conversationID: conversation.id) else { return XCTFail("Expected question") }
+        await model.requestAnswer(conversationID: conversation.id, questionID: question.id)
+        let jobID = model.answerJob?.id
+        model.close(conversationID: conversation.id)
+        await model.open(conversation)
+        XCTAssertEqual(model.answerJob?.id, jobID)
+        XCTAssertNotNil(model.answerPollingToken)
+        await model.pollAnswer(conversationID: conversation.id)
+        XCTAssertTrue(model.hasAnswer(for: question.id))
+    }
+
+    func testQuestionLimitCountsUnicodeScalars() async {
+        let conversation = ChatConversation(id: UUID(), title: "Synthetic", createdAt: "", updatedAt: "")
+        let service = FakeChatService(conversation: conversation)
+        let model = ChatViewModel(clientFactory: { _ in service })
+        await model.open(conversation)
+        model.draft = String(repeating: "👨‍👩‍👧‍👦", count: 600)
+        XCTAssertGreaterThan(model.draft.unicodeScalars.count, 4000)
+        await model.send(conversationID: conversation.id)
+        let attempts = await service.sendAttempts
+        XCTAssertEqual(attempts, 0)
+    }
+
     func testAnswerJobLoadsCitedAssistantReply() async {
         let conversation = ChatConversation(id: UUID(), title: "Synthetic", createdAt: "", updatedAt: "")
         let service = FakeChatService(conversation: conversation)

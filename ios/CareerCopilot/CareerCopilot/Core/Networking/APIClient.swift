@@ -40,7 +40,7 @@ struct APIClient {
               let host = url.host,
               scheme == "https" || (scheme == "http" && ["localhost", "127.0.0.1", "::1"].contains(host)),
               url.user == nil, url.password == nil, url.query == nil, url.fragment == nil else {
-            throw URLError(.badURL)
+            throw APIError.invalidBackendURL
         }
         return APIClient(baseURL: url)
     }
@@ -223,9 +223,20 @@ struct APIClient {
     }
 
     private func send(_ request: URLRequest) async throws -> (Data, HTTPURLResponse) {
-        let (data, response) = try await session.data(for: request)
-        guard let response = response as? HTTPURLResponse else { throw APIError.invalidResponse }
-        return (data, response)
+        do {
+            let (data, response) = try await session.data(for: request)
+            guard let response = response as? HTTPURLResponse else { throw APIError.invalidResponse }
+            return (data, response)
+        } catch let error as URLError {
+            switch error.code {
+            case .notConnectedToInternet, .networkConnectionLost, .cannotConnectToHost, .cannotFindHost, .dnsLookupFailed, .dataNotAllowed:
+                throw APIError.connectionUnavailable
+            case .timedOut:
+                throw APIError.connectionTimedOut
+            default:
+                throw error
+            }
+        }
     }
 
     private func validate(_ response: HTTPURLResponse, data: Data) throws {
@@ -236,13 +247,16 @@ struct APIClient {
     }
 
     enum APIError: LocalizedError {
-        case signedOut, invalidResponse, fileTooLarge
+        case signedOut, invalidResponse, invalidBackendURL, fileTooLarge, connectionUnavailable, connectionTimedOut
         case server(Int, String?)
         var errorDescription: String? {
             switch self {
             case .signedOut: "Your session has ended. Please sign in."
             case .invalidResponse: "The server returned an invalid response."
+            case .invalidBackendURL: "Enter a valid HTTPS backend URL, or use localhost for the simulator."
             case .fileTooLarge: "Choose a PDF smaller than 10 MB."
+            case .connectionUnavailable: "Can’t reach the server. Check your connection or make sure the backend is running, then try again."
+            case .connectionTimedOut: "The connection timed out. Check your connection and try again."
             case .server(let code, let message): message ?? "The server returned HTTP \(code)."
             }
         }

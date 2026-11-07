@@ -12,6 +12,8 @@ This is an early foundation, not a production release. Hosted deployment, full a
 
 The signed-in app has Workspace, Chat, and Settings tabs. In Chat, users can create and delete conversations, ask questions, and view answers with source excerpts. The initial knowledge base is a small set of project-authored example guidance; the AI can make mistakes and retrieval has known limitations. Questions and retrieved guidance may be sent to OpenRouter and Google Gemini after confirmation, with local Ollama available as a fallback. Use synthetic data until privacy and retention have been reviewed. Conversations and messages are stored on the backend until deleted. Unsent drafts are kept in memory while signed in.
 
+Connection and timeout failures show recovery guidance. If session restoration fails, the sign-in screen can retry the session check. A pending chat answer resumes status polling when returning to the conversation during the same app session; checking status does not start another AI request. The app does not yet provide offline access to saved server data. Large-text previews are available for the sign-in and conversation screens, but a full VoiceOver and real-device accessibility audit remains necessary.
+
 The resume details screen also offers job matching. Paste a synthetic job description and confirm before processing both inputs with the configured providers. Skill evidence is checked against the resume, but all AI output needs review. The temporary job description is deleted from the job when processing completes or its lease expires. Matching results are held in the app session; restoring matching history after relaunch is not implemented.
 
 ## Project structure

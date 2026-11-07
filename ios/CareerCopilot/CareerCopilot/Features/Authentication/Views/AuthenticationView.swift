@@ -3,26 +3,42 @@ import GoogleSignInSwift
 
 struct AuthenticationView: View {
     @ObservedObject var model: AppViewModel
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+    @FocusState private var focusedField: Field?
+
+    private enum Field { case email, password }
 
     var body: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: 24) {
+            VStack(alignment: .leading, spacing: dynamicTypeSize.isAccessibilitySize ? 16 : 24) {
                 GradientIcon(symbol: "sparkles", colors: [CareerStyle.accent, .purple])
                 VStack(alignment: .leading, spacing: 8) {
                     Text("Your next step starts here.")
-                        .font(.largeTitle.bold())
+                        .font(dynamicTypeSize.isAccessibilitySize ? .title2.bold() : .largeTitle.bold())
                     Text("Keep your resume ready for the opportunities ahead.")
                         .foregroundStyle(.secondary)
                 }
-                VStack(spacing: 16) {
-                    TextField("Email", text: $model.email)
-                        .textContentType(.username)
-                        .textInputAutocapitalization(.never)
-                        .keyboardType(.emailAddress)
-                        .autocorrectionDisabled()
+                VStack(alignment: .leading, spacing: 16) {
+                    VStack(alignment: .leading, spacing: 6) {
+                        Text("Email").font(.subheadline.weight(.semibold)).accessibilityHidden(true)
+                        TextField("Email", text: $model.email)
+                            .textContentType(.username)
+                            .textInputAutocapitalization(.never)
+                            .keyboardType(.emailAddress)
+                            .autocorrectionDisabled()
+                            .accessibilityLabel("Email address")
+                            .focused($focusedField, equals: .email)
+                            .submitLabel(.next)
+                            .onSubmit { focusedField = .password }
+                    }
                     Divider()
-                    SecureField("Password", text: $model.password)
-                        .textContentType(model.isRegistering ? .newPassword : .password)
+                    VStack(alignment: .leading, spacing: 6) {
+                        Text("Password").font(.subheadline.weight(.semibold)).accessibilityHidden(true)
+                        SecureField("Password", text: $model.password)
+                            .textContentType(model.isRegistering ? .newPassword : .password)
+                            .accessibilityLabel("Password")
+                            .focused($focusedField, equals: .password)
+                    }
                 }
                 .padding(20)
                 .careerCard()
@@ -31,7 +47,7 @@ struct AuthenticationView: View {
                 } label: {
                     HStack {
                         Spacer()
-                        if model.isLoading { ProgressView() }
+                        if model.isLoading { ProgressView("Signing in") }
                         else { Text(model.isRegistering ? "Create account" : "Sign in").fontWeight(.semibold) }
                         Spacer()
                     }
@@ -39,6 +55,11 @@ struct AuthenticationView: View {
                 }
                 .buttonStyle(.borderedProminent)
                 .disabled(model.isLoading || model.email.isEmpty || model.password.isEmpty)
+                if model.canRetrySessionRestore {
+                    Button("Retry session check") { Task { await model.restoreSession() } }
+                        .frame(minHeight: 44)
+                        .disabled(model.isLoading)
+                }
                 GoogleSignInButton {
                     Task { await model.googleSignIn() }
                 }
@@ -72,4 +93,9 @@ struct AuthenticationView: View {
     return ScreenPreview {
         AuthenticationView(model: model)
     }
+}
+
+#Preview("Sign in · large text") {
+    ScreenPreview { AuthenticationView(model: AppViewModel()) }
+        .environment(\.dynamicTypeSize, .accessibility3)
 }

@@ -41,14 +41,16 @@ struct ChatHomeView: View {
                 HStack {
                     Text("Your conversations").font(.title3.bold()).foregroundStyle(.white)
                     Spacer()
-                    Button { Task { await model.loadConversations() } } label: { Image(systemName: "arrow.clockwise") }
+                    Button { Task { await model.loadConversations() } } label: {
+                        Image(systemName: "arrow.clockwise").frame(minWidth: 44, minHeight: 44)
+                    }
                         .accessibilityLabel("Refresh conversations")
                         .disabled(model.isLoading)
                 }
                 if model.isLoading { ProgressView().tint(.white).accessibilityLabel("Loading conversations") }
                 if let error = model.error {
                     Text(error).font(.subheadline).foregroundStyle(.white)
-                    Button("Refresh") { Task { await model.loadConversations() } }.foregroundStyle(ChatStyle.cyan)
+                    Button("Refresh") { Task { await model.loadConversations() } }.foregroundStyle(ChatStyle.cyan).frame(minHeight: 44)
                 }
                 if model.conversations.isEmpty && !model.isLoading && model.error == nil {
                     Text("No conversations yet. Start one when you’re ready.").foregroundStyle(ChatStyle.muted)
@@ -76,7 +78,7 @@ struct ChatHomeView: View {
                     }
                 }
                 if model.hasMoreConversations {
-                    Button("Load more") { Task { await model.loadConversations(reset: false) } }.foregroundStyle(ChatStyle.cyan)
+                    Button("Load more") { Task { await model.loadConversations(reset: false) } }.foregroundStyle(ChatStyle.cyan).frame(minHeight: 44)
                 }
             }.frame(maxWidth: 700, alignment: .leading).frame(maxWidth: .infinity).padding(20)
         }

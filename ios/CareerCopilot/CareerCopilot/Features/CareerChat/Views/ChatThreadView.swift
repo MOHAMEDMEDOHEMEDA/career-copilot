@@ -22,10 +22,14 @@ struct ChatThreadView: View {
                         .padding(16).background(ChatStyle.surface, in: RoundedRectangle(cornerRadius: 20))
                     }
                     if model.isLoading { ProgressView("Loading messages").tint(.white).foregroundStyle(ChatStyle.muted) }
+                    if model.hasLoadedMessages && model.messages.isEmpty && !model.isLoading {
+                        Text("No messages yet. Ask your first career question below.")
+                            .font(.subheadline).foregroundStyle(ChatStyle.muted)
+                    }
                     if let error = model.error {
                         VStack(alignment: .leading, spacing: 8) {
                             Label(error, systemImage: "exclamationmark.circle").foregroundStyle(.white)
-                            Button("Refresh messages") { Task { await model.loadMessages(conversationID: conversation.id) } }.foregroundStyle(ChatStyle.cyan)
+                            Button("Refresh messages") { Task { await model.loadMessages(conversationID: conversation.id) } }.foregroundStyle(ChatStyle.cyan).frame(minHeight: 44)
                         }.padding(14).background(ChatStyle.surface, in: RoundedRectangle(cornerRadius: 16))
                     }
                     if model.isRequestingAnswer {
@@ -37,9 +41,9 @@ struct ChatThreadView: View {
                         VStack(alignment: .leading, spacing: 8) {
                             Text(answerError).foregroundStyle(.white)
                             if model.answerPollingPaused {
-                                Button("Check status") { model.checkAnswerStatus() }.foregroundStyle(ChatStyle.cyan)
+                                Button("Check status") { model.checkAnswerStatus() }.foregroundStyle(ChatStyle.cyan).frame(minHeight: 44)
                             } else if model.answerJob?.status == .failed {
-                                Button("Retry answer") { retrying = true; confirmAnswer = true }.foregroundStyle(ChatStyle.cyan)
+                                Button("Retry answer") { retrying = true; confirmAnswer = true }.foregroundStyle(ChatStyle.cyan).frame(minHeight: 44)
                             }
                         }.padding(14).background(ChatStyle.surface, in: RoundedRectangle(cornerRadius: 16))
                     }
@@ -48,6 +52,7 @@ struct ChatThreadView: View {
                             if message.role == .user { Spacer(minLength: 40) }
                             VStack(alignment: .leading, spacing: 10) {
                                 Text(message.content).foregroundStyle(.white).textSelection(.enabled)
+                                    .accessibilityLabel("\(message.role == .user ? "You" : "Assistant"): \(message.content)")
                                 if let citations = message.citations, !citations.isEmpty {
                                     Text("Sources").font(.caption.bold()).foregroundStyle(ChatStyle.muted)
                                     ForEach(citations) { citation in
@@ -62,6 +67,8 @@ struct ChatThreadView: View {
                                 if message.role == .user && !model.hasAnswer(for: message.id) {
                                     Button("Get answer") { pendingQuestionID = message.id; retrying = false; confirmAnswer = true }
                                         .font(.caption.weight(.semibold)).foregroundStyle(ChatStyle.cyan)
+                                        .frame(minHeight: 44)
+                                        .accessibilityHint("Requests an answer to this question.")
                                         .disabled(model.isRequestingAnswer || model.answerJob?.status == .queued || model.answerJob?.status == .running)
                                 }
                             }
@@ -73,6 +80,7 @@ struct ChatThreadView: View {
                     if model.hasMoreMessages {
                         Button("Load more messages") { Task { await model.loadMessages(conversationID: conversation.id, reset: false) } }
                             .foregroundStyle(ChatStyle.cyan)
+                            .frame(minHeight: 44)
                         Text("Load all messages before adding a new one.").font(.caption).foregroundStyle(ChatStyle.muted)
                     }
                     Color.clear.frame(height: 1).id("bottom")
@@ -115,7 +123,7 @@ struct ChatThreadView: View {
     private var composer: some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack(alignment: .bottom, spacing: 10) {
-                TextField("Write a career question", text: $model.draft, axis: .vertical)
+                TextField("Write a career question", text: $model.draft, prompt: Text("Write a career question").foregroundStyle(ChatStyle.muted), axis: .vertical)
                     .lineLimit(1...5)
                     .focused($composerFocused)
                     .foregroundStyle(.white)
@@ -132,17 +140,37 @@ struct ChatThreadView: View {
                     else { Image(systemName: "arrow.up").font(.headline).frame(width: 48, height: 48) }
                 }
                 .accessibilityLabel("Send question")
+                .accessibilityHint("Shows a confirmation before sending your question for an answer.")
                 .foregroundStyle(.black)
                 .background(ChatStyle.cyan, in: Circle())
-                .disabled(model.isSending || model.isLoading || model.isRequestingAnswer || model.answerJob?.status == .queued || model.answerJob?.status == .running || !model.hasLoadedMessages || model.hasMoreMessages || model.needsRefreshBeforeSending || model.draft.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || model.draft.count > 4000)
-                .opacity(model.isSending || model.isLoading ? 0.6 : 1)
+                .disabled(!canSend)
+                .opacity(canSend ? 1 : 0.45)
             }
-            Text("Review AI answers and their sources. \(model.draft.count)/4000")
+            Text(composerStatus)
                 .font(.caption).foregroundStyle(ChatStyle.muted)
         }
         .frame(maxWidth: 700).frame(maxWidth: .infinity)
         .padding(.horizontal, 16).padding(.vertical, 10)
         .background(ChatStyle.background)
+    }
+
+    private var canSend: Bool {
+        !model.isSending && !model.isLoading && !model.isRequestingAnswer &&
+        model.answerJob?.status != .queued && model.answerJob?.status != .running &&
+        model.hasLoadedMessages && !model.hasMoreMessages && !model.needsRefreshBeforeSending &&
+        !model.draft.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && model.draft.unicodeScalars.count <= 4000
+    }
+
+    private var composerStatus: String {
+        let count = model.draft.unicodeScalars.count
+        if count > 4000 { return "Your question is too long. \(count) of 4000 characters." }
+        if !model.hasLoadedMessages { return "Load messages before sending a question." }
+        if model.needsRefreshBeforeSending { return "Refresh messages before sending again." }
+        if model.hasMoreMessages { return "Load all messages before sending a question." }
+        if model.isRequestingAnswer || model.answerJob?.status == .queued || model.answerJob?.status == .running {
+            return "Wait for the current answer. \(count) of 4000 characters."
+        }
+        return "Review AI answers and their sources. \(count) of 4000 characters."
     }
 }
 
@@ -150,4 +178,11 @@ struct ChatThreadView: View {
     NavigationStack {
         ChatThreadView(model: ChatViewModel(clientFactory: { _ in ChatPreviewService() }), conversation: ChatConversation(id: UUID(), title: "Career goals", createdAt: "", updatedAt: ""))
     }
+}
+
+#Preview("Conversation · large text") {
+    NavigationStack {
+        ChatThreadView(model: ChatViewModel(clientFactory: { _ in ChatPreviewService() }), conversation: ChatConversation(id: UUID(), title: "Career goals", createdAt: "", updatedAt: ""))
+    }
+    .environment(\.dynamicTypeSize, .accessibility3)
 }
