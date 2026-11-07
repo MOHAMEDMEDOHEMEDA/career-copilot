@@ -59,3 +59,24 @@ The initial knowledge base contains project-authored career guidance, split into
 | `POST /api/v1/chat/conversations/{id}/answers/{job_id}/retry` | explicit retry and fallback consent | `202` requeued failed job; active or completed jobs return `409` |
 
 Jobs report `queued`, `running`, `completed`, or `failed`, with a safe error code and optional `answer_message_id`. Jobs are processed by the separately running worker and never automatically requeued. Assistant messages include a snapshot of `citations` (chunk ID, source ID, title, origin, and excerpt) and an `insufficient_information` flag. A question may have at most one assistant answer. All operations require ownership; only the updated app's explicit confirmation opts a job into cloud fallback.
+
+## Mock interview foundation
+
+All paths below are under `/api/v1/interviews` and require a bearer token. Every session belongs to the current user and references an owned resume. Inaccessible sessions and questions return `404`; lists return `items`, `limit`, and `offset`. Creating a session stores its job description and does not call an AI provider.
+
+| Method and path | Request | Success |
+| --- | --- | --- |
+| `POST /sessions` | `resume_id`, `job_description` (1–20,000 characters) | `201` draft session |
+| `GET /sessions` | `limit`, `offset` | paginated sessions |
+| `GET /sessions/{id}` | session ID | owned session |
+| `DELETE /sessions/{id}` | session ID | `204`, deleting questions and answers |
+| `GET /sessions/{id}/questions` | `limit`, `offset` | paginated, ordered questions |
+| `PUT /sessions/{id}/questions/{question_id}/answer` | `answer` (1–4,000 characters) | saved answer; prior feedback is cleared |
+
+Resume text, job descriptions, questions, and answers are untrusted. Session data is stored until the session or its resume is deleted and is not logged.
+
+### Interview AI output
+
+Question generation returns exactly three bounded question prompts. Feedback assesses correctness, completeness, relevance, and clarity independently, each with a qualitative rating (`strong`, `developing`, `needs_work`, or `not_assessable`) and an explanation. It also returns strengths, improvements, and an illustrative answer. The example must not invent the candidate's experience; the app must label it as a suggestion for the user to verify. These are practice assessments, not objective employability scores. All model output must pass strict schema validation before storage.
+
+The asynchronous API uses `POST /sessions/{id}/generation`, `POST /sessions/{id}/questions/{question_id}/feedback`, `GET /sessions/{id}/jobs/{job_id}`, and `POST /sessions/{id}/jobs/{job_id}/retry`. Requests explicitly disclose provider fallback via `allow_provider_fallbacks`, defaulting to false. Generation and feedback requests are idempotent per session or answer revision. Jobs report queued, running, completed or failed and a safe error code; they are never automatically requeued. A changed answer invalidates earlier feedback and any result generated from an older revision.

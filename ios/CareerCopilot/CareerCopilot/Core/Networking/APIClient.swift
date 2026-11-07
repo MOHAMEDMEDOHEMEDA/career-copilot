@@ -167,6 +167,44 @@ struct APIClient {
         return try await authenticated(path: "api/v1/chat/conversations/\(conversationID.uuidString)/answers/\(jobID.uuidString)/retry", method: "POST", body: body, contentType: "application/json")
     }
 
+    func interviews(offset: Int) async throws -> ChatPage<InterviewSession> {
+        try await authenticated(path: "api/v1/interviews/sessions?limit=20&offset=\(offset)")
+    }
+
+    func createInterview(resumeID: UUID, description: String) async throws -> InterviewSession {
+        let body = try JSONEncoder().encode(["resume_id": resumeID.uuidString, "job_description": description])
+        return try await authenticated(path: "api/v1/interviews/sessions", method: "POST", body: body, contentType: "application/json")
+    }
+
+    func deleteInterview(id: UUID) async throws {
+        let (data, response) = try await authorizedRequest(path: "api/v1/interviews/sessions/\(id.uuidString)", method: "DELETE")
+        try validate(response, data: data)
+    }
+
+    func interviewQuestions(sessionID: UUID) async throws -> ChatPage<InterviewQuestion> {
+        try await authenticated(path: "api/v1/interviews/sessions/\(sessionID.uuidString)/questions?limit=100")
+    }
+
+    func saveInterviewAnswer(sessionID: UUID, questionID: UUID, answer: String) async throws -> InterviewQuestion {
+        let body = try JSONEncoder().encode(["answer": answer])
+        return try await authenticated(path: "api/v1/interviews/sessions/\(sessionID.uuidString)/questions/\(questionID.uuidString)/answer", method: "PUT", body: body, contentType: "application/json")
+    }
+
+    func requestInterviewJob(sessionID: UUID, questionID: UUID?) async throws -> InterviewJob {
+        let path = questionID.map { "questions/\($0.uuidString)/feedback" } ?? "generation"
+        let body = Data("{\"allow_provider_fallbacks\":true}".utf8)
+        return try await authenticated(path: "api/v1/interviews/sessions/\(sessionID.uuidString)/\(path)", method: "POST", body: body, contentType: "application/json")
+    }
+
+    func interviewJob(sessionID: UUID, jobID: UUID) async throws -> InterviewJob {
+        try await authenticated(path: "api/v1/interviews/sessions/\(sessionID.uuidString)/jobs/\(jobID.uuidString)")
+    }
+
+    func retryInterviewJob(sessionID: UUID, jobID: UUID) async throws -> InterviewJob {
+        let body = Data("{\"allow_provider_fallbacks\":true}".utf8)
+        return try await authenticated(path: "api/v1/interviews/sessions/\(sessionID.uuidString)/jobs/\(jobID.uuidString)/retry", method: "POST", body: body, contentType: "application/json")
+    }
+
     func logout() async throws {
         try await sessions.signOut(baseURL: baseURL) { refreshToken in
             var request = URLRequest(url: endpoint("api/v1/auth/logout"))

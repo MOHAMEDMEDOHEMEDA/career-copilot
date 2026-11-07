@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		D10000000000000000000001 /* InterviewModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = D20000000000000000000001; };
+		D10000000000000000000002 /* InterviewViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D20000000000000000000002; };
+		D10000000000000000000003 /* InterviewHomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D20000000000000000000003; };
+		D10000000000000000000004 /* InterviewSessionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D20000000000000000000004; };
 		A10000000000000000000001 /* CareerCopilotApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000001 /* CareerCopilotApp.swift */; };
 		A10000000000000000000002 /* APIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000002 /* APIClient.swift */; };
 		A10000000000000000000003 /* TokenStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000003 /* TokenStore.swift */; };
@@ -42,6 +46,10 @@
 /* End PBXTargetDependency section */
 
 /* Begin PBXFileReference section */
+		D20000000000000000000001 /* InterviewModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InterviewModels.swift; sourceTree = "<group>"; };
+		D20000000000000000000002 /* InterviewViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InterviewViewModel.swift; sourceTree = "<group>"; };
+		D20000000000000000000003 /* InterviewHomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InterviewHomeView.swift; sourceTree = "<group>"; };
+		D20000000000000000000004 /* InterviewSessionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InterviewSessionView.swift; sourceTree = "<group>"; };
 		A20000000000000000000001 /* CareerCopilotApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CareerCopilotApp.swift; sourceTree = "<group>"; };
 		A20000000000000000000002 /* APIClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIClient.swift; sourceTree = "<group>"; };
 		A20000000000000000000003 /* TokenStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TokenStore.swift; sourceTree = "<group>"; };
@@ -443,6 +451,8 @@
 		B00000000000000000000085 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				D20000000000000000000003 /* InterviewHomeView.swift */,
+				D20000000000000000000004 /* InterviewSessionView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -450,6 +460,7 @@
 		B00000000000000000000086 /* ViewModels */ = {
 			isa = PBXGroup;
 			children = (
+				D20000000000000000000002 /* InterviewViewModel.swift */,
 			);
 			path = ViewModels;
 			sourceTree = "<group>";
@@ -457,6 +468,7 @@
 		B00000000000000000000087 /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				D20000000000000000000001 /* InterviewModels.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -526,6 +538,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D10000000000000000000001 /* InterviewModels.swift in Sources */,
+				D10000000000000000000002 /* InterviewViewModel.swift in Sources */,
+				D10000000000000000000003 /* InterviewHomeView.swift in Sources */,
+				D10000000000000000000004 /* InterviewSessionView.swift in Sources */,
 				A10000000000000000000001 /* CareerCopilotApp.swift in Sources */,
 				A10000000000000000000002 /* APIClient.swift in Sources */,
 				A10000000000000000000003 /* TokenStore.swift in Sources */,

@@ -16,6 +16,10 @@ from career_copilot_backend.services.chat_answers import (
     process_chat_answer,
     run_next_chat_answer,
 )
+from career_copilot_backend.services.interview_jobs import (
+    process_interview_job,
+    run_next_interview_job,
+)
 from career_copilot_backend.services.job_match import match_job
 from career_copilot_backend.services.jobs import run_next_job
 
@@ -75,7 +79,11 @@ def main() -> None:
             SessionLocal,
             lambda job_id: process_chat_answer(SessionLocal, provider, job_id),
         )
-        if not processed and not chat_processed:
+        interview_processed = run_next_interview_job(
+            SessionLocal,
+            lambda job_id: process_interview_job(SessionLocal, provider, job_id),
+        )
+        if not processed and not chat_processed and not interview_processed:
             time.sleep(2)
 
 

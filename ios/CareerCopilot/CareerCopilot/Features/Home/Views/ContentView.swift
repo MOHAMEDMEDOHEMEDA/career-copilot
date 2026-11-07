@@ -5,13 +5,14 @@ struct ContentView: View {
     @StateObject private var model = AppViewModel()
     @StateObject private var resumeModel = ResumeViewModel()
     @StateObject private var chatModel = ChatViewModel()
+    @StateObject private var interviewModel = InterviewViewModel()
     @State private var showImporter = false
     @State private var showSettings = false
     @State private var resumeToDelete: Resume?
     @State private var selectedTab: AppTab = .workspace
 
     private enum AppTab: Hashable {
-        case workspace, chat, settings
+        case workspace, chat, interview, settings
     }
 
     var body: some View {
@@ -44,6 +45,12 @@ struct ContentView: View {
                     }
                     .tabItem { Label("Chat", systemImage: "bubble.left.and.bubble.right") }
                     .tag(AppTab.chat)
+
+                    NavigationStack {
+                        InterviewHomeView(model: interviewModel, resumeModel: resumeModel)
+                    }
+                    .tabItem { Label("Practice", systemImage: "person.wave.2") }
+                    .tag(AppTab.interview)
 
                     SettingsView(model: model, showsDoneButton: false)
                         .tabItem { Label("Settings", systemImage: "gearshape") }
@@ -83,9 +90,10 @@ struct ContentView: View {
             }
             .task { await model.restoreSession() }
             .task(id: model.profile?.email) {
-                guard model.profile != nil else { resumeModel.reset(); chatModel.reset(); selectedTab = .workspace; return }
+                guard model.profile != nil else { resumeModel.reset(); chatModel.reset(); interviewModel.reset(); selectedTab = .workspace; return }
                 resumeModel.baseURL = model.baseURL
                 chatModel.baseURL = model.baseURL
+                interviewModel.baseURL = model.baseURL
                 await resumeModel.loadResumes()
             }
     }
