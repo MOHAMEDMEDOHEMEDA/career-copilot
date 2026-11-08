@@ -59,8 +59,9 @@ struct ContentView: View {
             }
         }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .background(CareerStyle.canvas)
+            .background(CareerStyle.gradient.ignoresSafeArea())
             .tint(CareerStyle.accent)
+            .preferredColorScheme(.dark)
             .sheet(isPresented: $showSettings) { SettingsView(model: model) }
             .confirmationDialog("Delete this resume?", isPresented: Binding(
                 get: { resumeToDelete != nil },

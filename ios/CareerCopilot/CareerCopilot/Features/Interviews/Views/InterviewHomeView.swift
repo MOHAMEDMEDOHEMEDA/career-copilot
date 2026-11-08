@@ -74,12 +74,17 @@ struct NewInterviewView: View {
                     if resumes.isEmpty { Text("Upload a resume in Workspace first.") }
                     else { Picker("Choose resume", selection: $resumeID) { Text("Select a resume").tag(UUID?.none); ForEach(resumes) { Text($0.filename).tag(Optional($0.id)) } } }
                 }
+                .listRowBackground(CareerStyle.card)
                 Section("Job description") {
-                    TextEditor(text: $description).frame(minHeight: 180).accessibilityLabel("Job description")
+                    TextEditor(text: $description).scrollContentBackground(.hidden).frame(minHeight: 180).accessibilityLabel("Job description")
                     Text("\(description.unicodeScalars.count) / 20,000").font(.caption).foregroundStyle(.secondary)
                 }
+                .listRowBackground(CareerStyle.card)
                 if let error = model.error { Section { Text(error).foregroundStyle(.red) } }
             }
+            .scrollContentBackground(.hidden)
+            .background(CareerStyle.gradient.ignoresSafeArea())
+            .listRowBackground(CareerStyle.card)
             .navigationTitle("New interview").navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() } }
@@ -89,6 +94,8 @@ struct NewInterviewView: View {
                 }
             }
         }
+        .tint(CareerStyle.accent)
+        .preferredColorScheme(.dark)
     }
 }
 

@@ -10,7 +10,7 @@ struct ResumeListView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 24) {
                 HStack(spacing: 12) {
-                    GradientIcon(symbol: "person.fill", colors: [CareerStyle.accent, .purple])
+                    GradientIcon(symbol: "person.fill")
                     VStack(alignment: .leading, spacing: 3) {
                         Text("Welcome back").font(.subheadline).foregroundStyle(.secondary)
                         Text(model.profile?.email ?? "Your workspace").font(.headline).lineLimit(1)
@@ -38,7 +38,7 @@ struct ResumeListView: View {
                     .disabled(resumeModel.isLoading || model.isLoading)
                 }
                 .padding(22)
-                .background(LinearGradient(colors: [.init(white: 0.25), .black], startPoint: .topLeading, endPoint: .bottomTrailing), in: RoundedRectangle(cornerRadius: 28))
+                .background(LinearGradient(colors: [CareerStyle.card, Color(red: 0.015, green: 0.22, blue: 0.3)], startPoint: .topLeading, endPoint: .bottomTrailing), in: RoundedRectangle(cornerRadius: 28))
 
                 HStack {
                     Text("Your resumes").font(.title3.bold())
@@ -75,11 +75,11 @@ struct ResumeListView: View {
                         Text(error)
                     } actions: {
                         Button("Try again") { Task { await resumeModel.loadResumes() } }
-                            .buttonStyle(.borderedProminent)
+                            .careerPrimaryButton()
                     }
                 } else if resumeModel.resumes.isEmpty {
                     VStack(alignment: .leading, spacing: 12) {
-                        GradientIcon(symbol: "doc.text", colors: [CareerStyle.coral, .pink])
+                        GradientIcon(symbol: "doc.text")
                         Text("A fresh start").font(.headline)
                         Text("Upload a PDF to keep your resume close at hand.")
                             .font(.subheadline).foregroundStyle(.secondary)
@@ -124,6 +124,7 @@ struct ResumeListView: View {
             .frame(maxWidth: .infinity)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(CareerStyle.gradient.ignoresSafeArea())
         .refreshable { await resumeModel.loadResumes() }
         .toolbar {
             ToolbarItem(placement: .topBarLeading) {

@@ -16,6 +16,7 @@ struct SettingsView: View {
                     Text("Use HTTPS, or localhost for simulator development.")
                         .font(.footnote).foregroundStyle(.secondary)
                 }
+                .listRowBackground(CareerStyle.card)
                 if let profile = model.profile {
                     Section("Account") {
                         Text(profile.email)
@@ -25,8 +26,12 @@ struct SettingsView: View {
                         Button("Sign out", role: .destructive) { Task { await model.signOut() } }
                             .disabled(model.isLoading)
                     }
+                    .listRowBackground(CareerStyle.card)
                 }
             }
+            .scrollContentBackground(.hidden)
+            .background(CareerStyle.gradient.ignoresSafeArea())
+            .listRowBackground(CareerStyle.card)
             .navigationTitle("Settings")
             .toolbar {
                 if showsDoneButton { Button("Done") { dismiss() } }
@@ -48,6 +53,8 @@ struct SettingsView: View {
                 Text(model.message ?? "")
             }
         }
+        .tint(CareerStyle.accent)
+        .preferredColorScheme(.dark)
     }
 
     @Environment(\.dismiss) private var dismiss

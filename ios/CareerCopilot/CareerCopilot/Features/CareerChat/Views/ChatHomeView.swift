@@ -1,11 +1,11 @@
 import SwiftUI
 
 enum ChatStyle {
-    static let background = Color(red: 0.015, green: 0.035, blue: 0.07)
-    static let surface = Color(red: 0.08, green: 0.13, blue: 0.19)
-    static let cyan = Color(red: 0.08, green: 0.69, blue: 0.94)
-    static let muted = Color.white.opacity(0.72)
-    static let gradient = LinearGradient(colors: [Color(red: 0.025, green: 0.14, blue: 0.21), background, .black], startPoint: .topLeading, endPoint: .bottomTrailing)
+    static let background = CareerStyle.canvas
+    static let surface = CareerStyle.card
+    static let cyan = CareerStyle.accent
+    static let muted = CareerStyle.muted
+    static let gradient = CareerStyle.gradient
 }
 
 struct ChatHomeView: View {

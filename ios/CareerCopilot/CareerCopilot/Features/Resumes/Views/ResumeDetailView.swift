@@ -16,6 +16,7 @@ struct ResumeDetailView: View {
         Group {
             if isEditing {
                 TextEditor(text: $draft)
+                    .scrollContentBackground(.hidden)
                     .padding(.horizontal)
                     .accessibilityLabel("Resume text")
                     .disabled(model.isLoading)
@@ -32,7 +33,7 @@ struct ResumeDetailView: View {
                             Label("Analyze resume", systemImage: "sparkles")
                                 .frame(maxWidth: .infinity)
                         }
-                        .buttonStyle(.borderedProminent)
+                        .careerPrimaryButton()
                         NavigationLink {
                             if let matchModel = model.matchModel(for: resume.id) {
                                 JobMatchView(model: matchModel)
@@ -55,6 +56,7 @@ struct ResumeDetailView: View {
                 }
             }
         }
+        .background(CareerStyle.gradient.ignoresSafeArea())
         .navigationTitle(resume.filename)
         .navigationBarTitleDisplayMode(.inline)
         .navigationBarBackButtonHidden(isEditing)
@@ -91,4 +93,5 @@ struct ResumeDetailView: View {
     NavigationStack {
         ResumeDetailView(model: ResumeViewModel(), resume: Resume(id: UUID(), filename: "Example.pdf", text: "Synthetic resume text."))
     }
+    .preferredColorScheme(.dark)
 }

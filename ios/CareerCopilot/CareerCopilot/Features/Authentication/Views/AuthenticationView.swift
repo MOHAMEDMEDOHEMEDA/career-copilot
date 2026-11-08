@@ -11,7 +11,7 @@ struct AuthenticationView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: dynamicTypeSize.isAccessibilitySize ? 16 : 24) {
-                GradientIcon(symbol: "sparkles", colors: [CareerStyle.accent, .purple])
+                GradientIcon(symbol: "sparkles")
                 VStack(alignment: .leading, spacing: 8) {
                     Text("Your next step starts here.")
                         .font(dynamicTypeSize.isAccessibilitySize ? .title2.bold() : .largeTitle.bold())
@@ -53,7 +53,7 @@ struct AuthenticationView: View {
                     }
                     .frame(minHeight: 44)
                 }
-                .buttonStyle(.borderedProminent)
+                .careerPrimaryButton()
                 .disabled(model.isLoading || model.email.isEmpty || model.password.isEmpty)
                 if model.canRetrySessionRestore {
                     Button("Retry session check") { Task { await model.restoreSession() } }
@@ -78,6 +78,7 @@ struct AuthenticationView: View {
             .frame(maxWidth: .infinity, alignment: .center)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(CareerStyle.gradient.ignoresSafeArea())
     }
 }
 

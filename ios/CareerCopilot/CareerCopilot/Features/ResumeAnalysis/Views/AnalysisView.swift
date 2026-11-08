@@ -33,12 +33,12 @@ struct AnalysisView: View {
                     statusCard(title: "Analysis couldn’t finish", message: message)
                     jobReference
                     Button("Start a new analysis") { confirmSubmission = true }
-                        .buttonStyle(.borderedProminent)
+                        .careerPrimaryButton()
                 case .paused(let message):
                     statusCard(title: "Status unavailable", message: message)
                     jobReference
                     Button("Check status") { model.checkStatus() }
-                        .buttonStyle(.borderedProminent)
+                        .careerPrimaryButton()
                 }
                 historySection
             }
@@ -47,7 +47,7 @@ struct AnalysisView: View {
             .frame(maxWidth: .infinity)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(CareerStyle.canvas)
+        .background(CareerStyle.gradient.ignoresSafeArea())
         .navigationTitle("Resume analysis")
         .navigationBarTitleDisplayMode(.inline)
         .confirmationDialog("Send this resume for analysis?", isPresented: $confirmSubmission, titleVisibility: .visible) {
@@ -100,14 +100,14 @@ struct AnalysisView: View {
 
     private var intro: some View {
         VStack(alignment: .leading, spacing: 16) {
-            GradientIcon(symbol: "sparkles", colors: [CareerStyle.accent, .purple])
+            GradientIcon(symbol: "sparkles")
             Text("Review your resume").font(.title2.bold())
             Text("Get a structured summary and suggestions based on your resume. Review every suggestion before using it.")
                 .foregroundStyle(.secondary)
             Text("Your resume may be sent to OpenRouter and Google Gemini, or processed locally with Ollama. For now, use synthetic resumes only.")
                 .font(.footnote).foregroundStyle(.secondary)
             Button("Start analysis") { confirmSubmission = true }
-                .buttonStyle(.borderedProminent)
+                .careerPrimaryButton()
         }
         .frame(maxWidth: .infinity, alignment: .leading).padding(20).careerCard()
     }
@@ -178,6 +178,7 @@ struct AnalysisView: View {
     NavigationStack {
         AnalysisView(model: AnalysisViewModel(resumeID: UUID(), service: PreviewAnalysisService()))
     }
+    .preferredColorScheme(.dark)
 }
 
 private struct PreviewAnalysisService: AnalysisServicing {

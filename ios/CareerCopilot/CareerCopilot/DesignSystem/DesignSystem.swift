@@ -1,23 +1,32 @@
 import SwiftUI
 
 enum CareerStyle {
-    static let canvas = Color(uiColor: .systemGroupedBackground)
-    static let card = Color(uiColor: .secondarySystemGroupedBackground)
-    static let ink = Color.primary
-    static let accent = Color(red: 0.27, green: 0.39, blue: 0.90)
-    static let coral = Color(red: 0.98, green: 0.46, blue: 0.40)
+    static let canvas = Color(red: 0.015, green: 0.035, blue: 0.07)
+    static let card = Color(red: 0.08, green: 0.13, blue: 0.19)
+    static let ink = Color.white
+    static let accent = Color(red: 0.08, green: 0.69, blue: 0.94)
+    static let muted = Color.white.opacity(0.72)
+    static let coral = Color(red: 0.12, green: 0.46, blue: 0.84)
+    static let gradient = LinearGradient(
+        colors: [Color(red: 0.025, green: 0.14, blue: 0.21), canvas, .black],
+        startPoint: .topLeading,
+        endPoint: .bottomTrailing
+    )
 }
 
 struct CareerCard: ViewModifier {
     func body(content: Content) -> some View {
         content
             .background(CareerStyle.card, in: RoundedRectangle(cornerRadius: 24, style: .continuous))
-            .overlay(RoundedRectangle(cornerRadius: 24, style: .continuous).strokeBorder(.primary.opacity(0.04)))
+            .overlay(RoundedRectangle(cornerRadius: 24, style: .continuous).strokeBorder(.white.opacity(0.08)))
     }
 }
 
 extension View {
     func careerCard() -> some View { modifier(CareerCard()) }
+    func careerPrimaryButton() -> some View {
+        self.buttonStyle(.borderedProminent).foregroundStyle(.black)
+    }
 }
 
 struct GradientIcon: View {
@@ -41,7 +50,7 @@ struct ScreenPreview<Content: View>: View {
         NavigationStack {
             content
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .background(CareerStyle.canvas)
+                .background(CareerStyle.gradient.ignoresSafeArea())
                 .tint(CareerStyle.accent)
                 .navigationBarTitleDisplayMode(.inline)
                 .toolbar {
@@ -51,16 +60,18 @@ struct ScreenPreview<Content: View>: View {
                     }
                 }
         }
+        .preferredColorScheme(.dark)
     }
 }
 
 #Preview("Design components") {
     HStack {
         GradientIcon(symbol: "sparkles")
-        GradientIcon(symbol: "doc.text", colors: [CareerStyle.coral, .pink])
+        GradientIcon(symbol: "doc.text")
     }
     .padding()
     .careerCard()
     .padding()
-    .background(CareerStyle.canvas)
+    .background(CareerStyle.gradient)
+    .preferredColorScheme(.dark)
 }

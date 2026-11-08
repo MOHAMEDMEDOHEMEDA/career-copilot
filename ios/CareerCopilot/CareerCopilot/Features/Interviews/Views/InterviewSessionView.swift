@@ -14,7 +14,7 @@ struct InterviewSessionView: View {
                 Text(interview.jobDescription).lineLimit(4).foregroundStyle(ChatStyle.muted)
                 if model.questions.isEmpty {
                     Text("Generate three questions tailored to this role and resume.").foregroundStyle(.white)
-                    Button("Generate questions") { confirmGeneration = true }.buttonStyle(.borderedProminent).disabled(model.loading)
+                    Button("Generate questions") { confirmGeneration = true }.careerPrimaryButton().disabled(model.loading)
                 }
                 if model.loading { ProgressView("Working on your interview…").tint(.white).foregroundStyle(.white) }
                 if let error = model.error {
@@ -68,7 +68,7 @@ struct InterviewAnswerView: View {
                         TextEditor(text: $answer).scrollContentBackground(.hidden).foregroundStyle(.white).padding(8).frame(minHeight: 180).background(ChatStyle.surface, in: RoundedRectangle(cornerRadius: 16)).accessibilityLabel("Your answer")
                         Text("\(answer.unicodeScalars.count) / 4,000").font(.caption).foregroundStyle(ChatStyle.muted)
                         Button("Save answer") { Task { _ = await model.save(sessionID: sessionID, questionID: questionID, answer: answer) } }
-                            .buttonStyle(.borderedProminent).disabled(model.loading || answer.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || answer.unicodeScalars.count > 4000)
+                            .careerPrimaryButton().disabled(model.loading || answer.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || answer.unicodeScalars.count > 4000)
                         if question.answer != nil {
                             Button("Get feedback") { confirmFeedback = true }.buttonStyle(.bordered).disabled(model.loading || answer != question.answer)
                         }

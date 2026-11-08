@@ -14,10 +14,10 @@ struct JobMatchView: View {
                 case .idle:
                     Text("Paste a job description").font(.title2.bold())
                     Text("Compare its requirements with your resume. Use synthetic data until privacy and retention have been reviewed.").foregroundStyle(.secondary)
-                    TextEditor(text: $model.description).frame(minHeight: 200).padding(8).careerCard().accessibilityLabel("Job description")
+                    TextEditor(text: $model.description).scrollContentBackground(.hidden).frame(minHeight: 200).padding(8).careerCard().accessibilityLabel("Job description")
                     Text("\(model.description.unicodeScalars.count) / 20,000 characters").font(.caption).foregroundStyle(.secondary)
                     Button("Compare with resume") { confirm = true }
-                        .buttonStyle(.borderedProminent)
+                        .careerPrimaryButton()
                         .disabled(model.description.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || model.description.unicodeScalars.count > 20_000)
                 case .submitting:
                     ProgressView("Starting comparison")
@@ -28,7 +28,7 @@ struct JobMatchView: View {
                 case .paused(let message):
                     Label(message, systemImage: "exclamationmark.circle")
                     jobReference
-                    Button("Check status") { model.checkStatus() }.buttonStyle(.borderedProminent)
+                    Button("Check status") { model.checkStatus() }.careerPrimaryButton()
                 case .failed(let message):
                     Label(message, systemImage: "exclamationmark.circle")
                     jobReference
@@ -46,7 +46,7 @@ struct JobMatchView: View {
             }.frame(maxWidth: 700, alignment: .leading).frame(maxWidth: .infinity).padding(20)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(CareerStyle.canvas)
+        .background(CareerStyle.gradient.ignoresSafeArea())
         .navigationTitle("Job matching")
         .navigationBarTitleDisplayMode(.inline)
         .confirmationDialog("Send this comparison for analysis?", isPresented: $confirm, titleVisibility: .visible) {
@@ -74,6 +74,7 @@ struct JobMatchView: View {
 
 #Preview {
     NavigationStack { JobMatchView(model: JobMatchViewModel(resumeID: UUID(), service: PreviewMatchService())) }
+        .preferredColorScheme(.dark)
 }
 
 private struct PreviewMatchService: JobMatchServicing {
