@@ -18,12 +18,16 @@ final class InterviewViewModel: ObservableObject {
     @Published private(set) var sessions: [InterviewSession] = []
     @Published private(set) var questions: [InterviewQuestion] = []
     @Published private(set) var loading = false
+    @Published private(set) var loadingQuestions = false
+    @Published private(set) var hasLoadedQuestions = false
     @Published private(set) var hasMore = false
     @Published private(set) var job: InterviewJob?
     @Published var error: String?
     var baseURL: String
     private var generation = UUID()
+    private var accountGeneration = UUID()
     private var activeSessionID: UUID?
+    private var jobsBySession: [UUID: InterviewJob] = [:]
     private let clientFactory: (String) throws -> any InterviewServicing
 
     init(baseURL: String = UserDefaults.standard.string(forKey: "baseURL") ?? "http://localhost:8000", clientFactory: @escaping (String) throws -> any InterviewServicing = { try APIClient.configured(baseURL: $0) }) {
@@ -32,7 +36,7 @@ final class InterviewViewModel: ObservableObject {
     }
 
     func reset() {
-        generation = UUID(); sessions = []; questions = []; job = nil; error = nil; loading = false; hasMore = false; activeSessionID = nil
+        generation = UUID(); accountGeneration = UUID(); jobsBySession.removeAll(); sessions = []; questions = []; job = nil; error = nil; loading = false; loadingQuestions = false; hasLoadedQuestions = false; hasMore = false; activeSessionID = nil
     }
 
     func loadSessions(more: Bool = false) async {
@@ -68,23 +72,33 @@ final class InterviewViewModel: ObservableObject {
         do {
             try await clientFactory(baseURL).deleteInterview(id: item.id)
             guard token == generation, !Task.isCancelled else { return }
-            sessions.removeAll { $0.id == item.id }; error = nil
+            sessions.removeAll { $0.id == item.id }; jobsBySession[item.id] = nil; error = nil
         } catch { if token == generation && !Task.isCancelled { self.error = error.localizedDescription } }
     }
 
     func open(_ sessionID: UUID) async {
         generation = UUID(); activeSessionID = sessionID; loading = false
-        questions = []; job = nil; error = nil
+        let token = generation
+        questions = []; job = jobsBySession[sessionID]; error = nil; hasLoadedQuestions = false; loadingQuestions = false
         await refresh(sessionID)
+        guard token == generation, activeSessionID == sessionID, hasLoadedQuestions, !Task.isCancelled, let job else { return }
+        if job.status == .queued || job.status == .running {
+            await checkStatus(sessionID: sessionID)
+        } else if job.status == .failed {
+            error = "Interview request failed (\(job.errorCode ?? "unknown error")). You can retry."
+        }
     }
 
     func refresh(_ sessionID: UUID) async {
+        guard !loadingQuestions else { return }
         let token = generation
+        loadingQuestions = true
+        defer { if token == generation { loadingQuestions = false } }
         do {
             let page = try await clientFactory(baseURL).interviewQuestions(sessionID: sessionID)
             guard token == generation, activeSessionID == sessionID, !Task.isCancelled else { return }
             guard page.items.allSatisfy({ $0.sessionID == sessionID }) else { throw URLError(.badServerResponse) }
-            questions = page.items; error = nil
+            questions = page.items; hasLoadedQuestions = true; error = nil
         } catch { if token == generation && !Task.isCancelled { self.error = error.localizedDescription } }
     }
 
@@ -96,30 +110,63 @@ final class InterviewViewModel: ObservableObject {
             let item = try await clientFactory(baseURL).saveInterviewAnswer(sessionID: sessionID, questionID: questionID, answer: answer)
             guard token == generation, !Task.isCancelled, item.sessionID == sessionID, item.id == questionID else { return false }
             if let index = questions.firstIndex(where: { $0.id == questionID }) { questions[index] = item }
-            if job?.questionID == questionID { job = nil }
+            if job?.questionID == questionID { job = nil; jobsBySession[sessionID] = nil }
             error = nil; return true
         } catch { if token == generation && !Task.isCancelled { self.error = error.localizedDescription }; return false }
     }
 
     func request(sessionID: UUID, questionID: UUID?, retry: Bool = false) async {
         guard !loading else { return }
-        let token = generation; loading = true
+        let token = generation; let accountToken = accountGeneration; loading = true
         defer { if token == generation { loading = false } }
         do {
             let client = try clientFactory(baseURL)
             var current: InterviewJob
             if retry, let old = job { current = try await client.retryInterviewJob(sessionID: sessionID, jobID: old.id) }
             else { current = try await client.requestInterviewJob(sessionID: sessionID, questionID: questionID) }
+            guard accountToken == accountGeneration, current.sessionID == sessionID, current.questionID == questionID else { return }
+            jobsBySession[sessionID] = current
+            if token != generation, activeSessionID == sessionID, job == nil, !loading {
+                job = current
+                if hasLoadedQuestions && error == nil && (current.status == .queued || current.status == .running) {
+                    await checkStatus(sessionID: sessionID)
+                } else if hasLoadedQuestions && error == nil && current.status == .failed {
+                    error = "Interview request failed (\(current.errorCode ?? "unknown error")). You can retry."
+                }
+                return
+            }
+            guard token == generation, activeSessionID == sessionID, !Task.isCancelled else { return }
+            error = nil
+            try await poll(current: &current, client: client, sessionID: sessionID, questionID: questionID, token: token)
+        } catch is CancellationError { return }
+        catch { if token == generation && !Task.isCancelled { self.error = "Couldn’t check the interview: \(error.localizedDescription). You can check again." } }
+    }
+
+    func checkStatus(sessionID: UUID) async {
+        guard !loading, var current = job, current.sessionID == sessionID,
+              current.status == .queued || current.status == .running else { return }
+        let token = generation; loading = true; error = nil
+        defer { if token == generation { loading = false } }
+        do {
+            let client = try clientFactory(baseURL)
+            current = try await client.interviewJob(sessionID: sessionID, jobID: current.id)
+            let questionID = current.questionID
+            try await poll(current: &current, client: client, sessionID: sessionID, questionID: questionID, token: token)
+        } catch is CancellationError { return }
+        catch { if token == generation && !Task.isCancelled { self.error = "Couldn’t check the interview: \(error.localizedDescription). You can check again." } }
+    }
+
+    private func poll(current: inout InterviewJob, client: any InterviewServicing, sessionID: UUID, questionID: UUID?, token: UUID) async throws {
             for _ in 0..<90 {
                 guard token == generation, !Task.isCancelled, current.sessionID == sessionID, current.questionID == questionID else { return }
-                job = current
+                job = current; jobsBySession[sessionID] = current
                 if current.status == .completed { await refresh(sessionID); return }
                 if current.status == .failed { error = "Interview request failed (\(current.errorCode ?? "unknown error")). You can retry."; return }
                 try await Task.sleep(nanoseconds: 2_000_000_000)
                 current = try await client.interviewJob(sessionID: sessionID, jobID: current.id)
             }
-            error = "This is taking longer than expected. Check the status again."
-        } catch is CancellationError { return }
-        catch { if token == generation && !Task.isCancelled { self.error = "Couldn’t check the interview: \(error.localizedDescription). You can check again." } }
+            if token == generation && activeSessionID == sessionID && !Task.isCancelled {
+                error = "This is taking longer than expected. Check the status again."
+            }
     }
 }

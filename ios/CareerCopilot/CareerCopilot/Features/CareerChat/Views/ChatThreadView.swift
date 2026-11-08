@@ -22,29 +22,31 @@ struct ChatThreadView: View {
                         .padding(16).background(ChatStyle.surface, in: RoundedRectangle(cornerRadius: 20))
                     }
                     if model.isLoading { ProgressView("Loading messages").tint(.white).foregroundStyle(ChatStyle.muted) }
-                    if model.hasLoadedMessages && model.messages.isEmpty && !model.isLoading {
-                        Text("No messages yet. Ask your first career question below.")
-                            .font(.subheadline).foregroundStyle(ChatStyle.muted)
+                    if model.hasLoadedMessages && model.messages.isEmpty && !model.isLoading && model.draft.isEmpty {
+                        VStack(alignment: .leading, spacing: 10) {
+                            Text("Not sure where to start?").font(.headline).foregroundStyle(.white)
+                            Text("Choose a question or write your own below.").font(.subheadline).foregroundStyle(ChatStyle.muted)
+                            ForEach(["How can I prepare for an interview?", "How can I improve my resume?", "How should I approach a career change?"], id: \.self) { suggestion in
+                                Button {
+                                    model.draft = suggestion
+                                    composerFocused = true
+                                } label: {
+                                    HStack {
+                                        Text(suggestion).multilineTextAlignment(.leading)
+                                        Spacer()
+                                        Image(systemName: "arrow.up.left")
+                                    }.frame(maxWidth: .infinity, minHeight: 44, alignment: .leading).padding(.horizontal, 14)
+                                }
+                                .buttonStyle(.plain).foregroundStyle(.white)
+                                .background(ChatStyle.surface, in: RoundedRectangle(cornerRadius: 14))
+                                .accessibilityHint("Adds this question to the message field for you to review.")
+                            }
+                        }
                     }
                     if let error = model.error {
                         VStack(alignment: .leading, spacing: 8) {
                             Label(error, systemImage: "exclamationmark.circle").foregroundStyle(.white)
                             Button("Refresh messages") { Task { await model.loadMessages(conversationID: conversation.id) } }.foregroundStyle(ChatStyle.cyan).frame(minHeight: 44)
-                        }.padding(14).background(ChatStyle.surface, in: RoundedRectangle(cornerRadius: 16))
-                    }
-                    if model.isRequestingAnswer {
-                        ProgressView("Requesting an answer").tint(.white).foregroundStyle(ChatStyle.muted)
-                    } else if let job = model.answerJob, job.status == .queued || job.status == .running, !model.answerPollingPaused {
-                        ProgressView(job.status == .running ? "Preparing an answer" : "Waiting for an answer").tint(.white).foregroundStyle(ChatStyle.muted)
-                    }
-                    if let answerError = model.answerError {
-                        VStack(alignment: .leading, spacing: 8) {
-                            Text(answerError).foregroundStyle(.white)
-                            if model.answerPollingPaused {
-                                Button("Check status") { model.checkAnswerStatus() }.foregroundStyle(ChatStyle.cyan).frame(minHeight: 44)
-                            } else if model.answerJob?.status == .failed {
-                                Button("Retry answer") { retrying = true; confirmAnswer = true }.foregroundStyle(ChatStyle.cyan).frame(minHeight: 44)
-                            }
                         }.padding(14).background(ChatStyle.surface, in: RoundedRectangle(cornerRadius: 16))
                     }
                     ForEach(model.messages) { message in
@@ -82,6 +84,21 @@ struct ChatThreadView: View {
                             .foregroundStyle(ChatStyle.cyan)
                             .frame(minHeight: 44)
                         Text("Load all messages before adding a new one.").font(.caption).foregroundStyle(ChatStyle.muted)
+                    }
+                    if model.isRequestingAnswer {
+                        ProgressView("Requesting an answer").tint(.white).foregroundStyle(ChatStyle.muted)
+                    } else if let job = model.answerJob, job.status == .queued || job.status == .running, !model.answerPollingPaused {
+                        ProgressView(job.status == .running ? "Preparing an answer" : "Waiting for an answer").tint(.white).foregroundStyle(ChatStyle.muted)
+                    }
+                    if let answerError = model.answerError {
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text(answerError).foregroundStyle(.white)
+                            if model.answerPollingPaused {
+                                Button("Check status") { model.checkAnswerStatus() }.foregroundStyle(ChatStyle.cyan).frame(minHeight: 44)
+                            } else if model.answerJob?.status == .failed {
+                                Button("Retry answer") { retrying = true; confirmAnswer = true }.foregroundStyle(ChatStyle.cyan).frame(minHeight: 44)
+                            }
+                        }.padding(14).background(ChatStyle.surface, in: RoundedRectangle(cornerRadius: 16))
                     }
                     Color.clear.frame(height: 1).id("bottom")
                 }

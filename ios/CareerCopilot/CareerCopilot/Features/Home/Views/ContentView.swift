@@ -33,7 +33,12 @@ struct ContentView: View {
             } else {
                 TabView(selection: $selectedTab) {
                     NavigationStack {
-                        ResumeListView(model: model, resumeModel: resumeModel, showImporter: $showImporter, resumeToDelete: $resumeToDelete)
+                        ResumeListView(
+                            model: model, resumeModel: resumeModel,
+                            showImporter: $showImporter, resumeToDelete: $resumeToDelete,
+                            openChat: { selectedTab = .chat },
+                            openPractice: { selectedTab = .interview }
+                        )
                             .navigationTitle("Workspace")
                             .navigationBarTitleDisplayMode(.inline)
                     }

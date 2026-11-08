@@ -715,6 +715,7 @@ final class InterviewViewModelTests: XCTestCase {
         let model = InterviewViewModel(clientFactory: { _ in service })
         await model.loadSessions()
         await model.open(id)
+        XCTAssertTrue(model.hasLoadedQuestions)
         XCTAssertEqual(model.sessions.count, 1)
         XCTAssertEqual(model.questions.count, 1)
         let saved = await model.save(sessionID: id, questionID: model.questions[0].id, answer: "Synthetic answer")
@@ -723,12 +724,94 @@ final class InterviewViewModelTests: XCTestCase {
         model.reset()
         XCTAssertTrue(model.questions.isEmpty)
         XCTAssertTrue(model.sessions.isEmpty)
+        XCTAssertFalse(model.hasLoadedQuestions)
     }
+
+    func testChecksInterruptedInterviewJobWithoutCreatingAnotherRequest() async {
+        let id = UUID()
+        let service = FakeInterviewService(sessionID: id)
+        let model = InterviewViewModel(clientFactory: { _ in service })
+        await model.open(id)
+        await model.request(sessionID: id, questionID: nil)
+        XCTAssertEqual(model.job?.status, .queued)
+        XCTAssertNotNil(model.error)
+        await model.checkStatus(sessionID: id)
+        XCTAssertEqual(model.job?.status, .completed)
+        XCTAssertNil(model.error)
+        let requests = await service.jobRequests
+        XCTAssertEqual(requests, 1)
+    }
+
+    func testReopeningSessionRecoversPendingJob() async {
+        let id = UUID()
+        let service = FakeInterviewService(sessionID: id)
+        let model = InterviewViewModel(clientFactory: { _ in service })
+        await model.open(id)
+        await model.request(sessionID: id, questionID: nil)
+        XCTAssertEqual(model.job?.status, .queued)
+        await model.open(id)
+        XCTAssertEqual(model.job?.status, .completed)
+        XCTAssertNil(model.error)
+        let requests = await service.jobRequests
+        XCTAssertEqual(requests, 1)
+        model.reset()
+        XCTAssertNil(model.job)
+    }
+
+    func testOldRequestDoesNotClearNewSessionError() async {
+        let first = UUID(), second = UUID()
+        let service = DelayedInterviewService(failingSession: second)
+        let model = InterviewViewModel(clientFactory: { _ in service })
+        await model.open(first)
+        let request = Task { await model.request(sessionID: first, questionID: nil) }
+        await service.waitUntilRequested()
+        await model.open(second)
+        XCTAssertNotNil(model.error)
+        await service.finishRequest()
+        await request.value
+        XCTAssertNotNil(model.error)
+        XCTAssertFalse(model.hasLoadedQuestions)
+    }
+}
+
+private actor DelayedInterviewService: InterviewServicing {
+    let failingSession: UUID
+    private var requestContinuation: CheckedContinuation<InterviewJob, Never>?
+    private var requestStarted: CheckedContinuation<Void, Never>?
+    private var requestedSession: UUID?
+    init(failingSession: UUID) { self.failingSession = failingSession }
+    func waitUntilRequested() async {
+        if requestedSession != nil { return }
+        await withCheckedContinuation { requestStarted = $0 }
+    }
+    func finishRequest() {
+        guard let requestedSession else { return }
+        requestContinuation?.resume(returning: InterviewJob(id: UUID(), sessionID: requestedSession, questionID: nil, status: .queued, errorCode: nil))
+        requestContinuation = nil
+    }
+    func interviews(offset: Int) async throws -> ChatPage<InterviewSession> { ChatPage(items: [], limit: 20, offset: offset) }
+    func createInterview(resumeID: UUID, description: String) async throws -> InterviewSession { throw URLError(.unsupportedURL) }
+    func deleteInterview(id: UUID) async throws {}
+    func interviewQuestions(sessionID: UUID) async throws -> ChatPage<InterviewQuestion> {
+        if sessionID == failingSession { throw URLError(.notConnectedToInternet) }
+        return ChatPage(items: [], limit: 100, offset: 0)
+    }
+    func saveInterviewAnswer(sessionID: UUID, questionID: UUID, answer: String) async throws -> InterviewQuestion { throw URLError(.unsupportedURL) }
+    func requestInterviewJob(sessionID: UUID, questionID: UUID?) async throws -> InterviewJob {
+        requestedSession = sessionID
+        requestStarted?.resume(); requestStarted = nil
+        return await withCheckedContinuation { requestContinuation = $0 }
+    }
+    func interviewJob(sessionID: UUID, jobID: UUID) async throws -> InterviewJob { throw URLError(.unsupportedURL) }
+    func retryInterviewJob(sessionID: UUID, jobID: UUID) async throws -> InterviewJob { throw URLError(.unsupportedURL) }
 }
 
 private actor FakeInterviewService: InterviewServicing {
     let interview: InterviewSession
     var question: InterviewQuestion
+    private let jobID = UUID()
+    private var statusChecks = 0
+    private(set) var jobRequests = 0
     init(sessionID: UUID) {
         interview = InterviewSession(id: sessionID, resumeID: UUID(), jobDescription: "Synthetic role", status: "ready")
         question = InterviewQuestion(id: UUID(), sessionID: sessionID, sequence: 1, prompt: "Synthetic question?", answer: nil, feedback: nil)
@@ -741,7 +824,14 @@ private actor FakeInterviewService: InterviewServicing {
         question = InterviewQuestion(id: question.id, sessionID: sessionID, sequence: 1, prompt: question.prompt, answer: answer, feedback: nil)
         return question
     }
-    func requestInterviewJob(sessionID: UUID, questionID: UUID?) async throws -> InterviewJob { throw URLError(.unsupportedURL) }
-    func interviewJob(sessionID: UUID, jobID: UUID) async throws -> InterviewJob { throw URLError(.unsupportedURL) }
+    func requestInterviewJob(sessionID: UUID, questionID: UUID?) async throws -> InterviewJob {
+        jobRequests += 1
+        return InterviewJob(id: jobID, sessionID: sessionID, questionID: questionID, status: .queued, errorCode: nil)
+    }
+    func interviewJob(sessionID: UUID, jobID: UUID) async throws -> InterviewJob {
+        statusChecks += 1
+        if statusChecks == 1 { throw URLError(.notConnectedToInternet) }
+        return InterviewJob(id: jobID, sessionID: sessionID, questionID: nil, status: .completed, errorCode: nil)
+    }
     func retryInterviewJob(sessionID: UUID, jobID: UUID) async throws -> InterviewJob { throw URLError(.unsupportedURL) }
 }

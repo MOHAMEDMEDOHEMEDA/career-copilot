@@ -12,16 +12,30 @@ struct InterviewSessionView: View {
                 Text("PRACTICE SESSION").font(.caption.weight(.semibold)).tracking(1.3).foregroundStyle(ChatStyle.cyan)
                 Text("Let’s get you ready.").font(.largeTitle.bold()).foregroundStyle(.white)
                 Text(interview.jobDescription).lineLimit(4).foregroundStyle(ChatStyle.muted)
-                if model.questions.isEmpty {
+                if model.loadingQuestions && !model.hasLoadedQuestions {
+                    ProgressView("Loading your interview…").tint(.white).foregroundStyle(.white)
+                } else if model.hasLoadedQuestions && model.questions.isEmpty && model.error == nil && model.job?.status != .queued && model.job?.status != .running {
                     Text("Generate three questions tailored to this role and resume.").foregroundStyle(.white)
                     Button("Generate questions") { confirmGeneration = true }.careerPrimaryButton().disabled(model.loading)
                 }
-                if model.loading { ProgressView("Working on your interview…").tint(.white).foregroundStyle(.white) }
+                if model.loading { ProgressView("Working on your interview…").tint(.white).foregroundStyle(.white); Text("You can return to this session later.").font(.caption).foregroundStyle(ChatStyle.muted) }
                 if let error = model.error {
                     Text(error).foregroundStyle(.white)
-                    if let job = model.job, job.questionID == nil, job.status == .failed {
+                    if !model.hasLoadedQuestions {
+                        Button("Refresh questions") { Task { await model.open(interview.id) } }.disabled(model.loadingQuestions)
+                    } else if let job = model.job, job.questionID == nil, job.status == .failed {
                         Button("Retry generation") { confirmGeneration = true }.disabled(model.loading)
+                    } else if let job = model.job, job.questionID == nil, job.status == .queued || job.status == .running {
+                        Button("Check status") { Task { await model.checkStatus(sessionID: interview.id) } }.disabled(model.loading)
                     } else { Button("Refresh") { Task { await model.refresh(interview.id) } } }
+                }
+                if !model.questions.isEmpty {
+                    let answered = model.questions.filter { $0.answer != nil }.count
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("Your progress").font(.headline).foregroundStyle(.white)
+                        ProgressView(value: Double(answered), total: Double(model.questions.count)).tint(ChatStyle.cyan)
+                        Text("\(answered) of \(model.questions.count) answers saved").font(.caption).foregroundStyle(ChatStyle.muted)
+                    }.padding(16).frame(maxWidth: .infinity, alignment: .leading).background(ChatStyle.surface, in: RoundedRectangle(cornerRadius: 20))
                 }
                 ForEach(model.questions) { question in
                     Button { selected = question } label: {
@@ -55,7 +69,9 @@ struct InterviewAnswerView: View {
     let questionID: UUID
     @State private var answer = ""
     @State private var confirmFeedback = false
+    @State private var confirmDiscard = false
     private var question: InterviewQuestion? { model.questions.first { $0.id == questionID } }
+    private var hasUnsavedChanges: Bool { answer != (question?.answer ?? "") }
 
     var body: some View {
         NavigationStack {
@@ -67,27 +83,34 @@ struct InterviewAnswerView: View {
                         Text("Your answer").font(.headline).foregroundStyle(.white)
                         TextEditor(text: $answer).scrollContentBackground(.hidden).foregroundStyle(.white).padding(8).frame(minHeight: 180).background(ChatStyle.surface, in: RoundedRectangle(cornerRadius: 16)).accessibilityLabel("Your answer")
                         Text("\(answer.unicodeScalars.count) / 4,000").font(.caption).foregroundStyle(ChatStyle.muted)
+                        if hasUnsavedChanges { Text("Save your changes before requesting feedback.").font(.caption).foregroundStyle(ChatStyle.muted) }
                         Button("Save answer") { Task { _ = await model.save(sessionID: sessionID, questionID: questionID, answer: answer) } }
-                            .careerPrimaryButton().disabled(model.loading || answer.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || answer.unicodeScalars.count > 4000)
+                            .careerPrimaryButton().disabled(model.loading || !hasUnsavedChanges || answer.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || answer.unicodeScalars.count > 4000)
                         if question.answer != nil {
                             Button("Get feedback") { confirmFeedback = true }.buttonStyle(.bordered).disabled(model.loading || answer != question.answer)
                         }
-                        if let feedback = question.feedback { InterviewFeedbackView(feedback: feedback) }
+                        if let feedback = question.feedback, !hasUnsavedChanges { InterviewFeedbackView(feedback: feedback) }
                     }
-                    if model.loading { ProgressView("Preparing feedback…").tint(.white).foregroundStyle(.white) }
+                    if model.loading { ProgressView("Working on your answer…").tint(.white).foregroundStyle(.white) }
                     if let error = model.error {
                         Text(error).foregroundStyle(.white)
-                        if let job = model.job, job.questionID == questionID, job.status == .failed { Button("Retry feedback") { confirmFeedback = true }.disabled(model.loading) }
+                        if let job = model.job, job.questionID == questionID, job.status == .failed { Button("Retry feedback") { confirmFeedback = true }.disabled(model.loading || hasUnsavedChanges) }
+                        else if let job = model.job, job.questionID == questionID, job.status == .queued || job.status == .running { Button("Check status") { Task { await model.checkStatus(sessionID: sessionID) } }.disabled(model.loading) }
                     }
                 }.frame(maxWidth: 700, alignment: .leading).frame(maxWidth: .infinity).padding(20)
             }.background(ChatStyle.gradient.ignoresSafeArea()).tint(ChatStyle.cyan)
             .navigationTitle("Practice answer").navigationBarTitleDisplayMode(.inline).toolbarColorScheme(.dark, for: .navigationBar)
-            .toolbar { ToolbarItem(placement: .confirmationAction) { Button("Done") { dismiss() } } }
+            .toolbar { ToolbarItem(placement: .confirmationAction) { Button("Done") { if hasUnsavedChanges { confirmDiscard = true } else { dismiss() } } } }
+            .interactiveDismissDisabled(hasUnsavedChanges)
             .onAppear { answer = question?.answer ?? "" }
             .alert("Get AI feedback?", isPresented: $confirmFeedback) {
                 Button("Continue") { Task { await model.request(sessionID: sessionID, questionID: questionID, retry: model.job?.status == .failed && model.job?.questionID == questionID) } }
                 Button("Cancel", role: .cancel) {}
             } message: { Text("Your resume, job description, question, and answer are sent to the configured AI providers, including cloud providers if fallback is needed.") }
+            .confirmationDialog("Discard your changes?", isPresented: $confirmDiscard, titleVisibility: .visible) {
+                Button("Discard changes", role: .destructive) { dismiss() }
+                Button("Keep editing", role: .cancel) {}
+            } message: { Text("Your unsaved answer will be lost.") }
         }
     }
 }

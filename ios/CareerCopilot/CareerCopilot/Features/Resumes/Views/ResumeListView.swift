@@ -5,6 +5,8 @@ struct ResumeListView: View {
     @ObservedObject var resumeModel: ResumeViewModel
     @Binding var showImporter: Bool
     @Binding var resumeToDelete: Resume?
+    var openChat: () -> Void = {}
+    var openPractice: () -> Void = {}
 
     var body: some View {
         ScrollView {
@@ -18,27 +20,20 @@ struct ResumeListView: View {
                     Spacer()
                 }
 
-                VStack(alignment: .leading, spacing: 14) {
-                    Label("YOUR CAREER WORKSPACE", systemImage: "sparkles")
-                        .font(.caption.weight(.semibold)).foregroundStyle(.white.opacity(0.75))
-                    Text("Make your next\nmove a great one.")
-                        .font(.title.bold()).foregroundStyle(.white)
-                    Text("Keep your resume ready for what's next.")
-                        .font(.subheadline).foregroundStyle(.white.opacity(0.7))
-                    Button { showImporter = true } label: {
-                        HStack {
-                            Text("Upload a resume").fontWeight(.semibold)
-                            Spacer()
-                            Image(systemName: "arrow.up.doc")
-                        }
-                        .padding(14)
-                        .foregroundStyle(.white)
-                        .background(.white.opacity(0.12), in: RoundedRectangle(cornerRadius: 16))
-                    }
-                    .disabled(resumeModel.isLoading || model.isLoading)
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("YOUR CAREER WORKSPACE")
+                        .font(.caption.weight(.semibold)).tracking(1.2).foregroundStyle(CareerStyle.accent)
+                    Text("Make your next move.").font(.title.bold())
+                    Text("Choose where you’d like to start.").font(.subheadline).foregroundStyle(CareerStyle.muted)
                 }
-                .padding(22)
-                .background(LinearGradient(colors: [CareerStyle.card, Color(red: 0.015, green: 0.22, blue: 0.3)], startPoint: .topLeading, endPoint: .bottomTrailing), in: RoundedRectangle(cornerRadius: 28))
+
+                VStack(alignment: .leading, spacing: 12) {
+                    Text("Quick actions").font(.headline)
+                    ViewThatFits(in: .horizontal) {
+                        HStack(spacing: 10) { quickActions }
+                        VStack(spacing: 10) { quickActions }
+                    }
+                }
 
                 HStack {
                     Text("Your resumes").font(.title3.bold())
@@ -80,23 +75,29 @@ struct ResumeListView: View {
                 } else if resumeModel.resumes.isEmpty {
                     VStack(alignment: .leading, spacing: 12) {
                         GradientIcon(symbol: "doc.text")
-                        Text("A fresh start").font(.headline)
-                        Text("Upload a PDF to keep your resume close at hand.")
+                        Text("Add your first resume").font(.headline)
+                        Text("Upload a PDF to analyze it, match a job, or practice for an interview.")
                             .font(.subheadline).foregroundStyle(.secondary)
+                        Button { showImporter = true } label: {
+                            Label("Upload a resume", systemImage: "arrow.up.doc")
+                        }
+                        .careerPrimaryButton()
+                        .disabled(model.isLoading || resumeModel.isLoading)
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(20).careerCard()
                 } else {
                     LazyVStack(spacing: 12) {
                         ForEach(resumeModel.resumes) { resume in
-                            HStack(spacing: 12) {
+                            VStack(alignment: .leading, spacing: 14) {
+                              HStack(spacing: 12) {
                                 NavigationLink {
                                     ResumeDetailView(model: resumeModel, resume: resume)
                                 } label: {
                                     HStack(spacing: 12) {
                                         GradientIcon(symbol: "doc.text.fill")
                                         VStack(alignment: .leading, spacing: 4) {
-                                            Text(resume.filename).font(.headline).lineLimit(1)
+                                            Text(resume.filename).font(.headline).lineLimit(2).truncationMode(.middle)
                                             Text("Resume · PDF").font(.subheadline).foregroundStyle(.secondary)
                                         }
                                         Spacer()
@@ -113,6 +114,11 @@ struct ResumeListView: View {
                                 }
                                 .accessibilityLabel("Options for \(resume.filename)")
                                 .disabled(resumeModel.isLoading || model.isLoading)
+                              }
+                              ViewThatFits(in: .horizontal) {
+                                  HStack(spacing: 10) { resumeActions(resume) }
+                                  VStack(alignment: .leading, spacing: 8) { resumeActions(resume) }
+                              }
                             }
                             .padding(16).careerCard()
                         }
@@ -127,15 +133,65 @@ struct ResumeListView: View {
         .background(CareerStyle.gradient.ignoresSafeArea())
         .refreshable { await resumeModel.loadResumes() }
         .toolbar {
-            ToolbarItem(placement: .topBarLeading) {
-                Button("Sign out") { Task { await model.signOut() } }.disabled(resumeModel.isLoading || model.isLoading)
-            }
             ToolbarItem(placement: .topBarTrailing) {
                 Button { showImporter = true } label: { Image(systemName: "plus") }
                     .disabled(resumeModel.isLoading || model.isLoading)
                     .accessibilityLabel("Upload resume")
             }
         }
+    }
+
+    private var quickActions: some View {
+        Group {
+            quickAction("Upload", subtitle: "Add a PDF", symbol: "arrow.up.doc") { showImporter = true }
+                .disabled(resumeModel.isLoading || model.isLoading)
+            quickAction("Chat", subtitle: "Ask a question", symbol: "bubble.left.and.bubble.right") { openChat() }
+            quickAction("Practice", subtitle: "Mock interview", symbol: "person.wave.2") { openPractice() }
+        }
+    }
+
+    private func quickAction(_ title: String, subtitle: String, symbol: String, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            VStack(alignment: .leading, spacing: 8) {
+                Image(systemName: symbol).foregroundStyle(CareerStyle.accent).font(.title3)
+                Text(title).font(.subheadline.weight(.semibold)).foregroundStyle(.white)
+                Text(subtitle).font(.caption).foregroundStyle(CareerStyle.muted).lineLimit(2)
+            }
+            .frame(maxWidth: .infinity, minHeight: 88, alignment: .leading)
+            .padding(14)
+            .careerCard()
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .accessibilityElement(children: .combine)
+    }
+
+    private func resumeActions(_ resume: Resume) -> some View {
+        Group {
+            NavigationLink {
+                if let analysisModel = resumeModel.analysisModel(for: resume.id) {
+                    AnalysisView(model: analysisModel)
+                } else {
+                    ContentUnavailableView("Invalid backend URL", systemImage: "exclamationmark.triangle")
+                }
+            } label: {
+                Label("Analyze", systemImage: "sparkles")
+            }
+            .accessibilityLabel("Analyze \(resume.filename)")
+
+            NavigationLink {
+                if let matchModel = resumeModel.matchModel(for: resume.id) {
+                    JobMatchView(model: matchModel)
+                } else {
+                    ContentUnavailableView("Invalid backend URL", systemImage: "exclamationmark.triangle")
+                }
+            } label: {
+                Label("Match a job", systemImage: "briefcase")
+            }
+            .accessibilityLabel("Match a job with \(resume.filename)")
+        }
+        .buttonStyle(.bordered)
+        .disabled(resumeModel.isLoading || model.isLoading)
     }
 
 }
