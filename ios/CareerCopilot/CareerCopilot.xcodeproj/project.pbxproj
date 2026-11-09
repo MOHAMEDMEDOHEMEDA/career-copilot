@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		D10000000000000000000006 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D20000000000000000000006; };
+		D10000000000000000000005 /* InterviewDictation.swift in Sources */ = {isa = PBXBuildFile; fileRef = D20000000000000000000005; };
 		D10000000000000000000001 /* InterviewModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = D20000000000000000000001; };
 		D10000000000000000000002 /* InterviewViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D20000000000000000000002; };
 		D10000000000000000000003 /* InterviewHomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D20000000000000000000003; };
@@ -46,6 +48,8 @@
 /* End PBXTargetDependency section */
 
 /* Begin PBXFileReference section */
+		D20000000000000000000006 /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
+		D20000000000000000000005 /* InterviewDictation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InterviewDictation.swift; sourceTree = "<group>"; };
 		D20000000000000000000001 /* InterviewModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InterviewModels.swift; sourceTree = "<group>"; };
 		D20000000000000000000002 /* InterviewViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InterviewViewModel.swift; sourceTree = "<group>"; };
 		D20000000000000000000003 /* InterviewHomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InterviewHomeView.swift; sourceTree = "<group>"; };
@@ -217,6 +221,7 @@
 		B00000000000000000000069 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				D20000000000000000000006 /* OnboardingView.swift */,
 				A20000000000000000000008 /* AuthenticationView.swift */,
 			);
 			path = Views;
@@ -460,6 +465,7 @@
 		B00000000000000000000086 /* ViewModels */ = {
 			isa = PBXGroup;
 			children = (
+				D20000000000000000000005 /* InterviewDictation.swift */,
 				D20000000000000000000002 /* InterviewViewModel.swift */,
 			);
 			path = ViewModels;
@@ -538,6 +544,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D10000000000000000000006 /* OnboardingView.swift in Sources */,
+				D10000000000000000000005 /* InterviewDictation.swift in Sources */,
 				D10000000000000000000001 /* InterviewModels.swift in Sources */,
 				D10000000000000000000002 /* InterviewViewModel.swift in Sources */,
 				D10000000000000000000003 /* InterviewHomeView.swift in Sources */,

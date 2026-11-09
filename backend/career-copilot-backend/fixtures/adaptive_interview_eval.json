@@ -1,0 +1,5 @@
+[
+  {"id":"swift-strong","question":"What does a Swift actor protect?","answer":"An actor isolates mutable state and helps prevent data races.","topic":"Swift Concurrency","classification":"correct","score":4,"evidence":"isolates mutable state","expected_action":"deepen","expected_difficulty":4},
+  {"id":"http-partial","question":"What does HTTP 401 mean?","answer":"The request needs authentication.","topic":"API Security","classification":"partially_correct","score":2,"evidence":"needs authentication","expected_action":"clarify","expected_difficulty":3},
+  {"id":"database-weak","question":"What is a database transaction?","answer":"It is a type of database server.","topic":"Database Design","classification":"incorrect","score":0,"evidence":"type of database server","expected_action":"clarify","expected_difficulty":2}
+]

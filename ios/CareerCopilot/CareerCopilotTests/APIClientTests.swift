@@ -2,6 +2,26 @@ import Foundation
 import XCTest
 @testable import CareerCopilot
 
+final class OnboardingGateTests: XCTestCase {
+    func testOnlyNewSignedOutUsersSeeIntroduction() {
+        XCTAssertTrue(OnboardingGate.shouldPresent(hasProfile: false, completed: false, canRetryRestore: false))
+        XCTAssertFalse(OnboardingGate.shouldPresent(hasProfile: true, completed: false, canRetryRestore: false))
+        XCTAssertFalse(OnboardingGate.shouldPresent(hasProfile: false, completed: true, canRetryRestore: false))
+        XCTAssertFalse(OnboardingGate.shouldPresent(hasProfile: false, completed: false, canRetryRestore: true))
+    }
+}
+
+final class InterviewDictationTests: XCTestCase {
+    func testDictationAppendsWithoutLosingOrDuplicatingExistingText() {
+        XCTAssertEqual(DictationDraft.appending("second thought", to: "First thought."), "First thought. second thought")
+        XCTAssertEqual(DictationDraft.appending("next line", to: "First line\n"), "First line\nnext line")
+        XCTAssertEqual(DictationDraft.appending("", to: "Existing answer"), "Existing answer")
+        XCTAssertEqual(DictationDraft.appending("مرحبا", to: ""), "مرحبا")
+        let original = String(repeating: "x", count: 4000)
+        XCTAssertEqual(DictationDraft.appending("extra", to: original).unicodeScalars.count, 4006)
+    }
+}
+
 final class APIClientTests: XCTestCase {
     private var session: URLSession!
 
@@ -804,6 +824,43 @@ private actor DelayedInterviewService: InterviewServicing {
     }
     func interviewJob(sessionID: UUID, jobID: UUID) async throws -> InterviewJob { throw URLError(.unsupportedURL) }
     func retryInterviewJob(sessionID: UUID, jobID: UUID) async throws -> InterviewJob { throw URLError(.unsupportedURL) }
+}
+
+@MainActor
+final class AdaptiveInterviewViewModelTests: XCTestCase {
+    func testReopeningRestoresPendingJobWithoutStartingAnotherRequest() async {
+        let id = UUID()
+        let service = FakeAdaptiveInterviewService(sessionID: id)
+        let model = AdaptiveInterviewViewModel(factory: { _ in service })
+        await model.open(id)
+        XCTAssertEqual(model.job?.status, .completed)
+        XCTAssertEqual(model.turns.count, 1)
+        let requested = await service.generatedRequests
+        XCTAssertEqual(requested, 0)
+    }
+}
+
+private actor FakeAdaptiveInterviewService: AdaptiveInterviewServicing {
+    let interview: AdaptiveSession
+    let queued: AdaptiveJob
+    private(set) var generatedRequests = 0
+    init(sessionID: UUID) {
+        interview = AdaptiveSession(id: sessionID, role: "Synthetic developer", seniority: "mid", status: "active", interviewType: "technical", resumeID: nil, currentDifficulty: 3, stateVersion: 0)
+        queued = AdaptiveJob(id: UUID(), sessionID: sessionID, turnID: nil, kind: "next", status: .queued, errorCode: nil, stateVersion: 0)
+    }
+    func adaptiveSessions(offset: Int) async throws -> ChatPage<AdaptiveSession> { ChatPage(items: [interview], limit: 20, offset: offset) }
+    func createAdaptiveSession(role: String, seniority: String, interviewType: String, resumeID: UUID?, description: String, skills: [String]) async throws -> AdaptiveSession { interview }
+    func adaptiveSession(id: UUID) async throws -> AdaptiveSession { interview }
+    func deleteAdaptiveSession(id: UUID) async throws {}
+    func adaptiveTurns(sessionID: UUID) async throws -> ChatPage<AdaptiveTurn> { ChatPage(items: [AdaptiveTurn(id: UUID(), sessionID: sessionID, sequence: 1, difficulty: 3, topic: "Swift", prompt: "Synthetic question?", answer: nil, evaluation: nil)], limit: 100, offset: 0) }
+    func adaptiveJobs(sessionID: UUID) async throws -> ChatPage<AdaptiveJob> { ChatPage(items: [queued], limit: 100, offset: 0) }
+    func saveAdaptiveAnswer(sessionID: UUID, turnID: UUID, answer: String) async throws -> AdaptiveTurn { throw URLError(.unsupportedURL) }
+    func requestAdaptiveJob(sessionID: UUID, turnID: UUID?) async throws -> AdaptiveJob { generatedRequests += 1; return queued }
+    func adaptiveJob(sessionID: UUID, jobID: UUID) async throws -> AdaptiveJob { AdaptiveJob(id: jobID, sessionID: sessionID, turnID: nil, kind: "next", status: .completed, errorCode: nil, stateVersion: 0) }
+    func retryAdaptiveJob(sessionID: UUID, jobID: UUID) async throws -> AdaptiveJob { throw URLError(.unsupportedURL) }
+    func completeAdaptiveSession(sessionID: UUID) async throws -> AdaptiveSession { throw URLError(.unsupportedURL) }
+    func adaptiveReport(sessionID: UUID) async throws -> AdaptiveReport { throw URLError(.unsupportedURL) }
+    func adaptiveProgress(offset: Int) async throws -> ChatPage<AdaptiveTopicProgress> { ChatPage(items: [], limit: 100, offset: offset) }
 }
 
 private actor FakeInterviewService: InterviewServicing {

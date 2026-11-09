@@ -10,6 +10,8 @@ services:
       GEMINI_API_KEY: ${GEMINI_API_KEY:-}
       OLLAMA_ENABLED: ${OLLAMA_ENABLED:-true}
       OLLAMA_BASE_URL: http://host.docker.internal:11434
+      REVIEWED_TECHNICAL_SOURCE_IDS: ${REVIEWED_TECHNICAL_SOURCE_IDS:-}
+      ADAPTIVE_INTERVIEW_LIMIT_PER_HOUR: ${ADAPTIVE_INTERVIEW_LIMIT_PER_HOUR:-30}
       GOOGLE_SERVER_CLIENT_ID: ${GOOGLE_SERVER_CLIENT_ID:-${GOOGLE_CLIENT_ID:-}}
     depends_on:
       db:
@@ -24,7 +26,9 @@ services:
       GEMINI_API_KEY: ${GEMINI_API_KEY:-}
       OLLAMA_ENABLED: ${OLLAMA_ENABLED:-true}
       OLLAMA_MODEL: ${OLLAMA_MODEL:-llama3.2:latest}
+      ADAPTIVE_MAX_FOLLOWUPS: ${ADAPTIVE_MAX_FOLLOWUPS:-2}
       OLLAMA_BASE_URL: http://host.docker.internal:11434
+      REVIEWED_TECHNICAL_SOURCE_IDS: ${REVIEWED_TECHNICAL_SOURCE_IDS:-}
     depends_on:
       db:
         condition: service_healthy

@@ -10,6 +10,7 @@ struct ContentView: View {
     @State private var showSettings = false
     @State private var resumeToDelete: Resume?
     @State private var selectedTab: AppTab = .workspace
+    @AppStorage("hasCompletedOnboarding") private var hasCompletedOnboarding = false
 
     private enum AppTab: Hashable {
         case workspace, chat, interview, settings
@@ -20,6 +21,14 @@ struct ContentView: View {
             if model.isRestoringSession {
                 ProgressView("Restoring your session")
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
+            } else if OnboardingGate.shouldPresent(hasProfile: model.profile != nil, completed: hasCompletedOnboarding, canRetryRestore: model.canRetrySessionRestore) {
+                OnboardingView {
+                    model.isRegistering = true
+                    hasCompletedOnboarding = true
+                } onSignIn: {
+                    model.isRegistering = false
+                    hasCompletedOnboarding = true
+                }
             } else if model.profile == nil {
                 NavigationStack {
                     AuthenticationView(model: model)
@@ -97,6 +106,7 @@ struct ContentView: View {
             .task { await model.restoreSession() }
             .task(id: model.profile?.email) {
                 guard model.profile != nil else { resumeModel.reset(); chatModel.reset(); interviewModel.reset(); selectedTab = .workspace; return }
+                hasCompletedOnboarding = true
                 resumeModel.baseURL = model.baseURL
                 chatModel.baseURL = model.baseURL
                 interviewModel.baseURL = model.baseURL

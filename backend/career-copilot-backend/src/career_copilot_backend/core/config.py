@@ -14,6 +14,9 @@ class Settings(BaseSettings):
     refresh_token_days: int = 30
     upload_limit_per_hour: int = 20
     analysis_limit_per_hour: int = 5
+    adaptive_interview_limit_per_hour: int = 30
+    adaptive_max_followups: int = Field(default=2, ge=0, le=5)
+    reviewed_technical_source_ids: str = ""
     openrouter_api_key: SecretStr = SecretStr("")
     gemini_api_key: SecretStr = SecretStr("")
     ollama_enabled: bool = True

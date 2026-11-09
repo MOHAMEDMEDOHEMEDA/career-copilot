@@ -205,6 +205,63 @@ struct APIClient {
         return try await authenticated(path: "api/v1/interviews/sessions/\(sessionID.uuidString)/jobs/\(jobID.uuidString)/retry", method: "POST", body: body, contentType: "application/json")
     }
 
+    func adaptiveSessions(offset: Int) async throws -> ChatPage<AdaptiveSession> {
+        try await authenticated(path: "api/v1/interviews/adaptive/sessions?limit=20&offset=\(offset)")
+    }
+
+    func createAdaptiveSession(role: String, seniority: String, interviewType: String, resumeID: UUID?, description: String, skills: [String]) async throws -> AdaptiveSession {
+        struct Body: Encodable { let role, seniority, interview_type: String; let resume_id: String?; let job_description: String?; let skills: [String] }
+        let body = try JSONEncoder().encode(Body(role: role, seniority: seniority, interview_type: interviewType, resume_id: resumeID?.uuidString, job_description: description.isEmpty ? nil : description, skills: skills))
+        return try await authenticated(path: "api/v1/interviews/adaptive/sessions", method: "POST", body: body, contentType: "application/json")
+    }
+
+    func adaptiveSession(id: UUID) async throws -> AdaptiveSession {
+        try await authenticated(path: "api/v1/interviews/adaptive/sessions/\(id.uuidString)")
+    }
+
+    func deleteAdaptiveSession(id: UUID) async throws {
+        let (data, response) = try await authorizedRequest(path: "api/v1/interviews/adaptive/sessions/\(id.uuidString)", method: "DELETE")
+        try validate(response, data: data)
+    }
+
+    func adaptiveTurns(sessionID: UUID) async throws -> ChatPage<AdaptiveTurn> {
+        try await authenticated(path: "api/v1/interviews/adaptive/sessions/\(sessionID.uuidString)/turns?limit=100")
+    }
+
+    func adaptiveJobs(sessionID: UUID) async throws -> ChatPage<AdaptiveJob> {
+        try await authenticated(path: "api/v1/interviews/adaptive/sessions/\(sessionID.uuidString)/jobs?limit=100")
+    }
+
+    func saveAdaptiveAnswer(sessionID: UUID, turnID: UUID, answer: String) async throws -> AdaptiveTurn {
+        let body = try JSONEncoder().encode(["answer": answer])
+        return try await authenticated(path: "api/v1/interviews/adaptive/sessions/\(sessionID.uuidString)/turns/\(turnID.uuidString)/answer", method: "PUT", body: body, contentType: "application/json")
+    }
+
+    func requestAdaptiveJob(sessionID: UUID, turnID: UUID?) async throws -> AdaptiveJob {
+        let suffix = turnID.map { "turns/\($0.uuidString)/evaluation" } ?? "next"
+        return try await authenticated(path: "api/v1/interviews/adaptive/sessions/\(sessionID.uuidString)/\(suffix)", method: "POST", body: Data("{\"allow_provider_fallbacks\":true}".utf8), contentType: "application/json")
+    }
+
+    func adaptiveJob(sessionID: UUID, jobID: UUID) async throws -> AdaptiveJob {
+        try await authenticated(path: "api/v1/interviews/adaptive/sessions/\(sessionID.uuidString)/jobs/\(jobID.uuidString)")
+    }
+
+    func retryAdaptiveJob(sessionID: UUID, jobID: UUID) async throws -> AdaptiveJob {
+        try await authenticated(path: "api/v1/interviews/adaptive/sessions/\(sessionID.uuidString)/jobs/\(jobID.uuidString)/retry", method: "POST", body: Data("{\"allow_provider_fallbacks\":true}".utf8), contentType: "application/json")
+    }
+
+    func completeAdaptiveSession(sessionID: UUID) async throws -> AdaptiveSession {
+        try await authenticated(path: "api/v1/interviews/adaptive/sessions/\(sessionID.uuidString)/complete", method: "POST")
+    }
+
+    func adaptiveReport(sessionID: UUID) async throws -> AdaptiveReport {
+        try await authenticated(path: "api/v1/interviews/adaptive/sessions/\(sessionID.uuidString)/report")
+    }
+
+    func adaptiveProgress(offset: Int) async throws -> ChatPage<AdaptiveTopicProgress> {
+        try await authenticated(path: "api/v1/interviews/adaptive/skill-progress?limit=100&offset=\(offset)")
+    }
+
     func logout() async throws {
         try await sessions.signOut(baseURL: baseURL) { refreshToken in
             var request = URLRequest(url: endpoint("api/v1/auth/logout"))

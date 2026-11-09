@@ -11,6 +11,10 @@ from career_copilot_backend.llm.alternatives import (
 )
 from career_copilot_backend.llm.provider import LLMProvider
 from career_copilot_backend.models import Job, Resume
+from career_copilot_backend.services.adaptive_jobs import (
+    process_adaptive_job,
+    run_next_adaptive_job,
+)
 from career_copilot_backend.services.analysis import analyze_resume
 from career_copilot_backend.services.chat_answers import (
     process_chat_answer,
@@ -83,7 +87,16 @@ def main() -> None:
             SessionLocal,
             lambda job_id: process_interview_job(SessionLocal, provider, job_id),
         )
-        if not processed and not chat_processed and not interview_processed:
+        adaptive_processed = run_next_adaptive_job(
+            SessionLocal,
+            lambda job_id: process_adaptive_job(SessionLocal, provider, job_id),
+        )
+        if (
+            not processed
+            and not chat_processed
+            and not interview_processed
+            and not adaptive_processed
+        ):
             time.sleep(2)
 
 

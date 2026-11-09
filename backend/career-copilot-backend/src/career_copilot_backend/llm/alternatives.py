@@ -1,5 +1,6 @@
 import asyncio
 import json
+from collections.abc import Callable
 from urllib.parse import urlsplit
 
 import httpx
@@ -8,6 +9,10 @@ from pydantic import ValidationError
 from career_copilot_backend.core.config import settings
 from career_copilot_backend.llm.openrouter import OpenRouterProvider
 from career_copilot_backend.llm.provider import LLMProvider, ProviderError
+from career_copilot_backend.schemas.adaptive_interview import (
+    AdaptiveEvaluation,
+    AdaptiveQuestion,
+)
 from career_copilot_backend.schemas.analysis import ResumeAnalysis
 from career_copilot_backend.schemas.interview import (
     InterviewFeedback,
@@ -126,6 +131,13 @@ class FallbackProvider:
         return UnavailableLegacyProvider()
 
     async def generate_structured(self, *, system_instruction: str, untrusted_text: str, output_schema: dict, max_output_tokens: int) -> str:
+        return await self.generate_validated(
+            system_instruction=system_instruction, untrusted_text=untrusted_text,
+            output_schema=output_schema, max_output_tokens=max_output_tokens,
+            validator=lambda _: None,
+        )
+
+    async def generate_validated(self, *, system_instruction: str, untrusted_text: str, output_schema: dict, max_output_tokens: int, validator: Callable[[str], None]) -> str:
         last_error = ProviderError("No AI provider was available")
         for provider in self._providers:
             try:
@@ -146,8 +158,13 @@ class FallbackProvider:
                         InterviewQuestions.model_validate_json(output)
                     elif output_schema.get("title") == "InterviewFeedback":
                         InterviewFeedback.model_validate_json(output)
+                    elif output_schema.get("title") == "AdaptiveEvaluation":
+                        AdaptiveEvaluation.model_validate_json(output)
+                    elif output_schema.get("title") == "AdaptiveQuestion":
+                        AdaptiveQuestion.model_validate_json(output)
                     else:
                         json.loads(output)
+                    validator(output)
                 except (ValidationError, ValueError) as exc:
                     raise ProviderError("Provider returned invalid output", code="invalid_output") from exc
                 return output

@@ -32,16 +32,19 @@ def index_corpus(session: Session, embedder: OllamaEmbedder) -> int:
 
 
 def retrieve(
-    session: Session, vector: list[float], *, limit: int = 4, max_distance: float = 0.35
+    session: Session,
+    vector: list[float],
+    *,
+    limit: int = 4,
+    max_distance: float = 0.35,
+    source_ids: tuple[str, ...] | None = None,
 ) -> list[KnowledgeChunk]:
     distance = KnowledgeChunk.embedding.cosine_distance(vector)
+    query = select(KnowledgeChunk).where(distance <= max_distance)
+    if source_ids is not None:
+        query = query.where(KnowledgeChunk.source_id.in_(source_ids))
     return list(
-        session.scalars(
-            select(KnowledgeChunk)
-            .where(distance <= max_distance)
-            .order_by(distance, KnowledgeChunk.id)
-            .limit(limit)
-        )
+        session.scalars(query.order_by(distance, KnowledgeChunk.id).limit(limit))
     )
 
 

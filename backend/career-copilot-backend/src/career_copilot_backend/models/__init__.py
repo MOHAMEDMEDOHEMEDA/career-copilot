@@ -10,6 +10,9 @@ from career_copilot_backend.models.usage_event import UsageEvent
 from career_copilot_backend.models.user import User
 
 __all__ = [
+    "AdaptiveInterviewJob",
+    "AdaptiveInterviewSession",
+    "AdaptiveInterviewTurn",
     "ChatAnswerJob",
     "ChatMessage",
     "Conversation",
@@ -24,4 +27,9 @@ __all__ = [
     "UsageEvent",
     "User",
 ]
+from career_copilot_backend.models.adaptive_interview import (
+    AdaptiveInterviewSession,
+    AdaptiveInterviewTurn,
+)
+from career_copilot_backend.models.adaptive_interview_job import AdaptiveInterviewJob
 from career_copilot_backend.models.job import Job
