@@ -1,55 +1,85 @@
 # Career Copilot Backend
 
-FastAPI backend for the Career Copilot AI portfolio project.
+FastAPI backend for the Career Copilot AI portfolio project. It provides authentication, resume storage and analysis, job matching, career chat, and standard and adaptive mock interviews. AI calls run in a separate worker through a configurable provider interface.
 
-## Local setup
+## Requirements
 
-Requirements: Python 3.12 and `uv`.
+- Python 3.12 or later and `uv` for local development and migrations.
+- Docker and Docker Compose for PostgreSQL with pgvector and, optionally, the API and worker.
+- At least one configured AI provider for AI features. Ollama is also required for knowledge indexing and retrieval.
+
+Run the following commands from this directory. Create local configuration and dependencies:
 
 ```bash
 uv sync --dev
 cp .env.example .env
-uv run uvicorn career_copilot_backend.main:app --reload
 ```
 
-Set `JWT_SECRET` in `.env` to a unique random value of at least 32 characters before using login. Never use the example value outside local development.
-For Google Sign-In, set `GOOGLE_SERVER_CLIENT_ID` (or `GOOGLE_CLIENT_ID`) to the Google OAuth web client ID. The iOS app sends a Google ID token to `/api/v1/auth/google`; existing accounts must first sign in and explicitly link using `/api/v1/auth/google/link`. No Google client secret is required by this token-exchange flow.
-Compose also reads `JWT_SECRET` from this `.env` file. Run migrations before using authentication.
+Edit `.env` and set `JWT_SECRET` to a unique random value of at least 32 characters. Set the AI provider keys and Google client ID if you intend to use those features. The example values are placeholders; never commit `.env`, API keys, or real resumes.
 
-The API is available at `http://localhost:8000`. Interactive documentation is
-available at `/docs`, and health checks are at `/health` and `/api/v1/health`.
+## Start the local stack
 
-## Database
-
-Start the API and local PostgreSQL database with pgvector:
+Start PostgreSQL, the API, and the worker, then apply migrations from the host:
 
 ```bash
-docker compose up --build
-```
-
-Apply database migrations from the backend directory after starting the database:
-
-```bash
+docker compose --profile analysis up -d --build
 uv run alembic upgrade head
 ```
 
-## Checks
+Compose reads `.env` from this directory. The API is at `http://localhost:8000`, its interactive API documentation is at `/docs`, and health endpoints are `/health` and `/api/v1/health`. The worker must be running to process analysis, matching, chat, and interview jobs. Queued jobs are stored in the database.
+
+Alternatively, start just the database with `docker compose up -d db`, then run these in separate terminals after migrating:
+
+```bash
+uv run uvicorn career_copilot_backend.main:app --reload
+```
+
+```bash
+uv run python -m career_copilot_backend.services.analysis_jobs
+```
+
+The host-run API and worker use the `DATABASE_URL` in `.env`; the example targets `localhost:5432`. Docker services use `db:5432` and reach Ollama on the host via `host.docker.internal:11434`.
+
+## Authentication
+
+Password authentication uses Argon2 and rotating refresh tokens. Google Sign-In requires `GOOGLE_SERVER_CLIENT_ID` in `.env`, set to the Google OAuth web client ID used by the iOS app. The backend verifies the Google ID token; an existing password account must explicitly link its Google identity. See the [iOS README](../../ios/CareerCopilot/README.md) for client setup. Google sign-in was exercised in the simulator; linking an existing account still needs real-account verification.
+
+## AI providers and privacy
+
+Set `OPENROUTER_API_KEY` to use the OpenRouter free router. When a request explicitly permits fallbacks, the configured chain tries OpenRouter, local Ollama, and then Gemini, with at most one attempt per configured provider. Set `GEMINI_API_KEY` to enable Gemini; omit it to skip Gemini. Ollama defaults to `llama3.2:latest` on port 11434; set `OLLAMA_MODEL` to an installed local model or `OLLAMA_ENABLED=false` to disable this fallback. Free-model availability and quotas can change, and a billed provider account may incur costs.
+
+Inputs and retrieved text are treated as untrusted data, and model outputs are validated. These protections do not guarantee factual accuracy. Resume text, job descriptions, questions, and answers can be sent to cloud providers after the app's disclosure. Google’s free tier may use content to improve products. Use synthetic data until provider privacy and retention are reviewed.
+
+## Knowledge base and chat
+
+The project-authored corpus is in `src/career_copilot_backend/knowledge/corpus.json`. Install and start Ollama, pull the `nomic-embed-text:latest` embedding model, apply migrations, and index the corpus from the host:
+
+```bash
+ollama pull nomic-embed-text:latest
+uv run python -m career_copilot_backend.knowledge.index
+```
+
+Reindex after changing the corpus. Indexing uses the local Ollama embedder and stores vectors in pgvector. Chat retrieves source excerpts and can return insufficient information if nothing relevant is found. The corpus and retrieval quality need further review; a citation does not prove every generated statement is supported.
+
+## Adaptive interviews
+
+The separate `/api/v1/interviews/adaptive` API supports session setup, optional owned resumes, question and evaluation jobs, explicit retry, completion, reports, and topic progress. Existing standard interview endpoints remain available. Difficulty and follow-ups use backend policy based on model-generated coaching feedback; scores are approximate, not verified measures of proficiency. An explicit “I don't know” response can receive an unscored AI-generated example answer.
+
+Optional technical retrieval is restricted to sources marked `technical_reference` and listed in the comma-separated `REVIEWED_TECHNICAL_SOURCE_IDS` setting. The list is empty by default. Review source accuracy and rights before enabling sources, and reindex after corpus changes. `ADAPTIVE_INTERVIEW_LIMIT_PER_HOUR` and `ADAPTIVE_MAX_FOLLOWUPS` configure interview request limits and follow-up depth.
+
+## Checks and evaluation
 
 ```bash
 uv run pytest
 uv run ruff check .
 uv run mypy src
+uv run python scripts/smoke_test.py --base-url http://localhost:8000
+uv run python scripts/eval_retrieval.py
+uv run python scripts/eval_adaptive.py
 ```
 
-To smoke-test an already running backend, use `uv run python scripts/smoke_test.py --base-url http://localhost:8000`. The script creates a synthetic account, removes its uploaded resume, and leaves the account in place because account deletion is not yet implemented. The script does not yet cover analysis, matching, or chat.
+The smoke test creates a synthetic account and removes its uploaded resume, but leaves the account because account deletion is not implemented; it does not yet cover the full AI flow. Retrieval and adaptive scripts are small synthetic smoke evaluations, not measurements of real-world model quality. The retrieval evaluation requires the corpus to be indexed and Ollama to be available.
 
-The initial draft auth and resume API is documented in `../../docs/backend-contracts.md`.
-Use `/docs` for the current implemented endpoints.
+## Remaining work
 
-Analysis uses OpenRouter's free router. Set `OPENROUTER_API_KEY` in `.env`; never commit the key. After migrating, run `uv run python -m career_copilot_backend.services.analysis_jobs` alongside the API, or start Compose with `docker compose --profile analysis up --build`. Submit a resume ID to `POST /api/v1/resume-analysis`, then poll `GET /api/v1/jobs/{id}`. Use synthetic resumes until third-party data handling has been reviewed. The worker must be running to process queued jobs.
-
-For requests that explicitly set `allow_provider_fallbacks: true`, the worker tries OpenRouter, local Ollama, then Gemini once each when the previous provider fails. Add `GEMINI_API_KEY` to `.env` to enable Gemini and keep the key out of source control. Google offers a free tier with limits; a billed Google project can incur charges. Ollama defaults to the local `llama3.2:latest` model and must be running on port 11434. Set `OLLAMA_ENABLED=false` to disable it or `OLLAMA_MODEL` to another installed local model. Docker connects to the host via `host.docker.internal:11434`; a worker run directly on the host defaults to `127.0.0.1:11434`. Gemini's free tier may use content to improve Google's products, so use synthetic data until the privacy review is complete. Existing clients that omit the flag remain limited to OpenRouter.
-
-The RAG corpus is project-authored example guidance, not a comprehensive source of expert advice. Install Ollama's `nomic-embed-text:latest`, apply migrations, and run `uv run python -m career_copilot_backend.knowledge.index` to create the local pgvector index. Reindex after changing the corpus. `uv run python scripts/eval_retrieval.py` runs a small synthetic smoke evaluation. Retrieval and answer quality must be evaluated further before release.
-
-Adaptive interview sessions use the separate `/api/v1/interviews/adaptive` API. They support an optional owned resume, single-question jobs, answer evaluations, explicit retry, completion, reports and cross-session topic progress. Existing interview endpoints remain available. Set `ADAPTIVE_INTERVIEW_LIMIT_PER_HOUR` and `ADAPTIVE_MAX_FOLLOWUPS` as needed. Optional technical retrieval uses the existing index only for sources whose corpus metadata has `kind: "technical_reference"` and whose IDs are explicitly listed in `REVIEWED_TECHNICAL_SOURCE_IDS`; its default is empty and the operator must review the source content and rights before adding IDs. Sources may specify `version`, `roles`, `topics`, `min_difficulty`, and `max_difficulty`; reindex after content changes. The app discloses cloud fallback before AI requests. `uv run python scripts/eval_adaptive.py` runs three synthetic policy smoke cases; it does not measure model quality. Ratings and scores are coaching estimates, not validated measures of skill or employability.
+Account deletion, broader AI and retrieval evaluation, reviewed technical sources, a full end-to-end smoke test, hosted deployment, privacy and retention review, and production hardening remain. The [architecture](../../docs/architecture.md) and [backend contracts](../../docs/backend-contracts.md) contain further details; `/docs` reflects the running API.
