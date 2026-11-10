@@ -17,8 +17,13 @@ class Settings(BaseSettings):
     adaptive_interview_limit_per_hour: int = 30
     adaptive_max_followups: int = Field(default=2, ge=0, le=5)
     reviewed_technical_source_ids: str = ""
+    knowledge_hybrid_enabled: bool = False
+    knowledge_vector_max_distance: float = Field(default=0.35, ge=0, le=2)
+    knowledge_keyword_max_distance: float = Field(default=0.55, ge=0, le=2)
     openrouter_api_key: SecretStr = SecretStr("")
     gemini_api_key: SecretStr = SecretStr("")
+    gemini_input_usd_per_million: float | None = Field(default=None, ge=0, le=1_000_000, allow_inf_nan=False)
+    gemini_output_usd_per_million: float | None = Field(default=None, ge=0, le=1_000_000, allow_inf_nan=False)
     ollama_enabled: bool = True
     ollama_base_url: str = "http://127.0.0.1:11434"
     ollama_model: str = "llama3.2:latest"
@@ -30,6 +35,7 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(
         env_file=".env",
         env_file_encoding="utf-8",
+        env_ignore_empty=True,
         extra="ignore",
     )
 

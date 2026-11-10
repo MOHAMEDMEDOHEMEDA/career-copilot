@@ -28,7 +28,7 @@ final class InterviewDictation: ObservableObject {
     private var audioSessionActive = false
     private var tapInstalled = false
 
-    func start() async {
+    func start(locale: Locale = .current) async {
         guard !isActive else { return }
         let token = UUID()
         generation = token
@@ -47,7 +47,7 @@ final class InterviewDictation: ObservableObject {
             error = authorization == .restricted ? "Speech recognition is restricted on this device." : "Allow speech recognition in Settings to dictate your answer."
             return
         }
-        guard let recognizer = SFSpeechRecognizer(locale: .current), recognizer.isAvailable, recognizer.supportsOnDeviceRecognition else {
+        guard let recognizer = SFSpeechRecognizer(locale: locale), recognizer.isAvailable, recognizer.supportsOnDeviceRecognition else {
             isPreparing = false
             error = "On-device dictation is unavailable for the current language or device. You can type your answer instead."
             return

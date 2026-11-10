@@ -23,14 +23,18 @@ class Source(BaseModel):
         "evaluation_rubric",
     ] = "career_guidance"
     version: str = Field(default="1", min_length=1, max_length=64)
+    domain: str | None = Field(default=None, min_length=1, max_length=100)
+    technology: str | None = Field(default=None, min_length=1, max_length=100)
     roles: list[str] = Field(default_factory=list, max_length=20)
     topics: list[str] = Field(default_factory=list, max_length=20)
     min_difficulty: int = Field(default=1, ge=1, le=5)
     max_difficulty: int = Field(default=5, ge=1, le=5)
 
-    @field_validator("title", "origin", "text", "version")
+    @field_validator("title", "origin", "text", "version", "domain", "technology")
     @classmethod
-    def reject_blank(cls, value: str) -> str:
+    def reject_blank(cls, value: str | None) -> str | None:
+        if value is None:
+            return None
         if not value.strip():
             raise ValueError("Source field cannot be blank")
         return value.strip()
@@ -76,6 +80,21 @@ def select_reviewed_sources(
     ]
 
 
+def select_metadata_sources(
+    sources: list[Source], *, domain: str | None = None,
+    technology: str | None = None, version: str | None = None,
+) -> set[str]:
+    def matches(actual: str | None, expected: str | None) -> bool:
+        return expected is None or (actual is not None and actual.casefold() == expected.strip().casefold())
+
+    return {
+        source.id for source in sources
+        if matches(source.domain, domain)
+        and matches(source.technology, technology)
+        and matches(source.version, version)
+    }
+
+
 @dataclass(frozen=True)
 class Chunk:
     id: str
@@ -90,6 +109,13 @@ def load_corpus(path: Path = CORPUS_PATH) -> list[Source]:
     if not isinstance(data, list) or not data:
         raise ValueError("Corpus must contain a list of sources")
     sources = [Source.model_validate(item) for item in data]
+    if path == CORPUS_PATH:
+        from career_copilot_backend.knowledge.records import (
+            load_records,
+            reviewed_sources,
+        )
+
+        sources.extend(reviewed_sources(load_records()))
     if len({source.id for source in sources}) != len(sources):
         raise ValueError("Corpus source IDs must be unique")
     return sources

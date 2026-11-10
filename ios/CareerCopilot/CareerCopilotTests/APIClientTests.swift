@@ -84,6 +84,36 @@ final class APIClientTests: XCTestCase {
         }
     }
 
+    func testProfileNameUpdateUsesAuthenticatedEndpoint() async throws {
+        let url = try XCTUnwrap(URL(string: "https://example.com"))
+        let coordinator = SessionCoordinator(store: MemorySessionStore())
+        try await coordinator.startSession(TokenPair(accessToken: "access", refreshToken: "refresh"), baseURL: url)
+        MockURLProtocol.handler = { request in
+            XCTAssertEqual(request.url?.path, "/api/v1/auth/me/name")
+            XCTAssertEqual(request.httpMethod, "PATCH")
+            XCTAssertEqual(request.value(forHTTPHeaderField: "Authorization"), "Bearer access")
+            return (200, Data(#"{"email":"person@example.com","display_name":"محمد"}"#.utf8))
+        }
+        let client = APIClient(baseURL: url, session: session, sessions: coordinator)
+        let profile = try await client.updateDisplayName("محمد")
+        XCTAssertEqual(profile.displayName, "محمد")
+    }
+
+    func testAIUsageDecodesUnknownCosts() async throws {
+        let url = try XCTUnwrap(URL(string: "https://example.com"))
+        let coordinator = SessionCoordinator(store: MemorySessionStore())
+        try await coordinator.startSession(TokenPair(accessToken: "access", refreshToken: "refresh"), baseURL: url)
+        MockURLProtocol.handler = { request in
+            XCTAssertEqual(request.url?.path, "/api/v1/ai-usage")
+            XCTAssertEqual(request.value(forHTTPHeaderField: "Authorization"), "Bearer access")
+            return (200, Data(#"{"summary":{"attempts":1,"known_input_tokens":12,"known_output_tokens":3,"attempts_with_unknown_tokens":0,"known_cost_usd":0,"attempts_with_unknown_cost":1},"items":[{"id":"91982D98-AC81-4C69-888B-19EE9079D5EA","operation":"chat_answer","provider":"gemini","model":"model","outcome":"response_received","input_tokens":12,"output_tokens":3,"cost_usd":null,"cost_basis":null}],"limit":20,"offset":0}"#.utf8))
+        }
+        let client = APIClient(baseURL: url, session: session, sessions: coordinator)
+        let page = try await client.aiUsage()
+        XCTAssertEqual(page.summary.attemptsWithUnknownCost, 1)
+        XCTAssertNil(page.items.first?.costUSD)
+    }
+
     func testBackendURLAllowsHTTPSAndLocalHTTPOnly() throws {
         XCTAssertNoThrow(try APIClient.configured(baseURL: "https://example.com"))
         XCTAssertNoThrow(try APIClient.configured(baseURL: "http://localhost:8000"))

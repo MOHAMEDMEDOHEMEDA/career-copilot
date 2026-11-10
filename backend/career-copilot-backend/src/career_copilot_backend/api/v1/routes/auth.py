@@ -10,6 +10,7 @@ from career_copilot_backend.core.database import get_db
 from career_copilot_backend.schemas.auth import (
     AccessTokenResponse,
     Credentials,
+    DisplayNameUpdate,
     GoogleTokenRequest,
     ProfileUpdate,
     RefreshRequest,
@@ -22,6 +23,7 @@ from career_copilot_backend.services.auth import (
     get_access_user,
     issue_tokens,
     register_user,
+    update_display_name,
 )
 from career_copilot_backend.services.google_auth import (
     GoogleAuthUnavailable,
@@ -184,3 +186,15 @@ def update_profile(
         raise HTTPException(status_code=409, detail="Email already registered") from exc
     session.refresh(user)
     return UserResponse.model_validate(user)
+
+
+@router.patch("/me/name", response_model=UserResponse)
+def change_display_name(
+    body: DisplayNameUpdate,
+    session: Database,
+    credentials: Annotated[HTTPAuthorizationCredentials | None, Depends(bearer)],
+) -> UserResponse:
+    user = get_access_user(session, credentials.credentials) if credentials else None
+    if user is None:
+        raise HTTPException(status_code=401, detail="Invalid access token")
+    return UserResponse.model_validate(update_display_name(session, user, body.display_name))

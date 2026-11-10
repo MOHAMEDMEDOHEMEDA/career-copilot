@@ -8,6 +8,7 @@ from sqlalchemy.orm import Session, sessionmaker
 
 from career_copilot_backend.llm.alternatives import FallbackProvider
 from career_copilot_backend.llm.provider import LLMProvider, ProviderError
+from career_copilot_backend.llm.usage import capture_usage
 from career_copilot_backend.models import (
     InterviewJob,
     InterviewQuestion,
@@ -101,9 +102,13 @@ def run_next_interview_job(
         job.lease_expires_at = now + timedelta(seconds=lease_seconds)
         job.attempts += 1
         job_id = job.id
+        interview = db.get(InterviewSession, job.session_id)
+        user_id = interview.user_id if interview else None
+        operation = f"interview_{job.kind}"
         db.commit()
     try:
-        result = handler(job_id)
+        with capture_usage(sessions, user_id, operation, job_id):
+            result = handler(job_id)
         error = None
     except Exception as exc:  # noqa: BLE001 - never persist provider or user content in errors
         result = None

@@ -99,3 +99,20 @@ When a candidate explicitly says they do not know, the evaluator requests a shor
 AI-generated example and returns an unscored `not_assessable` evaluation. An
 example is coaching guidance, not evidence of the candidate's proficiency.
 Existing stored evaluations without this field remain valid.
+# Display name
+
+`PATCH /api/v1/auth/me/name` requires an access token and accepts
+`{"display_name": "Name"}`. It updates only the authenticated account and
+returns the user profile. Names are trimmed, must contain visible text, and
+are limited to 100 characters. `GET /api/v1/auth/me` and registration responses
+include the nullable `display_name` field; existing accounts initially have no
+name. This endpoint works for password and Google accounts.
+# AI usage
+
+`GET /api/v1/ai-usage?limit=20&offset=0` requires an access token and returns
+only that user's provider attempts, newest first, plus an all-time summary.
+Each item contains the operation, provider, model when available, response or
+failure status, reported token counts, cost when known, and cost basis. The
+summary's known totals exclude unknown values; unknown attempt counts must be
+shown alongside them. The endpoint does not expose prompts, answers, or tokens
+used for authentication. Results before tracking was enabled are unavailable.

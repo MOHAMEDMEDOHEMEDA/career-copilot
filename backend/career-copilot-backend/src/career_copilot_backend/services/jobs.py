@@ -6,6 +6,7 @@ from sqlalchemy import select, update
 from sqlalchemy.orm import Session, sessionmaker
 
 from career_copilot_backend.llm.provider import ProviderError
+from career_copilot_backend.llm.usage import capture_usage
 from career_copilot_backend.models import Job, Resume
 from career_copilot_backend.services.analysis import (
     AnalysisInputError,
@@ -65,10 +66,11 @@ def run_next_job(
         job.lease_id = lease_id
         job.lease_expires_at = now + timedelta(seconds=lease_seconds)
         job.attempts += 1
-        job_id, kind = job.id, job.kind
+        job_id, kind, user_id = job.id, job.kind, job.user_id
         session.commit()
     try:
-        result = handlers[kind](job_id)
+        with capture_usage(sessions, user_id, kind, job_id):
+            result = handlers[kind](job_id)
         status = "completed"
         error_code = None
     except Exception as exc:

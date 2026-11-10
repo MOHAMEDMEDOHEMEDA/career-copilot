@@ -10,6 +10,7 @@ from career_copilot_backend.core.config import settings
 from career_copilot_backend.knowledge.embeddings import EmbeddingError, OllamaEmbedder
 from career_copilot_backend.llm.alternatives import FallbackProvider
 from career_copilot_backend.llm.provider import LLMProvider, ProviderError
+from career_copilot_backend.llm.usage import capture_usage
 from career_copilot_backend.models import ChatAnswerJob, ChatMessage, Conversation
 from career_copilot_backend.schemas.rag import CitedAnswer
 from career_copilot_backend.services.analysis import (
@@ -124,9 +125,12 @@ def run_next_chat_answer(
         job.lease_expires_at = now + timedelta(seconds=lease_seconds)
         job.attempts += 1
         job_id = job.id
+        conversation = session.get(Conversation, job.conversation_id)
+        user_id = conversation.user_id if conversation else None
         session.commit()
     try:
-        result = handler(job_id)
+        with capture_usage(sessions, user_id, "chat_answer", job_id):
+            result = handler(job_id)
         error_code = None
     except Exception as exc:  # noqa: BLE001 - record failures without leaking provider data
         result = None

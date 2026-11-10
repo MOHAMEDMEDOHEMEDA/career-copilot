@@ -12,6 +12,8 @@ class ModelAnswer(AnalysisModel):
     def require_sources(self):
         if not self.insufficient_information and not self.citation_ids:
             raise ValueError("Supported answers must cite a source")
+        if not self.insufficient_information and self.answer.strip().strip(".! ").casefold() in {"true", "false", "yes", "no"}:
+            raise ValueError("Answers must explain the cited information")
         if len(self.citation_ids) != len(set(self.citation_ids)):
             raise ValueError("Duplicate citations are not allowed")
         return self

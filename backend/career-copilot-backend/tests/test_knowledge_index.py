@@ -48,8 +48,10 @@ def test_index_is_replaced_only_after_embeddings_succeed(client):
         def __init__(self):
             self.fail = False
             self.texts = []
+            self.calls = 0
 
         def embed(self, texts):
+            self.calls += 1
             self.texts = texts
             if self.fail:
                 raise EmbeddingError("synthetic failure")
@@ -60,7 +62,13 @@ def test_index_is_replaced_only_after_embeddings_succeed(client):
         count = index_corpus(session, embedder)
         assert count > 0
         assert all("\n" in value for value in embedder.texts)
+        initial_calls = embedder.calls
         assert index_corpus(session, embedder) == count
+        assert embedder.calls == initial_calls
+        first = session.scalar(select(KnowledgeChunk))
+        assert first is not None
+        first.content_hash = None
+        session.commit()
         embedder.fail = True
         with pytest.raises(EmbeddingError):
             index_corpus(session, embedder)
@@ -101,8 +109,42 @@ def test_large_corpus_batches_and_preserves_index_if_later_batch_fails(
         first = BatchEmbedder()
         assert index_corpus(session, first) == 65
         assert first.sizes == [32, 32, 1]
+        chunks[:] = [
+            Chunk(id=item.id, source_id=item.source_id, title=item.title, origin=item.origin, content=item.content + " updated")
+            for item in chunks
+        ]
         failing = BatchEmbedder(fail_on=2)
         with pytest.raises(EmbeddingError):
             index_corpus(session, failing)
         assert failing.sizes == [32, 32]
         assert session.scalar(select(func.count()).select_from(KnowledgeChunk)) == 65
+        assert session.get(KnowledgeChunk, "source:0").content == "Paragraph 0"
+
+
+def test_incremental_index_reuses_vectors_and_updates_changed_or_removed_chunks(client, monkeypatch):
+    _, engine = client
+    chunks = [Chunk(id=f"source:{i}", source_id="source", title="Synthetic", origin="Test", content=f"Paragraph {i}") for i in range(3)]
+    monkeypatch.setattr("career_copilot_backend.knowledge.index.load_corpus", list)
+    monkeypatch.setattr("career_copilot_backend.knowledge.index.chunk_sources", lambda _: chunks)
+
+    class Embedder:
+        def __init__(self):
+            self.batches = []
+
+        def embed(self, texts):
+            self.batches.append(texts)
+            return [[0.1] * 768 for _ in texts]
+
+    embedder = Embedder()
+    with Session(engine) as session:
+        assert index_corpus(session, embedder) == 3
+        chunks[0] = Chunk(id="source:0", source_id="source", title="Synthetic", origin="New origin", content="Paragraph 0")
+        chunks[1] = Chunk(id="source:1", source_id="source", title="Synthetic", origin="Test", content="Changed paragraph")
+        chunks.pop()
+        assert index_corpus(session, embedder) == 2
+        assert len(embedder.batches) == 2 and len(embedder.batches[1]) == 1
+        assert session.get(KnowledgeChunk, "source:0").origin == "New origin"
+        assert session.get(KnowledgeChunk, "source:1").content == "Changed paragraph"
+        assert session.get(KnowledgeChunk, "source:2") is None
+        assert index_corpus(session, embedder, force=True) == 2
+        assert len(embedder.batches[-1]) == 2

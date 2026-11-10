@@ -45,7 +45,7 @@ struct InterviewSessionView: View {
                             Text("\(question.sequence)").font(.headline).foregroundStyle(ChatStyle.cyan).frame(width: 40, height: 40).background(.white.opacity(0.07), in: Circle())
                             VStack(alignment: .leading, spacing: 8) {
                                 Text(question.prompt).font(.headline).foregroundStyle(.white).multilineTextAlignment(.leading)
-                                Text(question.feedback != nil ? "Feedback ready" : question.answer != nil ? "Answer saved" : "Ready to answer").font(.caption).foregroundStyle(ChatStyle.muted)
+                                Text(LocalizedStringKey(question.feedback != nil ? "Feedback ready" : question.answer != nil ? "Answer saved" : "Ready to answer")).font(.caption).foregroundStyle(ChatStyle.muted)
                             }
                             Spacer(); Image(systemName: "chevron.right").foregroundStyle(ChatStyle.muted)
                         }.padding(16).frame(maxWidth: .infinity, alignment: .leading).background(ChatStyle.surface, in: RoundedRectangle(cornerRadius: 20))
@@ -181,7 +181,7 @@ struct AdaptiveSessionView: View {
                             Text("Saved answer").font(.headline).foregroundStyle(.white)
                             Text(answer).foregroundStyle(ChatStyle.muted).textSelection(.enabled)
                         }
-                        Button(current.answer == nil ? "Write answer" : "Edit answer") { showingAnswer = true }.buttonStyle(.bordered).disabled(model.loading)
+                        Button(LocalizedStringKey(current.answer == nil ? "Write answer" : "Edit answer")) { showingAnswer = true }.buttonStyle(.bordered).disabled(model.loading)
                         if let evaluation = current.evaluation {
                             AdaptiveFeedbackView(evaluation: evaluation)
                             Button("Next question") { targetTurn = nil; retry = false; confirmRequest = true }.careerPrimaryButton().disabled(model.loading)
@@ -223,6 +223,7 @@ struct AdaptiveSessionView: View {
 
 struct AdaptiveAnswerView: View {
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.locale) private var locale
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.openURL) private var openURL
     @ObservedObject var model: AdaptiveInterviewViewModel
@@ -247,21 +248,21 @@ struct AdaptiveAnswerView: View {
                             else if dictation.isRecording { dictation.stop() }
                             else {
                                 dictationPrefix = draft
-                                Task { await dictation.start() }
+                                Task { await dictation.start(locale: locale) }
                             }
                         } label: {
-                            Label(dictation.isPreparing ? "Cancel dictation" : dictation.isRecording ? "Stop dictation" : "Dictate answer", systemImage: dictation.isRecording ? "stop.circle.fill" : "mic.fill")
+                            Label(LocalizedStringKey(dictation.isPreparing ? "Cancel dictation" : dictation.isRecording ? "Stop dictation" : "Dictate answer"), systemImage: dictation.isRecording ? "stop.circle.fill" : "mic.fill")
                                 .frame(minHeight: 44)
                         }
                         .buttonStyle(.bordered)
                         .disabled(model.loading || dictation.isFinishing || (!dictation.isActive && draft.unicodeScalars.count >= 4000))
                         if dictation.isPreparing || dictation.isFinishing { ProgressView().tint(.white).accessibilityLabel(dictation.isPreparing ? "Preparing dictation" : "Finishing dictation") }
                     }
-                    Text(dictation.isRecording ? "Listening… Tap Stop when you’re finished." : dictation.isFinishing ? "Finishing transcription…" : "On-device dictation. Review and edit the text before saving.")
+                    Text(LocalizedStringKey(dictation.isRecording ? "Listening… Tap Stop when you’re finished." : dictation.isFinishing ? "Finishing transcription…" : "On-device dictation. Review and edit the text before saving."))
                         .font(.caption).foregroundStyle(ChatStyle.muted)
                     if draft.unicodeScalars.count > 4000 { Text("Your answer is over the limit. Edit it before saving.").font(.caption).foregroundStyle(.orange) }
                     if let error = dictation.error {
-                        Text(error).font(.subheadline).foregroundStyle(.white)
+                        Text(LocalizedStringKey(error)).font(.subheadline).foregroundStyle(.white)
                         if dictation.needsSettings, let url = URL(string: UIApplication.openSettingsURLString) {
                             Button("Open Settings") { openURL(url) }.frame(minHeight: 44)
                         }

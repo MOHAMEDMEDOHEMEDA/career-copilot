@@ -25,6 +25,13 @@ def test_google_new_user_and_existing_identity(client):
         first = test_client.post("/api/v1/auth/google", json={"id_token": "synthetic"})
         second = test_client.post("/api/v1/auth/google", json={"id_token": "synthetic"})
         assert first.status_code == second.status_code == 200
+        profile = test_client.patch(
+            "/api/v1/auth/me/name",
+            headers={"Authorization": f"Bearer {first.json()['access_token']}"},
+            json={"display_name": "Google User"},
+        )
+        assert profile.status_code == 200
+        assert profile.json()["display_name"] == "Google User"
         with Session(engine) as session:
             user = session.scalar(
                 select(User).where(User.email == "google@example.com")

@@ -4,6 +4,7 @@ import httpx
 
 from career_copilot_backend.core.config import settings
 from career_copilot_backend.llm.provider import ProviderError
+from career_copilot_backend.llm.usage import provider_attempt, record_response
 
 OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
 FREE_MODEL = "openrouter/free"
@@ -57,13 +58,14 @@ class OpenRouterProvider:
             },
         }
         headers = {"Authorization": f"Bearer {self._api_key}"}
-        if self._client is not None:
-            return await self._request(self._client, payload, headers)
-        async with httpx.AsyncClient(timeout=30, follow_redirects=False) as client:
-            return await self._request(client, payload, headers)
+        with provider_attempt("openrouter", FREE_MODEL) as event:
+            if self._client is not None:
+                return await self._request(self._client, payload, headers, event)
+            async with httpx.AsyncClient(timeout=30, follow_redirects=False) as client:
+                return await self._request(client, payload, headers, event)
 
     async def _request(
-        self, client: httpx.AsyncClient, payload: dict, headers: dict
+        self, client: httpx.AsyncClient, payload: dict, headers: dict, event: dict
     ) -> str:
         try:
             async with client.stream(
@@ -87,6 +89,8 @@ class OpenRouterProvider:
                             "OpenRouter response exceeds the size limit"
                         )
             body = json.loads(chunks)
+            if isinstance(body, dict):
+                record_response(event, body, "openrouter")
             if body["choices"][0].get("finish_reason") == "length":
                 raise ProviderError("OpenRouter exhausted the output token limit", code="output_limit")
             content = body["choices"][0]["message"]["content"]

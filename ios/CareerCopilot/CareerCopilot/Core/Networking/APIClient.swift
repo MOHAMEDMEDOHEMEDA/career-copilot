@@ -2,6 +2,44 @@ import Foundation
 
 struct Profile: Decodable {
     let email: String
+    let displayName: String?
+
+    enum CodingKeys: String, CodingKey { case email; case displayName = "display_name" }
+
+    init(email: String, displayName: String? = nil) {
+        self.email = email
+        self.displayName = displayName
+    }
+}
+
+struct AIUsagePage: Decodable {
+    struct Summary: Decodable {
+        let attempts, knownInputTokens, knownOutputTokens, attemptsWithUnknownTokens: Int
+        let knownCostUSD: Double
+        let attemptsWithUnknownCost: Int
+        enum CodingKeys: String, CodingKey {
+            case attempts
+            case knownInputTokens = "known_input_tokens", knownOutputTokens = "known_output_tokens"
+            case attemptsWithUnknownTokens = "attempts_with_unknown_tokens"
+            case knownCostUSD = "known_cost_usd", attemptsWithUnknownCost = "attempts_with_unknown_cost"
+        }
+    }
+    struct Item: Decodable, Identifiable {
+        let id: UUID
+        let operation, provider, outcome: String
+        let model: String?
+        let inputTokens, outputTokens: Int?
+        let costUSD: Double?
+        let costBasis: String?
+        enum CodingKeys: String, CodingKey {
+            case id, operation, provider, outcome, model
+            case inputTokens = "input_tokens", outputTokens = "output_tokens"
+            case costUSD = "cost_usd", costBasis = "cost_basis"
+        }
+    }
+    let summary: Summary
+    let items: [Item]
+    let limit, offset: Int
 }
 
 struct Resume: Decodable, Identifiable {
@@ -67,6 +105,15 @@ struct APIClient {
 
     func profile() async throws -> Profile {
         try await authenticated(path: "api/v1/auth/me")
+    }
+
+    func updateDisplayName(_ name: String) async throws -> Profile {
+        let body = try JSONEncoder().encode(["display_name": name])
+        return try await authenticated(path: "api/v1/auth/me/name", method: "PATCH", body: body, contentType: "application/json")
+    }
+
+    func aiUsage(offset: Int = 0) async throws -> AIUsagePage {
+        try await authenticated(path: "api/v1/ai-usage?limit=20&offset=\(offset)")
     }
 
     func resumes() async throws -> [Resume] {

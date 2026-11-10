@@ -22,7 +22,7 @@ struct JobMatchView: View {
                 case .submitting:
                     ProgressView("Starting comparison")
                 case .waiting(let status):
-                    ProgressView(status == .running ? "Comparing your resume" : "Waiting for comparison")
+                    ProgressView(LocalizedStringKey(status == .running ? "Comparing your resume" : "Waiting for comparison"))
                     Text("The job continues on the server if you leave this screen.").font(.subheadline).foregroundStyle(.secondary)
                     jobReference
                 case .paused(let message):

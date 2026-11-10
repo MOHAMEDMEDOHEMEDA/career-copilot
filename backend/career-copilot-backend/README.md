@@ -46,6 +46,15 @@ Password authentication uses Argon2 and rotating refresh tokens. Google Sign-In 
 
 ## AI providers and privacy
 
+The authenticated `GET /api/v1/ai-usage` endpoint reports per-user provider
+attempts, available token counts, and known or estimated costs. Tracking starts
+when the feature is enabled and does not include embeddings; interrupted jobs
+can leave gaps. Gemini cost is unknown unless both
+`GEMINI_INPUT_USD_PER_MILLION` and `GEMINI_OUTPUT_USD_PER_MILLION` are set to
+appropriate paid text rates. Estimates do not account for free quotas or all
+possible charges and are not invoices. Local inference has no API fee but uses
+hardware and electricity. Do not interpret a partial total as a complete bill.
+
 Set `OPENROUTER_API_KEY` to use the OpenRouter free router. When a request explicitly permits fallbacks, the configured chain tries OpenRouter, local Ollama, and then Gemini, with at most one attempt per configured provider. Set `GEMINI_API_KEY` to enable Gemini; omit it to skip Gemini. Ollama defaults to `llama3.2:latest` on port 11434; set `OLLAMA_MODEL` to an installed local model or `OLLAMA_ENABLED=false` to disable this fallback. Free-model availability and quotas can change, and a billed provider account may incur costs.
 
 Inputs and retrieved text are treated as untrusted data, and model outputs are validated. These protections do not guarantee factual accuracy. Resume text, job descriptions, questions, and answers can be sent to cloud providers after the app's disclosure. Google’s free tier may use content to improve products. Use synthetic data until provider privacy and retention are reviewed.
@@ -60,6 +69,8 @@ uv run python -m career_copilot_backend.knowledge.index
 ```
 
 Reindex after changing the corpus. Indexing uses the local Ollama embedder and stores vectors in pgvector. Chat retrieves source excerpts and can return insufficient information if nothing relevant is found. The corpus and retrieval quality need further review; a citation does not prove every generated statement is supported.
+
+An experimental hybrid mode combines keyword and vector rankings with relevance gates. It is off by default. Run `uv run python scripts/eval_retrieval.py --compare-hybrid` with PostgreSQL, Ollama and an indexed corpus before considering `KNOWLEDGE_HYBRID_ENABLED=true`. Its synthetic cases are a smoke check, not a quality guarantee. See [the knowledge rollout guide](../../docs/software-engineering-knowledge.md) for review, metadata filters, and limitations.
 
 ## Adaptive interviews
 

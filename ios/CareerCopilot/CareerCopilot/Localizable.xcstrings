@@ -1,0 +1,3682 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "“%@”" : {
+
+    },
+    "%.1f / 4 · %@ answers" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$.1f / 4 · %2$@ answers"
+          }
+        }
+      }
+    },
+    "%@" : {
+
+    },
+    "%@ · %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ · %2$@"
+          }
+        }
+      }
+    },
+    "%@ / 4,000" : {
+
+    },
+    "%@ / 20,000" : {
+
+    },
+    "%@ / 20,000 characters" : {
+
+    },
+    "%@ %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ %2$@"
+          }
+        }
+      }
+    },
+    "%@ answers evaluated" : {
+
+    },
+    "%@ of %@ answers saved" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ of %2$@ answers saved"
+          }
+        }
+      }
+    },
+    "%@: %.1f / 4 · %@ answers" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@: %2$.1f / 4 · %3$@ answers"
+          }
+        }
+      }
+    },
+    "• %@" : {
+
+    },
+    "A little more clarity" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "وضوح أكبر"
+          }
+        }
+      }
+    },
+    "Account" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "الحساب"
+          }
+        }
+      }
+    },
+    "Account linked" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تم ربط الحساب"
+          }
+        }
+      }
+    },
+    "Adapt this suggestion using only details that are true for you." : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "عدّل هذا الاقتراح باستخدام التفاصيل الصحيحة عنك فقط."
+          }
+        }
+      }
+    },
+    "Adaptive interview" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "المقابلة التكيفية"
+          }
+        }
+      }
+    },
+    "Adaptive practice" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "التدريب التكيفي"
+          }
+        }
+      }
+    },
+    "ADAPTIVE PRACTICE" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "التدريب التكيفي"
+          }
+        }
+      }
+    },
+    "Add your first resume" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "أضف سيرتك الذاتية الأولى"
+          }
+        }
+      }
+    },
+    "Adds this question to the message field for you to review." : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "يضيف هذا السؤال إلى حقل الرسالة لمراجعته."
+          }
+        }
+      }
+    },
+    "AI" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "الذكاء الاصطناعي"
+          }
+        }
+      }
+    },
+    "AI can make mistakes. A requirement not demonstrated in your resume does not mean you lack it." : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "قد يخطئ الذكاء الاصطناعي. عدم ذكر متطلب في سيرتك الذاتية لا يعني أنك تفتقر إليه."
+          }
+        }
+      }
+    },
+    "AI suggestions can be incorrect. Keep only details supported by your resume." : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "قد تكون اقتراحات الذكاء الاصطناعي غير دقيقة. احتفظ فقط بالتفاصيل الواردة في سيرتك الذاتية."
+          }
+        }
+      }
+    },
+    "AI usage" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "استخدام الذكاء الاصطناعي"
+          }
+        }
+      }
+    },
+    "AI-generated study guidance; check cited references where available." : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "إرشادات تعليمية أنشأها الذكاء الاصطناعي؛ راجع المصادر إن وُجدت."
+          }
+        }
+      }
+    },
+    "Allow microphone access in Settings to dictate your answer." : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "اسمح بالوصول إلى الميكروفون في الإعدادات لإملاء إجابتك."
+          }
+        }
+      }
+    },
+    "Allow speech recognition in Settings to dictate your answer." : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "اسمح بالتعرف على الكلام في الإعدادات لإملاء إجابتك."
+          }
+        }
+      }
+    },
+    "Already have an account? Sign in" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "لديك حساب بالفعل؟ سجّل الدخول"
+          }
+        }
+      }
+    },
+    "Analyze" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تحليل"
+          }
+        }
+      }
+    },
+    "Analyze resume" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تحليل السيرة الذاتية"
+          }
+        }
+      }
+    },
+    "Analyzing your resume" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "جارٍ تحليل سيرتك الذاتية"
+          }
+        }
+      }
+    },
+    "Answer saved" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تم حفظ الإجابة"
+          }
+        }
+      }
+    },
+    "App language" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "لغة التطبيق"
+          }
+        }
+      }
+    },
+    "Approximate coaching feedback from completed interviews. A topic appears after at least two scored answers; it is not a verified skill measurement." : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ملاحظات تدريبية تقريبية من المقابلات المكتملة. يظهر الموضوع بعد إجابتين مُقيّمتين على الأقل؛ وهذا ليس قياسًا مؤكدًا للمهارة."
+          }
+        }
+      }
+    },
+    "Approximate feedback, not a measure of employability." : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ملاحظات تقريبية وليست مقياسًا لفرص التوظيف."
+          }
+        }
+      }
+    },
+    "Ask a career question. Answers use a small set of project-authored guidance and include sources when available." : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "اطرح سؤالًا مهنيًا. تعتمد الإجابات على مجموعة صغيرة من إرشادات المشروع وتتضمن مصادر عند توفرها."
+          }
+        }
+      }
+    },
+    "Ask career questions and explore answers with sources." : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "اطرح أسئلة مهنية واستكشف إجابات مع المصادر."
+          }
+        }
+      }
+    },
+    "Average practice score: %.1f / 4" : {
+
+    },
+    "Back" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "رجوع"
+          }
+        }
+      }
+    },
+    "Backend" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "الخادم"
+          }
+        }
+      }
+    },
+    "Backend URL" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "عنوان الخادم"
+          }
+        }
+      }
+    },
+    "Behavioral" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "سلوكية"
+          }
+        }
+      }
+    },
+    "Bring your career tools together in one calm space." : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "اجمع أدواتك المهنية في مساحة واحدة هادئة."
+          }
+        }
+      }
+    },
+    "BUILD YOUR STORY" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ابنِ قصتك"
+          }
+        }
+      }
+    },
+    "Cancel" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "إلغاء"
+          }
+        }
+      }
+    },
+    "Cancel dictation" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "إلغاء الإملاء"
+          }
+        }
+      }
+    },
+    "Career chat" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "المحادثة المهنية"
+          }
+        }
+      }
+    },
+    "Career Copilot" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "المساعد المهني"
+          }
+        }
+      }
+    },
+    "Career question" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "سؤال مهني"
+          }
+        }
+      }
+    },
+    "Chat" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "المحادثة"
+          }
+        }
+      }
+    },
+    "Check session" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "التحقق من الجلسة"
+          }
+        }
+      }
+    },
+    "Check status" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "التحقق من الحالة"
+          }
+        }
+      }
+    },
+    "Choose a name so you can find this conversation later." : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "اختر اسمًا لتتمكن من العثور على المحادثة لاحقًا."
+          }
+        }
+      }
+    },
+    "Choose a question or write your own below." : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "اختر سؤالًا أو اكتب سؤالك أدناه."
+          }
+        }
+      }
+    },
+    "Choose a resume and add a job description to begin." : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "اختر سيرة ذاتية وأضف وصفًا وظيفيًا للبدء."
+          }
+        }
+      }
+    },
+    "Choose resume" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "اختر سيرة ذاتية"
+          }
+        }
+      }
+    },
+    "Choose where you’d like to start." : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "اختر من أين تريد البدء."
+          }
+        }
+      }
+    },
+    "Coaching feedback" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ملاحظات التدريب"
+          }
+        }
+      }
+    },
+    "Compare another job" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "مقارنة وظيفة أخرى"
+          }
+        }
+      }
+    },
+    "Compare its requirements with your resume. Use synthetic data until privacy and retention have been reviewed." : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "قارن متطلبات الوظيفة بسيرتك الذاتية. استخدم بيانات تجريبية حتى تتم مراجعة الخصوصية والاحتفاظ بالبيانات."
+          }
+        }
+      }
+    },
+    "Compare with resume" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "مقارنة بالسيرة الذاتية"
+          }
+        }
+      }
+    },
+    "Comparing your resume" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "جارٍ مقارنة سيرتك الذاتية"
+          }
+        }
+      }
+    },
+    "Complete interview" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "إنهاء المقابلة"
+          }
+        }
+      }
+    },
+    "Complete more practice on a topic to see progress." : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "أكمل المزيد من التدريب على موضوع لرؤية تقدمك."
+          }
+        }
+      }
+    },
+    "Complete this interview?" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "هل تريد إنهاء هذه المقابلة؟"
+          }
+        }
+      }
+    },
+    "Concepts demonstrated" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "المفاهيم التي أظهرتها"
+          }
+        }
+      }
+    },
+    "Concepts to review" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "مفاهيم للمراجعة"
+          }
+        }
+      }
+    },
+    "Continue" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "متابعة"
+          }
+        }
+      }
+    },
+    "Continue to sign in" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "المتابعة لتسجيل الدخول"
+          }
+        }
+      }
+    },
+    "Conversation" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "محادثة"
+          }
+        }
+      }
+    },
+    "Conversation name" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "اسم المحادثة"
+          }
+        }
+      }
+    },
+    "Cost unknown" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "التكلفة غير معروفة"
+          }
+        }
+      }
+    },
+    "Couldn’t load history: %@" : {
+
+    },
+    "Couldn’t load resumes" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تعذّر تحميل السير الذاتية"
+          }
+        }
+      }
+    },
+    "Couldn’t refresh resumes" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تعذّر تحديث السير الذاتية"
+          }
+        }
+      }
+    },
+    "Couldn’t start dictation. Check your microphone and try again." : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تعذّر بدء الإملاء. تحقق من الميكروفون وحاول مجددًا."
+          }
+        }
+      }
+    },
+    "Couldn’t transcribe audio. Try again or type your answer." : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تعذّر تحويل الصوت إلى نص. حاول مجددًا أو اكتب إجابتك."
+          }
+        }
+      }
+    },
+    "Create" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "إنشاء"
+          }
+        }
+      }
+    },
+    "Create account" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "إنشاء حساب"
+          }
+        }
+      }
+    },
+    "Delete" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "حذف"
+          }
+        }
+      }
+    },
+    "Delete conversation" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "حذف المحادثة"
+          }
+        }
+      }
+    },
+    "Delete resume" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "حذف السيرة الذاتية"
+          }
+        }
+      }
+    },
+    "Delete session" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "حذف الجلسة"
+          }
+        }
+      }
+    },
+    "Delete this conversation?" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "هل تريد حذف هذه المحادثة؟"
+          }
+        }
+      }
+    },
+    "Delete this interview?" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "هل تريد حذف هذه المقابلة؟"
+          }
+        }
+      }
+    },
+    "Delete this resume?" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "هل تريد حذف هذه السيرة الذاتية؟"
+          }
+        }
+      }
+    },
+    "Dictate answer" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "إملاء الإجابة"
+          }
+        }
+      }
+    },
+    "Dictation stopped. You can review and edit the text." : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "توقف الإملاء. يمكنك مراجعة النص وتعديله."
+          }
+        }
+      }
+    },
+    "Discard changes" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تجاهل التعديلات"
+          }
+        }
+      }
+    },
+    "Discard your changes?" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "هل تريد تجاهل تعديلاتك؟"
+          }
+        }
+      }
+    },
+    "Done" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تم"
+          }
+        }
+      }
+    },
+    "e.g. iOS developer" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "مثلًا: مطور iOS"
+          }
+        }
+      }
+    },
+    "Edit" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تعديل"
+          }
+        }
+      }
+    },
+    "Edit and try again" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "عدّل وحاول مجددًا"
+          }
+        }
+      }
+    },
+    "Edit answer" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تعديل الإجابة"
+          }
+        }
+      }
+    },
+    "Edit this resume to add its text." : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "عدّل السيرة الذاتية لإضافة نصها."
+          }
+        }
+      }
+    },
+    "Email" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "البريد الإلكتروني"
+          }
+        }
+      }
+    },
+    "Email address" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "عنوان البريد الإلكتروني"
+          }
+        }
+      }
+    },
+    "English" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "English"
+          }
+        }
+      }
+    },
+    "Enter a role and up to 20 unique skills. Check the text limits." : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "أدخل وظيفة وما يصل إلى 20 مهارة مختلفة، وتحقق من حدود النص."
+          }
+        }
+      }
+    },
+    "Estimated from configured rates" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تقدير حسب الأسعار المُعدّة"
+          }
+        }
+      }
+    },
+    "Example answer" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "إجابة نموذجية"
+          }
+        }
+      }
+    },
+    "Experience context" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "معلومات الخبرة"
+          }
+        }
+      }
+    },
+    "Explore adaptive practice" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "استكشف التدريب التكيفي"
+          }
+        }
+      }
+    },
+    "Feedback ready" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "الملاحظات جاهزة"
+          }
+        }
+      }
+    },
+    "Finishing dictation" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "جارٍ إنهاء الإملاء"
+          }
+        }
+      }
+    },
+    "Finishing transcription…" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "جارٍ إنهاء التفريغ النصي…"
+          }
+        }
+      }
+    },
+    "From your answer" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "من إجابتك"
+          }
+        }
+      }
+    },
+    "Generate first question" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "إنشاء السؤال الأول"
+          }
+        }
+      }
+    },
+    "Generate interview questions?" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "هل تريد إنشاء أسئلة المقابلة؟"
+          }
+        }
+      }
+    },
+    "Generate questions" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "إنشاء الأسئلة"
+          }
+        }
+      }
+    },
+    "Generate three questions tailored to this role and resume." : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "أنشئ ثلاثة أسئلة تناسب هذه الوظيفة والسيرة الذاتية."
+          }
+        }
+      }
+    },
+    "Get a structured summary and suggestions based on your resume. Review every suggestion before using it." : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "احصل على ملخص منظم واقتراحات بناءً على سيرتك الذاتية. راجع كل اقتراح قبل استخدامه."
+          }
+        }
+      }
+    },
+    "Get AI feedback?" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "هل تريد الحصول على ملاحظات الذكاء الاصطناعي؟"
+          }
+        }
+      }
+    },
+    "Get answer" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "الحصول على إجابة"
+          }
+        }
+      }
+    },
+    "Get feedback" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "الحصول على الملاحظات"
+          }
+        }
+      }
+    },
+    "Get one question at a time, with follow-ups based on your answers." : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "أجب عن سؤال واحد في كل مرة مع أسئلة متابعة مبنية على إجاباتك."
+          }
+        }
+      }
+    },
+    "Get ready for\nwhat’s next." : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "استعد لما\nهو قادم."
+          }
+        }
+      }
+    },
+    "I don't know — show an example answer" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "لا أعرف — اعرض إجابة نموذجية"
+          }
+        }
+      }
+    },
+    "Illustrative answer" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "إجابة توضيحية"
+          }
+        }
+      }
+    },
+    "Interview complete" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "اكتملت المقابلة"
+          }
+        }
+      }
+    },
+    "INTERVIEW PRACTICE" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "التدرب على المقابلات"
+          }
+        }
+      }
+    },
+    "Interview setup" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "إعداد المقابلة"
+          }
+        }
+      }
+    },
+    "Interview type" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "نوع المقابلة"
+          }
+        }
+      }
+    },
+    "Invalid backend URL" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "عنوان الخادم غير صالح"
+          }
+        }
+      }
+    },
+    "Its questions, answers, and feedback will be deleted." : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "سيتم حذف أسئلتها وإجاباتها وملاحظاتها."
+          }
+        }
+      }
+    },
+    "Its questions, answers, and report will be deleted." : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "سيتم حذف أسئلتها وإجاباتها وتقريرها."
+          }
+        }
+      }
+    },
+    "Job description" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "الوصف الوظيفي"
+          }
+        }
+      }
+    },
+    "Job description (optional)" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "الوصف الوظيفي (اختياري)"
+          }
+        }
+      }
+    },
+    "Job ID: %@" : {
+
+    },
+    "Job matching" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "مطابقة الوظائف"
+          }
+        }
+      }
+    },
+    "Junior" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "مبتدئ"
+          }
+        }
+      }
+    },
+    "Keep editing" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "متابعة التعديل"
+          }
+        }
+      }
+    },
+    "Keep your career questions in one place." : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "احتفظ بأسئلتك المهنية في مكان واحد."
+          }
+        }
+      }
+    },
+    "Keep your resume close and explore how it fits the roles you care about." : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "احتفظ بسيرتك الذاتية واستكشف مدى ملاءمتها للوظائف التي تهمك."
+          }
+        }
+      }
+    },
+    "Keep your resume ready for the opportunities ahead." : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "أبقِ سيرتك الذاتية جاهزة للفرص القادمة."
+          }
+        }
+      }
+    },
+    "Known and estimated cost" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "التكلفة المعروفة والمقدّرة"
+          }
+        }
+      }
+    },
+    "Known input tokens" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "رموز الإدخال المعروفة"
+          }
+        }
+      }
+    },
+    "Known output tokens" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "رموز الإخراج المعروفة"
+          }
+        }
+      }
+    },
+    "Language" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "اللغة"
+          }
+        }
+      }
+    },
+    "Let’s get you ready." : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "لنستعد معًا."
+          }
+        }
+      }
+    },
+    "Let’s make your\nnext move." : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "لنبدأ خطوتك\nالقادمة."
+          }
+        }
+      }
+    },
+    "Link Google account" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ربط حساب Google"
+          }
+        }
+      }
+    },
+    "Listening… Tap Stop when you’re finished." : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "جارٍ الاستماع… اضغط على إيقاف عند الانتهاء."
+          }
+        }
+      }
+    },
+    "Load all messages before adding a new one." : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "حمّل جميع الرسائل قبل إضافة رسالة جديدة."
+          }
+        }
+      }
+    },
+    "Load more" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تحميل المزيد"
+          }
+        }
+      }
+    },
+    "Load more messages" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تحميل المزيد من الرسائل"
+          }
+        }
+      }
+    },
+    "Loading" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "جارٍ التحميل"
+          }
+        }
+      }
+    },
+    "Loading AI usage" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "جارٍ تحميل الاستخدام"
+          }
+        }
+      }
+    },
+    "Loading conversations" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "جارٍ تحميل المحادثات"
+          }
+        }
+      }
+    },
+    "Loading history" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "جارٍ تحميل السجل"
+          }
+        }
+      }
+    },
+    "Loading messages" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "جارٍ تحميل الرسائل"
+          }
+        }
+      }
+    },
+    "Loading progress" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "جارٍ تحميل التقدم"
+          }
+        }
+      }
+    },
+    "Loading resumes" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "جارٍ تحميل السير الذاتية"
+          }
+        }
+      }
+    },
+    "Loading sessions" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "جارٍ تحميل الجلسات"
+          }
+        }
+      }
+    },
+    "Loading your interview…" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "جارٍ تحميل مقابلتك…"
+          }
+        }
+      }
+    },
+    "Local inference" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "معالجة محلية"
+          }
+        }
+      }
+    },
+    "Make your next move." : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ابدأ خطوتك القادمة."
+          }
+        }
+      }
+    },
+    "Match a job" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "مطابقة وظيفة"
+          }
+        }
+      }
+    },
+    "Mid-level" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "متوسط"
+          }
+        }
+      }
+    },
+    "Mixed" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "مختلطة"
+          }
+        }
+      }
+    },
+    "Mock interview" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "مقابلة تجريبية"
+          }
+        }
+      }
+    },
+    "Name saved" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تم حفظ الاسم"
+          }
+        }
+      }
+    },
+    "New conversation" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "محادثة جديدة"
+          }
+        }
+      }
+    },
+    "New here? Create an account" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "جديد هنا؟ أنشئ حسابًا"
+          }
+        }
+      }
+    },
+    "New interview" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "مقابلة جديدة"
+          }
+        }
+      }
+    },
+    "Next question" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "السؤال التالي"
+          }
+        }
+      }
+    },
+    "No adaptive sessions yet." : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "لا توجد جلسات تكيفية بعد."
+          }
+        }
+      }
+    },
+    "No AI usage recorded yet." : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "لم يُسجّل استخدام للذكاء الاصطناعي بعد."
+          }
+        }
+      }
+    },
+    "No conversations yet. Start one when you’re ready." : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "لا توجد محادثات بعد. ابدأ محادثة عندما تكون مستعدًا."
+          }
+        }
+      }
+    },
+    "No previous analyses." : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "لا توجد تحليلات سابقة."
+          }
+        }
+      }
+    },
+    "No resume" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "بدون سيرة ذاتية"
+          }
+        }
+      }
+    },
+    "No resume text" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "لا يوجد نص للسيرة الذاتية"
+          }
+        }
+      }
+    },
+    "No sessions yet. Start when you’re ready." : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "لا توجد جلسات بعد. ابدأ عندما تكون مستعدًا."
+          }
+        }
+      }
+    },
+    "None identified" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "لم يتم تحديد أي منها"
+          }
+        }
+      }
+    },
+    "Not provided" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "غير متوفر"
+          }
+        }
+      }
+    },
+    "Not sure where to start?" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "لست متأكدًا من أين تبدأ؟"
+          }
+        }
+      }
+    },
+    "OK" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "حسنًا"
+          }
+        }
+      }
+    },
+    "On-device dictation is unavailable for the current language or device. You can type your answer instead." : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "الإملاء على الجهاز غير متاح للغة أو الجهاز الحالي. يمكنك كتابة إجابتك بدلًا من ذلك."
+          }
+        }
+      }
+    },
+    "On-device dictation. Review and edit the text before saving." : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "إملاء على الجهاز. راجع النص وعدّله قبل الحفظ."
+          }
+        }
+      }
+    },
+    "Open Settings" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "فتح الإعدادات"
+          }
+        }
+      }
+    },
+    "or continue with" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "أو تابع باستخدام"
+          }
+        }
+      }
+    },
+    "Original" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "النص الأصلي"
+          }
+        }
+      }
+    },
+    "Password" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "كلمة المرور"
+          }
+        }
+      }
+    },
+    "Paste a job description" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "الصق وصف الوظيفة"
+          }
+        }
+      }
+    },
+    "Possible inaccuracies" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "معلومات قد تكون غير دقيقة"
+          }
+        }
+      }
+    },
+    "Practice" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "التدريب"
+          }
+        }
+      }
+    },
+    "Practice answer" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "إجابة تدريبية"
+          }
+        }
+      }
+    },
+    "Practice guidance, not a measure of employability." : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "إرشادات للتدريب وليست مقياسًا لفرص التوظيف."
+          }
+        }
+      }
+    },
+    "Practice interview questions and explore career guidance at your own pace." : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تدرّب على أسئلة المقابلات واستكشف الإرشادات المهنية بالوتيرة التي تناسبك."
+          }
+        }
+      }
+    },
+    "Practice next" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تدرّب بعد ذلك"
+          }
+        }
+      }
+    },
+    "Practice one question at a time with follow-ups tailored to your answers." : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تدرّب على سؤال واحد في كل مرة مع أسئلة متابعة تناسب إجاباتك."
+          }
+        }
+      }
+    },
+    "Practice score: %@ / 4" : {
+
+    },
+    "PRACTICE SESSION" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "جلسة تدريبية"
+          }
+        }
+      }
+    },
+    "Practice with\npurpose." : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تدرّب\nبهدف."
+          }
+        }
+      }
+    },
+    "PRACTICE WITH PURPOSE" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تدرّب بهدف"
+          }
+        }
+      }
+    },
+    "Practice your next answer." : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تدرّب على إجابتك القادمة."
+          }
+        }
+      }
+    },
+    "Prepare for a role with tailored questions and thoughtful feedback." : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "استعد لوظيفة بأسئلة مخصصة وملاحظات بنّاءة."
+          }
+        }
+      }
+    },
+    "Preparing an answer" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "جارٍ إعداد إجابة"
+          }
+        }
+      }
+    },
+    "Preparing dictation" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "جارٍ إعداد الإملاء"
+          }
+        }
+      }
+    },
+    "Previous analyses" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "التحليلات السابقة"
+          }
+        }
+      }
+    },
+    "Previous same-role session: %.1f / 4 · change %+.1f" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Previous same-role session: %1$.1f / 4 · change %2$+.1f"
+          }
+        }
+      }
+    },
+    "Profile" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "الملف الشخصي"
+          }
+        }
+      }
+    },
+    "Progress" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "التقدم"
+          }
+        }
+      }
+    },
+    "Provider attempts" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "محاولات مزودي الخدمة"
+          }
+        }
+      }
+    },
+    "Put your best\nwork forward." : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "أبرز أفضل\nما لديك."
+          }
+        }
+      }
+    },
+    "QUESTION %@" : {
+
+    },
+    "QUESTION %@ · %@ · LEVEL %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "QUESTION %1$@ · %2$@ · LEVEL %3$@"
+          }
+        }
+      }
+    },
+    "Questions can differ between sessions, so this is only a rough comparison." : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "قد تختلف الأسئلة بين الجلسات، لذا فهذه مقارنة تقريبية فقط."
+          }
+        }
+      }
+    },
+    "Questions not generated yet" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "لم تُنشأ الأسئلة بعد"
+          }
+        }
+      }
+    },
+    "Quick actions" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "إجراءات سريعة"
+          }
+        }
+      }
+    },
+    "Ready to answer" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "جاهز للإجابة"
+          }
+        }
+      }
+    },
+    "Ready to practice" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "جاهز للتدريب"
+          }
+        }
+      }
+    },
+    "Recent attempts" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "المحاولات الأخيرة"
+          }
+        }
+      }
+    },
+    "Refresh" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تحديث"
+          }
+        }
+      }
+    },
+    "Refresh adaptive interviews" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تحديث المقابلات التكيفية"
+          }
+        }
+      }
+    },
+    "Refresh conversations" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تحديث المحادثات"
+          }
+        }
+      }
+    },
+    "Refresh interviews" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تحديث المقابلات"
+          }
+        }
+      }
+    },
+    "Refresh messages" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تحديث الرسائل"
+          }
+        }
+      }
+    },
+    "Refresh questions" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تحديث الأسئلة"
+          }
+        }
+      }
+    },
+    "Reported by provider" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "بحسب مزود الخدمة"
+          }
+        }
+      }
+    },
+    "Requesting an answer" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "جارٍ طلب إجابة"
+          }
+        }
+      }
+    },
+    "Requests an answer to this question." : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "يطلب إجابة عن هذا السؤال."
+          }
+        }
+      }
+    },
+    "Restoring your session" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "جارٍ استعادة جلستك"
+          }
+        }
+      }
+    },
+    "Results reflect the resume as it was when analyzed." : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تعكس النتائج السيرة الذاتية وقت تحليلها."
+          }
+        }
+      }
+    },
+    "Resume" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "السيرة الذاتية"
+          }
+        }
+      }
+    },
+    "Resume · PDF" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "السيرة الذاتية · PDF"
+          }
+        }
+      }
+    },
+    "Resume (optional)" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "السيرة الذاتية (اختياري)"
+          }
+        }
+      }
+    },
+    "Resume analysis" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تحليل السيرة الذاتية"
+          }
+        }
+      }
+    },
+    "Resume text" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "نص السيرة الذاتية"
+          }
+        }
+      }
+    },
+    "Retry answer" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "إعادة طلب الإجابة"
+          }
+        }
+      }
+    },
+    "Retry feedback" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "إعادة طلب الملاحظات"
+          }
+        }
+      }
+    },
+    "Retry generation" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "إعادة إنشاء الأسئلة"
+          }
+        }
+      }
+    },
+    "Retry request" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "إعادة المحاولة"
+          }
+        }
+      }
+    },
+    "Retry session check" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "إعادة التحقق من الجلسة"
+          }
+        }
+      }
+    },
+    "Review before you use it" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "راجع المحتوى قبل استخدامه"
+          }
+        }
+      }
+    },
+    "Review your resume" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "راجع سيرتك الذاتية"
+          }
+        }
+      }
+    },
+    "Review your resume and explore a job match when you’re ready." : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "راجع سيرتك الذاتية واستكشف مدى ملاءمتها لوظيفة عندما تكون مستعدًا."
+          }
+        }
+      }
+    },
+    "Room to practice" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "مساحة للتدريب"
+          }
+        }
+      }
+    },
+    "Save" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "حفظ"
+          }
+        }
+      }
+    },
+    "Save answer" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "حفظ الإجابة"
+          }
+        }
+      }
+    },
+    "Save name" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "حفظ الاسم"
+          }
+        }
+      }
+    },
+    "Save your changes before requesting feedback." : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "احفظ تعديلاتك قبل طلب الملاحظات."
+          }
+        }
+      }
+    },
+    "Saved answer" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "الإجابة المحفوظة"
+          }
+        }
+      }
+    },
+    "Saving resume" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "جارٍ حفظ السيرة الذاتية"
+          }
+        }
+      }
+    },
+    "Select a resume" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "حدد سيرة ذاتية"
+          }
+        }
+      }
+    },
+    "Selected skills, resume skill mentions and short resume excerpts, job details, questions and answers may be sent to OpenRouter and Google Gemini, or processed by local Ollama. Google’s free tier may use content to improve its products. Use synthetic data until privacy is reviewed." : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "قد تُرسل المهارات المحددة والمهارات المذكورة ومقتطفات قصيرة من السيرة الذاتية وتفاصيل الوظيفة والأسئلة والإجابات إلى OpenRouter وGoogle Gemini أو تُعالج محليًا بواسطة Ollama. قد تستخدم Google المحتوى لتحسين منتجاتها في المستوى المجاني. استخدم بيانات تجريبية حتى تتم مراجعة الخصوصية."
+          }
+        }
+      }
+    },
+    "Send for an answer" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "إرسال للحصول على إجابة"
+          }
+        }
+      }
+    },
+    "Send for analysis" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "إرسال للتحليل"
+          }
+        }
+      }
+    },
+    "Send for comparison" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "إرسال للمقارنة"
+          }
+        }
+      }
+    },
+    "Send question" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "إرسال السؤال"
+          }
+        }
+      }
+    },
+    "Send this comparison for analysis?" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "هل تريد إرسال هذه المقارنة للتحليل؟"
+          }
+        }
+      }
+    },
+    "Send this question for an answer?" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "هل تريد إرسال هذا السؤال للحصول على إجابة؟"
+          }
+        }
+      }
+    },
+    "Send this request?" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "هل تريد إرسال هذا الطلب؟"
+          }
+        }
+      }
+    },
+    "Send this resume for analysis?" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "هل تريد إرسال هذه السيرة الذاتية للتحليل؟"
+          }
+        }
+      }
+    },
+    "Senior" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "متقدم"
+          }
+        }
+      }
+    },
+    "Seniority" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "مستوى الخبرة"
+          }
+        }
+      }
+    },
+    "Session options" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "خيارات الجلسة"
+          }
+        }
+      }
+    },
+    "Set your backend URL in Settings before signing in." : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "اضبط عنوان الخادم في الإعدادات قبل تسجيل الدخول."
+          }
+        }
+      }
+    },
+    "Settings" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "الإعدادات"
+          }
+        }
+      }
+    },
+    "Shows a confirmation before sending your question for an answer." : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "يعرض تأكيدًا قبل إرسال سؤالك للحصول على إجابة."
+          }
+        }
+      }
+    },
+    "Sign in" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تسجيل الدخول"
+          }
+        }
+      }
+    },
+    "Sign in with Google" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تسجيل الدخول باستخدام Google"
+          }
+        }
+      }
+    },
+    "Sign out" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تسجيل الخروج"
+          }
+        }
+      }
+    },
+    "Signing in" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "جارٍ تسجيل الدخول"
+          }
+        }
+      }
+    },
+    "Skill progress" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تقدم المهارات"
+          }
+        }
+      }
+    },
+    "Skills, separated by commas" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "المهارات، مفصولة بفواصل"
+          }
+        }
+      }
+    },
+    "Skip" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تخطي"
+          }
+        }
+      }
+    },
+    "Something went wrong" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "حدث خطأ ما"
+          }
+        }
+      }
+    },
+    "Sources" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "المصادر"
+          }
+        }
+      }
+    },
+    "Speech recognition is restricted on this device." : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "التعرف على الكلام مقيّد على هذا الجهاز."
+          }
+        }
+      }
+    },
+    "Start a chat" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ابدأ محادثة"
+          }
+        }
+      }
+    },
+    "Start a new analysis" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "بدء تحليل جديد"
+          }
+        }
+      }
+    },
+    "Start adaptive interview" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ابدأ مقابلة تكيفية"
+          }
+        }
+      }
+    },
+    "Start analysis" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "بدء التحليل"
+          }
+        }
+      }
+    },
+    "Start practicing" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ابدأ التدريب"
+          }
+        }
+      }
+    },
+    "Start with a question tailored to your role and selected context." : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ابدأ بسؤال يناسب وظيفتك والمعلومات التي اخترتها."
+          }
+        }
+      }
+    },
+    "Starting analysis" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "جارٍ بدء التحليل"
+          }
+        }
+      }
+    },
+    "Starting comparison" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "جارٍ بدء المقارنة"
+          }
+        }
+      }
+    },
+    "Stop dictation" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "إيقاف الإملاء"
+          }
+        }
+      }
+    },
+    "Strengths" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "نقاط القوة"
+          }
+        }
+      }
+    },
+    "Strongest observed topics" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "أبرز الموضوعات التي أظهرتها"
+          }
+        }
+      }
+    },
+    "Submit answer" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "إرسال الإجابة"
+          }
+        }
+      }
+    },
+    "Submit answer for feedback" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "إرسال الإجابة للحصول على الملاحظات"
+          }
+        }
+      }
+    },
+    "Submit your answer for feedback?" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "هل تريد إرسال إجابتك للحصول على الملاحظات؟"
+          }
+        }
+      }
+    },
+    "Suggested rewrites" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "صياغات مقترحة"
+          }
+        }
+      }
+    },
+    "Suggestion" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "الاقتراح"
+          }
+        }
+      }
+    },
+    "System default" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "لغة النظام"
+          }
+        }
+      }
+    },
+    "Target role" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "الوظيفة المستهدفة"
+          }
+        }
+      }
+    },
+    "Technical" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تقنية"
+          }
+        }
+      }
+    },
+    "The job continues on the server if you leave this screen." : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تستمر المهمة على الخادم إذا غادرت هذه الشاشة."
+          }
+        }
+      }
+    },
+    "This name appears in your workspace." : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "يظهر هذا الاسم في مساحة عملك."
+          }
+        }
+      }
+    },
+    "This permanently deletes its messages." : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "سيؤدي ذلك إلى حذف رسائلها نهائيًا."
+          }
+        }
+      }
+    },
+    "This removes the resume and its associated data." : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "سيؤدي ذلك إلى حذف السيرة الذاتية والبيانات المرتبطة بها."
+          }
+        }
+      }
+    },
+    "Topics to review" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "موضوعات للمراجعة"
+          }
+        }
+      }
+    },
+    "Topics to revisit" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "موضوعات تحتاج إلى مراجعة"
+          }
+        }
+      }
+    },
+    "Totals are incomplete when costs or tokens are unknown. Estimates are not your bill; local inference excludes hardware and electricity." : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "الإجماليات غير مكتملة عندما تكون التكلفة أو الرموز غير معروفة. التقديرات ليست فاتورتك؛ ولا يشمل التشغيل المحلي الأجهزة والكهرباء."
+          }
+        }
+      }
+    },
+    "Tracking starts after this feature is enabled and may miss interrupted requests." : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "يبدأ التتبع بعد تفعيل هذه الميزة وقد لا يشمل الطلبات التي انقطعت."
+          }
+        }
+      }
+    },
+    "Try again" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "حاول مجددًا"
+          }
+        }
+      }
+    },
+    "Turn the next step into a plan you can act on." : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "حوّل خطوتك القادمة إلى خطة قابلة للتنفيذ."
+          }
+        }
+      }
+    },
+    "Unable to link account" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تعذّر ربط الحساب"
+          }
+        }
+      }
+    },
+    "Unable to update account" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تعذّر تحديث الحساب"
+          }
+        }
+      }
+    },
+    "Unknown cost: %@ attempts · Unknown tokens: %@ attempts" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Unknown cost: %1$@ attempts · Unknown tokens: %2$@ attempts"
+          }
+        }
+      }
+    },
+    "Updating account" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "جارٍ تحديث الحساب"
+          }
+        }
+      }
+    },
+    "Updating resumes" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "جارٍ تحديث السير الذاتية"
+          }
+        }
+      }
+    },
+    "Upload a PDF to analyze it, match a job, or practice for an interview." : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ارفع ملف PDF لتحليله أو مقارنته بوظيفة أو التدرب على مقابلة."
+          }
+        }
+      }
+    },
+    "Upload a resume" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ارفع سيرة ذاتية"
+          }
+        }
+      }
+    },
+    "Upload a resume in Workspace first." : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ارفع سيرة ذاتية في مساحة العمل أولًا."
+          }
+        }
+      }
+    },
+    "Upload resume" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "رفع سيرة ذاتية"
+          }
+        }
+      }
+    },
+    "Usage summary" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ملخص الاستخدام"
+          }
+        }
+      }
+    },
+    "Use HTTPS, or localhost for simulator development." : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "استخدم HTTPS أو localhost للتطوير على المحاكي."
+          }
+        }
+      }
+    },
+    "View skill progress" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "عرض تقدم المهارات"
+          }
+        }
+      }
+    },
+    "Waiting for an answer" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "بانتظار الإجابة"
+          }
+        }
+      }
+    },
+    "Waiting for analysis" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "بانتظار التحليل"
+          }
+        }
+      }
+    },
+    "Waiting for comparison" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "بانتظار المقارنة"
+          }
+        }
+      }
+    },
+    "Ways to improve" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "طرق التحسين"
+          }
+        }
+      }
+    },
+    "Welcome back" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "مرحبًا بعودتك"
+          }
+        }
+      }
+    },
+    "Working on your answer…" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "جارٍ تحليل إجابتك…"
+          }
+        }
+      }
+    },
+    "Working on your interview…" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "جارٍ إعداد مقابلتك…"
+          }
+        }
+      }
+    },
+    "Workspace" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "مساحة العمل"
+          }
+        }
+      }
+    },
+    "Write a career question" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "اكتب سؤالًا مهنيًا"
+          }
+        }
+      }
+    },
+    "Write answer" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "اكتب إجابة"
+          }
+        }
+      }
+    },
+    "Write or dictate an answer, then review your feedback." : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "اكتب إجابة أو أملِها، ثم راجع الملاحظات."
+          }
+        }
+      }
+    },
+    "You can leave this screen and return while the app stays open. The job continues on the server." : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "يمكنك مغادرة هذه الشاشة والعودة ما دام التطبيق مفتوحًا. تستمر المهمة على الخادم."
+          }
+        }
+      }
+    },
+    "You can return to this session later." : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "يمكنك العودة إلى هذه الجلسة لاحقًا."
+          }
+        }
+      }
+    },
+    "You can review the report after completing the interview." : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "يمكنك مراجعة التقرير بعد إنهاء المقابلة."
+          }
+        }
+      }
+    },
+    "Your adaptive sessions" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "جلساتك التكيفية"
+          }
+        }
+      }
+    },
+    "Your answer" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "إجابتك"
+          }
+        }
+      }
+    },
+    "Your answer is over the limit. Edit it before saving." : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تجاوزت إجابتك الحد المسموح. عدّلها قبل الحفظ."
+          }
+        }
+      }
+    },
+    "Your answer, selected skills, resume skill mentions and short resume excerpts, job details and questions may be sent to OpenRouter and Google Gemini, or processed by local Ollama. Google’s free tier may use content to improve its products. Use synthetic data until privacy is reviewed." : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "قد تُرسل إجابتك والمهارات المحددة والمهارات المذكورة ومقتطفات قصيرة من السيرة الذاتية وتفاصيل الوظيفة والأسئلة إلى OpenRouter وGoogle Gemini أو تُعالج محليًا بواسطة Ollama. قد تستخدم Google المحتوى لتحسين منتجاتها في المستوى المجاني. استخدم بيانات تجريبية حتى تتم مراجعة الخصوصية."
+          }
+        }
+      }
+    },
+    "Your career chat" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "محادثتك المهنية"
+          }
+        }
+      }
+    },
+    "YOUR CAREER COMPANION" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "رفيقك المهني"
+          }
+        }
+      }
+    },
+    "YOUR CAREER WORKSPACE" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "مساحة عملك المهنية"
+          }
+        }
+      }
+    },
+    "Your conversations" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "محادثاتك"
+          }
+        }
+      }
+    },
+    "Your experience, in focus" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "خبرتك في المقدمة"
+          }
+        }
+      }
+    },
+    "Your feedback" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ملاحظاتك"
+          }
+        }
+      }
+    },
+    "Your interview" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "مقابلتك"
+          }
+        }
+      }
+    },
+    "Your interview is complete." : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "اكتملت مقابلتك."
+          }
+        }
+      }
+    },
+    "Your name" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "اسمك"
+          }
+        }
+      }
+    },
+    "Your next interview starts here" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تبدأ مقابلتك القادمة من هنا"
+          }
+        }
+      }
+    },
+    "Your next move\nstarts here." : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "خطوتك القادمة\nتبدأ هنا."
+          }
+        }
+      }
+    },
+    "Your next step starts here." : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "خطوتك القادمة تبدأ هنا."
+          }
+        }
+      }
+    },
+    "Your progress" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تقدمك"
+          }
+        }
+      }
+    },
+    "Your question and retrieved guidance may be sent to OpenRouter and Google Gemini, or processed by local Ollama. Google’s free tier may use content to improve its products. Use synthetic data until privacy is reviewed." : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "قد يُرسل سؤالك والإرشادات المسترجعة إلى OpenRouter وGoogle Gemini أو تُعالج محليًا بواسطة Ollama. قد تستخدم Google المحتوى لتحسين منتجاتها في المستوى المجاني. استخدم بيانات تجريبية حتى تتم مراجعة الخصوصية."
+          }
+        }
+      }
+    },
+    "Your resume and job description are sent to the configured AI providers, including cloud providers if fallback is needed." : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تُرسل سيرتك الذاتية والوصف الوظيفي إلى مزودي الذكاء الاصطناعي المُعدّين، بما في ذلك المزودون السحابيون عند الحاجة إلى بديل."
+          }
+        }
+      }
+    },
+    "Your resume and job description may be sent to OpenRouter and Google Gemini, or processed by local Ollama if another provider fails. Google’s free tier may use content to improve its products. Use synthetic data until privacy and retention are reviewed." : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "قد تُرسل سيرتك الذاتية والوصف الوظيفي إلى OpenRouter وGoogle Gemini أو تُعالج محليًا بواسطة Ollama إذا تعذّر استخدام مزود آخر. قد تستخدم Google المحتوى لتحسين منتجاتها في المستوى المجاني. استخدم بيانات تجريبية حتى تتم مراجعة الخصوصية والاحتفاظ بالبيانات."
+          }
+        }
+      }
+    },
+    "Your resume may be sent to OpenRouter and Google Gemini, or processed by local Ollama if another provider fails. Google’s free tier may use content to improve its products. Use synthetic resumes until privacy and retention have been reviewed." : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "قد تُرسل سيرتك الذاتية إلى OpenRouter وGoogle Gemini أو تُعالج محليًا بواسطة Ollama إذا تعذّر استخدام مزود آخر. قد تستخدم Google المحتوى لتحسين منتجاتها في المستوى المجاني. استخدم سيرًا ذاتية تجريبية حتى تتم مراجعة الخصوصية والاحتفاظ بالبيانات."
+          }
+        }
+      }
+    },
+    "Your resume may be sent to OpenRouter and Google Gemini, or processed locally with Ollama. For now, use synthetic resumes only." : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "قد تُرسل سيرتك الذاتية إلى OpenRouter وGoogle Gemini أو تُعالج محليًا بواسطة Ollama. استخدم سيرًا ذاتية تجريبية فقط في الوقت الحالي."
+          }
+        }
+      }
+    },
+    "Your resume, job description, question, and answer are sent to the configured AI providers, including cloud providers if fallback is needed." : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تُرسل سيرتك الذاتية والوصف الوظيفي والسؤال والإجابة إلى مزودي الذكاء الاصطناعي المُعدّين، بما في ذلك المزودون السحابيون عند الحاجة إلى بديل."
+          }
+        }
+      }
+    },
+    "Your resumes" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "سيرك الذاتية"
+          }
+        }
+      }
+    },
+    "Your selected skills are treated as claims, not verified experience." : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تُعامل المهارات المحددة على أنها معلومات مقدمة منك وليست خبرة مؤكدة."
+          }
+        }
+      }
+    },
+    "Your sessions" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "جلساتك"
+          }
+        }
+      }
+    },
+    "Your space to think ahead" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "مساحتك للتخطيط للمستقبل"
+          }
+        }
+      }
+    },
+    "Your unsaved answer will be lost." : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ستفقد إجابتك غير المحفوظة."
+          }
+        }
+      }
+    },
+    "العربية" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "العربية"
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.0"
+}

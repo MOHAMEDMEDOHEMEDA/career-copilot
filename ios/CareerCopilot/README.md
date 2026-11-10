@@ -8,6 +8,8 @@ A SwiftUI iOS app for career preparation, backed by the Career Copilot FastAPI s
 2. Open `CareerCopilot.xcodeproj` in Xcode and select the `CareerCopilot` scheme and an available simulator.
 3. Run the app. In Settings, set the backend URL if needed. The simulator can use `http://localhost:8000`; non-local hosts require HTTPS.
 
+In Settings, choose English, Arabic, or the system language. Arabic uses a right-to-left layout. The interface has Arabic translations for its main screens; some dynamic status and server messages may still appear in English. User-entered text and AI-generated content retain their original language. iOS permission prompts follow the device's language settings.
+
 A physical iPhone cannot use its own `localhost` to reach your Mac. It needs a reachable, appropriately configured backend URL. A hosted deployment and real-device verification are still needed for release.
 
 ## Google Sign-In
@@ -23,8 +25,11 @@ The current bundle ID is `com.careercopilot.spike`; choose the final bundle ID a
 - **Chat:** create and delete conversations, ask career questions, and view answers with source excerpts. The project-authored corpus is limited and answers can be inaccurate.
 - **Practice:** standard and adaptive interviews. Adaptive sessions can use a selected role, seniority, skills, and optional resume; they support question and answer turns, feedback, session recovery, reports, and topic progress. Submit an answer to request feedback automatically, or choose the “I don't know” option for an unscored example answer.
 - **Settings:** account and backend configuration.
+- **AI usage:** review recorded provider attempts, available token counts, and
+  known or estimated costs in Settings. Unknown costs and incomplete totals are
+  identified; tracking begins only after the feature is enabled.
 
-Adaptive answer dictation requests microphone and speech-recognition permission and requires on-device recognition for the current locale. Availability depends on the device and locale. Users can review and edit the transcription before submitting it.
+Adaptive answer dictation requests microphone and speech-recognition permission and requires on-device recognition for the selected app language. Availability depends on the device and locale. Users can review and edit the transcription before submitting it.
 
 AI-generated feedback and example answers are approximate study guidance, not verified assessments. The app discloses provider use before AI requests. Depending on the request, selected resume excerpts, job details, questions, and answers may be sent to OpenRouter or Google Gemini or processed by local Ollama. Google’s free tier may use content to improve products. Use synthetic data until privacy and retention have been reviewed.
 

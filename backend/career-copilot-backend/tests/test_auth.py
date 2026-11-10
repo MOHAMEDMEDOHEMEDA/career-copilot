@@ -143,3 +143,22 @@ def test_expired_tokens_rejected(client) -> None:
         ).status_code
         == 401
     )
+
+
+def test_display_name_requires_auth_and_is_owned(client) -> None:
+    test_client, _ = client
+    first = {"email": "first@example.com", "password": "correct-password"}
+    second = {"email": "second@example.com", "password": "correct-password"}
+    for credentials in (first, second):
+        assert test_client.post("/api/v1/auth/register", json=credentials).status_code == 201
+    tokens = [test_client.post("/api/v1/auth/login", json=item).json()["access_token"] for item in (first, second)]
+    headers = [{"Authorization": f"Bearer {token}"} for token in tokens]
+    assert test_client.patch("/api/v1/auth/me/name", json={"display_name": "Name"}).status_code == 401
+    result = test_client.patch("/api/v1/auth/me/name", headers=headers[0], json={"display_name": "  محمد علي  "})
+    assert result.status_code == 200
+    assert result.json()["display_name"] == "محمد علي"
+    assert test_client.get("/api/v1/auth/me", headers=headers[0]).json()["display_name"] == "محمد علي"
+    assert test_client.get("/api/v1/auth/me", headers=headers[1]).json()["display_name"] is None
+    for value in (" ", "a" * 101, "name\nother"):
+        assert test_client.patch("/api/v1/auth/me/name", headers=headers[0], json={"display_name": value}).status_code == 422
+    assert test_client.patch("/api/v1/auth/me/name", headers=headers[0], json={"display_name": "Name", "email": second["email"]}).status_code == 422

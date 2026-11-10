@@ -1,0 +1,15 @@
+[
+  {"question":"How should I write a resume bullet?","expected_source":"resume-evidence"},
+  {"question":"How can I describe real examples in a job interview?","expected_source":"interview-preparation"},
+  {"question":"Does a missing resume skill mean I do not possess it?","expected_source":"job-description-analysis"},
+  {"question":"How can I plan career development?","expected_source":"career-goals"},
+  {"question":"How do I prepare for interviews?","expected_source":"interview-preparation"},
+  {"question":"What is the surface temperature of Mars?","expected_source":null},
+  {"question":"What does await mean when calling a Swift async function?","expected_source":"se-swift-async-await"},
+  {"question":"When should Swift use async let or a task group for child tasks?","expected_source":"se-swift-structured-tasks"},
+  {"question":"Does cancelling a Swift task force it to stop?","expected_source":"se-swift-task-cancellation"},
+  {"question":"How does Swift actor isolation protect mutable state?","expected_source":"se-swift-actor-isolation"},
+  {"question":"Can actor state change while a Swift actor method is suspended at await?","expected_source":"se-swift-actor-reentrancy"},
+  {"question":"What does MainActor isolation mean for UI state in Swift?","expected_source":"se-swift-main-actor"},
+  {"question":"How do I configure a PostgreSQL query planner for a production database?","expected_source":null}
+]

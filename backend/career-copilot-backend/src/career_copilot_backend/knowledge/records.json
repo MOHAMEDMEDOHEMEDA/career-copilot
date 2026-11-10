@@ -1,0 +1,286 @@
+[
+  {
+    "id": "se-swift-actor-isolation",
+    "domain": "mobile",
+    "technology": "Swift",
+    "topic": "Swift Concurrency",
+    "subtopic": "Actor isolation",
+    "difficulty": 3,
+    "content_type": "concept",
+    "definition": "Actor isolation controls access to state associated with an actor.",
+    "explanation": "Actor-isolated mutable state is accessed through its isolation domain. Calls that cross into an actor generally require an asynchronous hop and await; code already in the same isolation domain can access its state directly.",
+    "code_examples": [
+      "actor Counter {\n    private var value = 0\n    func increment() { value += 1 }\n}\n\nfunc update(_ counter: Counter) async {\n    await counter.increment()\n}"
+    ],
+    "common_mistakes": [
+      "Assuming every actor method always needs await, including calls already on that actor.",
+      "Assuming actor isolation prevents every logical race across suspension points."
+    ],
+    "prerequisites": [
+      "se-swift-async-await"
+    ],
+    "interview_questions": [
+      {
+        "question": "How does an actor protect mutable state from data races?",
+        "expected_concepts": [
+          "Actor-isolated state",
+          "Serialized access between suspension points",
+          "Cross-actor access may require await"
+        ],
+        "follow_ups": [
+          "What can change while an actor method is suspended?"
+        ]
+      }
+    ],
+    "source": {
+      "title": "Calling an actor-isolated method from a synchronous nonisolated context",
+      "url": "https://docs.swift.org/latest/documentation/diagnostics/actor-isolated-call/",
+      "documentation_version": "latest (unversioned)"
+    },
+    "technology_version": "Swift (version unspecified)",
+    "verification_status": "reviewed",
+    "updated_at": "2026-11-10T00:00:00Z",
+    "roles": [
+      "ios",
+      "swift"
+    ],
+    "reviewed_by": "Codex (AI-assisted review; independent review pending)",
+    "reviewed_at": "2026-11-10T10:28:17Z"
+  },
+  {
+    "id": "se-swift-async-await",
+    "domain": "mobile",
+    "technology": "Swift",
+    "topic": "Swift Concurrency",
+    "subtopic": "Async and await",
+    "difficulty": 2,
+    "content_type": "concept",
+    "definition": "An async function can suspend while work is in progress and resume later.",
+    "explanation": "Use await at a potential suspension point when calling asynchronous work. Suspension lets other work run; it does not by itself guarantee parallel execution or a particular thread when execution resumes.",
+    "code_examples": [
+      "func greeting() async -> String {\n    \"Hello\"\n}\n\nfunc makeMessage() async -> String {\n    let text = await greeting()\n    return text\n}"
+    ],
+    "common_mistakes": [
+      "Assuming every await starts a new task.",
+      "Assuming async automatically moves CPU-intensive work off the main actor."
+    ],
+    "prerequisites": [],
+    "interview_questions": [
+      {
+        "question": "What does await tell you about an async function call?",
+        "expected_concepts": [
+          "A possible suspension point",
+          "The calling task waits for the result",
+          "Suspension is not necessarily parallel execution"
+        ],
+        "follow_ups": [
+          "How would you start two independent async operations concurrently?"
+        ]
+      }
+    ],
+    "source": {
+      "title": "The Swift Programming Language: Concurrency",
+      "url": "https://docs.swift.org/swift-book/documentation/the-swift-programming-language/concurrency/",
+      "documentation_version": "current (unversioned)"
+    },
+    "technology_version": "Swift (version unspecified)",
+    "verification_status": "reviewed",
+    "updated_at": "2026-11-10T00:00:00Z",
+    "roles": [
+      "ios",
+      "swift"
+    ],
+    "reviewed_by": "Codex (AI-assisted review; independent review pending)",
+    "reviewed_at": "2026-11-10T10:28:17Z"
+  },
+  {
+    "id": "se-swift-structured-tasks",
+    "domain": "mobile",
+    "technology": "Swift",
+    "topic": "Swift Concurrency",
+    "subtopic": "Structured child tasks",
+    "difficulty": 3,
+    "content_type": "concept",
+    "definition": "Structured concurrency creates child tasks whose lifetime is bounded by a parent scope.",
+    "explanation": "Use async let for a fixed set of independent operations and a task group for a dynamic set. The scope waits for its child tasks before returning; cancellation propagates through the task hierarchy.",
+    "code_examples": [
+      "func pair() async -> (Int, Int) {\n    async let first = loadValue()\n    async let second = loadValue()\n    return await (first, second)\n}\n\nfunc loadValue() async -> Int { 1 }"
+    ],
+    "common_mistakes": [
+      "Treating Task { } as a structured child task.",
+      "Assuming a task group can leave unfinished children running after its scope exits."
+    ],
+    "prerequisites": [
+      "se-swift-async-await"
+    ],
+    "interview_questions": [
+      {
+        "question": "When would you use async let instead of a task group?",
+        "expected_concepts": [
+          "Fixed versus dynamic number of operations",
+          "Child tasks belong to a parent scope",
+          "The scope waits for child tasks"
+        ],
+        "follow_ups": [
+          "What happens to child tasks when the parent is cancelled?"
+        ]
+      }
+    ],
+    "source": {
+      "title": "The Swift Programming Language: Concurrency",
+      "url": "https://docs.swift.org/swift-book/documentation/the-swift-programming-language/concurrency/",
+      "documentation_version": "current (unversioned)"
+    },
+    "technology_version": "Swift (version unspecified)",
+    "verification_status": "reviewed",
+    "updated_at": "2026-11-10T00:00:00Z",
+    "roles": [
+      "ios",
+      "swift"
+    ],
+    "reviewed_by": "Codex (AI-assisted review; independent review pending)",
+    "reviewed_at": "2026-11-10T10:28:17Z"
+  },
+  {
+    "id": "se-swift-task-cancellation",
+    "domain": "mobile",
+    "technology": "Swift",
+    "topic": "Swift Concurrency",
+    "subtopic": "Cooperative task cancellation",
+    "difficulty": 3,
+    "content_type": "concept",
+    "definition": "Swift task cancellation signals that work should stop; cancellation is cooperative.",
+    "explanation": "A cancelled task must observe cancellation and respond at appropriate points. Task.checkCancellation() throws when cancellation is observed, while other operations may choose a different cancellation response.",
+    "code_examples": [
+      "func process(_ values: [Int]) async throws -> Int {\n    var total = 0\n    for value in values {\n        try Task.checkCancellation()\n        total += value\n    }\n    return total\n}"
+    ],
+    "common_mistakes": [
+      "Assuming cancel() forcibly stops the task.",
+      "Catching cancellation and continuing indefinitely without a deliberate reason."
+    ],
+    "prerequisites": [
+      "se-swift-structured-tasks"
+    ],
+    "interview_questions": [
+      {
+        "question": "Why might a cancelled task continue executing?",
+        "expected_concepts": [
+          "Cancellation is cooperative",
+          "The task or called operations need to observe cancellation",
+          "Cancellation can be handled by throwing or another appropriate response"
+        ],
+        "follow_ups": [
+          "How would you make a long-running loop respond to cancellation?"
+        ]
+      }
+    ],
+    "source": {
+      "title": "Swift Task: Task Cancellation",
+      "url": "https://developer.apple.com/documentation/swift/task/",
+      "documentation_version": "current (unversioned)"
+    },
+    "technology_version": "Swift (version unspecified)",
+    "verification_status": "reviewed",
+    "updated_at": "2026-11-10T00:00:00Z",
+    "roles": [
+      "ios",
+      "swift"
+    ],
+    "reviewed_by": "Codex (AI-assisted review; independent review pending)",
+    "reviewed_at": "2026-11-10T10:28:17Z"
+  },
+  {
+    "id": "se-swift-actor-reentrancy",
+    "domain": "mobile",
+    "technology": "Swift",
+    "topic": "Swift Concurrency",
+    "subtopic": "Actor reentrancy",
+    "difficulty": 4,
+    "content_type": "concept",
+    "definition": "An actor can process other work while an actor-isolated function is suspended.",
+    "explanation": "Actor-isolated code runs without interleaving between suspension points, but an await can allow another operation on the same actor to run before the original operation resumes. Recheck assumptions about mutable state after suspension.",
+    "code_examples": [],
+    "common_mistakes": [
+      "Assuming actor state is unchanged after an await.",
+      "Confusing data-race protection with transactional consistency across an asynchronous operation."
+    ],
+    "prerequisites": [
+      "se-swift-actor-isolation"
+    ],
+    "interview_questions": [
+      {
+        "question": "Can an actor still have a logical race condition? Explain an example.",
+        "expected_concepts": [
+          "Interleaving at suspension points",
+          "State can change while a method is suspended",
+          "Revalidate assumptions after await"
+        ],
+        "follow_ups": [
+          "How would you redesign a check-then-await-then-update sequence?"
+        ]
+      }
+    ],
+    "source": {
+      "title": "The Swift Programming Language: Concurrency",
+      "url": "https://docs.swift.org/swift-book/documentation/the-swift-programming-language/concurrency/",
+      "documentation_version": "current (unversioned)"
+    },
+    "technology_version": "Swift (version unspecified)",
+    "verification_status": "reviewed",
+    "updated_at": "2026-11-10T00:00:00Z",
+    "roles": [
+      "ios",
+      "swift"
+    ],
+    "reviewed_by": "Codex (AI-assisted review; independent review pending)",
+    "reviewed_at": "2026-11-10T10:28:17Z"
+  },
+  {
+    "id": "se-swift-main-actor",
+    "domain": "mobile",
+    "technology": "Swift",
+    "topic": "Swift Concurrency",
+    "subtopic": "Main actor isolation",
+    "difficulty": 3,
+    "content_type": "concept",
+    "definition": "The main actor is a global actor used to isolate work that must run on the main thread.",
+    "explanation": "Mark UI-related state or functions with @MainActor when they need main-actor isolation. Calls from another isolation domain may require await; main-actor isolation alone does not make expensive synchronous work nonblocking.",
+    "code_examples": [
+      "@MainActor\nfinal class ScreenState {\n    var title = \"Ready\"\n    func updateTitle(_ value: String) { title = value }\n}"
+    ],
+    "common_mistakes": [
+      "Assuming @MainActor automatically moves expensive synchronous computation to a background executor.",
+      "Updating main-actor-isolated state synchronously from a nonisolated context."
+    ],
+    "prerequisites": [
+      "se-swift-actor-isolation"
+    ],
+    "interview_questions": [
+      {
+        "question": "Why might a view model be annotated with @MainActor?",
+        "expected_concepts": [
+          "UI state isolation",
+          "Cross-isolation access",
+          "Avoid blocking the main actor with expensive synchronous work"
+        ],
+        "follow_ups": [
+          "How can you perform expensive work without blocking UI updates?"
+        ]
+      }
+    ],
+    "source": {
+      "title": "The Swift Programming Language: Concurrency",
+      "url": "https://docs.swift.org/swift-book/documentation/the-swift-programming-language/concurrency/",
+      "documentation_version": "current (unversioned)"
+    },
+    "technology_version": "Swift (version unspecified)",
+    "verification_status": "reviewed",
+    "updated_at": "2026-11-10T00:00:00Z",
+    "roles": [
+      "ios",
+      "swift"
+    ],
+    "reviewed_by": "Codex (AI-assisted review; independent review pending)",
+    "reviewed_at": "2026-11-10T10:28:17Z"
+  }
+]

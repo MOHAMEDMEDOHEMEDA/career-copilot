@@ -13,6 +13,8 @@ class KnowledgeChunk(Base):
     title: Mapped[str] = mapped_column(String(200), nullable=False)
     origin: Mapped[str] = mapped_column(String(200), nullable=False)
     content: Mapped[str] = mapped_column(Text, nullable=False)
+    content_hash: Mapped[str | None] = mapped_column(String(64))
+    embedding_model: Mapped[str | None] = mapped_column(String(160))
     embedding: Mapped[list[float]] = mapped_column(
         Vector(768).with_variant(JSON(), "sqlite"), nullable=False
     )

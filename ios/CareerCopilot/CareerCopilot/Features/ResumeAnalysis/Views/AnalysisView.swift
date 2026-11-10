@@ -20,7 +20,7 @@ struct AnalysisView: View {
                         .frame(maxWidth: .infinity).padding()
                 case .waiting(let status):
                     VStack(alignment: .leading, spacing: 12) {
-                        ProgressView(status == .running ? "Analyzing your resume" : "Waiting for analysis")
+                        ProgressView(LocalizedStringKey(status == .running ? "Analyzing your resume" : "Waiting for analysis"))
                         Text("You can leave this screen and return while the app stays open. The job continues on the server.")
                             .font(.subheadline).foregroundStyle(.secondary)
                         jobReference

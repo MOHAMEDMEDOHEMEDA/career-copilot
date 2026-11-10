@@ -88,7 +88,7 @@ struct ChatThreadView: View {
                     if model.isRequestingAnswer {
                         ProgressView("Requesting an answer").tint(.white).foregroundStyle(ChatStyle.muted)
                     } else if let job = model.answerJob, job.status == .queued || job.status == .running, !model.answerPollingPaused {
-                        ProgressView(job.status == .running ? "Preparing an answer" : "Waiting for an answer").tint(.white).foregroundStyle(ChatStyle.muted)
+                        ProgressView(LocalizedStringKey(job.status == .running ? "Preparing an answer" : "Waiting for an answer")).tint(.white).foregroundStyle(ChatStyle.muted)
                     }
                     if let answerError = model.answerError {
                         VStack(alignment: .leading, spacing: 8) {

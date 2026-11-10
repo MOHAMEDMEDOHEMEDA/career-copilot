@@ -130,4 +130,21 @@ final class AppViewModel: ObservableObject {
             canRetrySessionRestore = false
         } catch { message = error.localizedDescription }
     }
+
+    func updateDisplayName(_ name: String) async -> Bool {
+        guard !isLoading, profile != nil else { return false }
+        isLoading = true
+        defer { isLoading = false }
+        do {
+            profile = try await client().updateDisplayName(name)
+            return true
+        } catch {
+            message = error.localizedDescription
+            return false
+        }
+    }
+
+    func aiUsage(offset: Int = 0) async throws -> AIUsagePage {
+        try await client().aiUsage(offset: offset)
+    }
 }

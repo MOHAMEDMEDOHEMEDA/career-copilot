@@ -1,3 +1,4 @@
+from career_copilot_backend.models.ai_usage import AIUsage
 from career_copilot_backend.models.chat import ChatMessage, Conversation
 from career_copilot_backend.models.chat_job import ChatAnswerJob
 from career_copilot_backend.models.external_identity import ExternalIdentity
@@ -10,6 +11,7 @@ from career_copilot_backend.models.usage_event import UsageEvent
 from career_copilot_backend.models.user import User
 
 __all__ = [
+    "AIUsage",
     "AdaptiveInterviewJob",
     "AdaptiveInterviewSession",
     "AdaptiveInterviewTurn",

@@ -7,6 +7,7 @@ enum OnboardingGate {
 }
 
 struct OnboardingView: View {
+    @Environment(\.layoutDirection) private var layoutDirection
     private struct Page: Identifiable {
         let id: Int
         let eyebrow, title, description, symbol, detailTitle, detail: String
@@ -58,13 +59,13 @@ struct OnboardingView: View {
                         .frame(maxWidth: .infinity)
                         .padding(.top, 14)
                     VStack(alignment: .leading, spacing: 12) {
-                        Text(item.eyebrow).font(.caption.weight(.semibold)).tracking(1.3).foregroundStyle(CareerStyle.accent)
-                        Text(item.title).font(.largeTitle.bold()).foregroundStyle(.white).fixedSize(horizontal: false, vertical: true)
-                        Text(item.description).font(.body).foregroundStyle(CareerStyle.muted).fixedSize(horizontal: false, vertical: true)
+                        Text(LocalizedStringKey(item.eyebrow)).font(.caption.weight(.semibold)).tracking(1.3).foregroundStyle(CareerStyle.accent)
+                        Text(LocalizedStringKey(item.title)).font(.largeTitle.bold()).foregroundStyle(.white).fixedSize(horizontal: false, vertical: true)
+                        Text(LocalizedStringKey(item.description)).font(.body).foregroundStyle(CareerStyle.muted).fixedSize(horizontal: false, vertical: true)
                     }
                     VStack(alignment: .leading, spacing: 8) {
-                        Label(item.detailTitle, systemImage: "sparkle").font(.headline).foregroundStyle(.white)
-                        Text(item.detail).font(.subheadline).foregroundStyle(CareerStyle.muted).fixedSize(horizontal: false, vertical: true)
+                        Label(LocalizedStringKey(item.detailTitle), systemImage: "sparkle").font(.headline).foregroundStyle(.white)
+                        Text(LocalizedStringKey(item.detail)).font(.subheadline).foregroundStyle(CareerStyle.muted).fixedSize(horizontal: false, vertical: true)
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(18)
@@ -78,8 +79,9 @@ struct OnboardingView: View {
             .id(page)
             .simultaneousGesture(DragGesture(minimumDistance: 40).onEnded { value in
                 guard abs(value.translation.width) > abs(value.translation.height) * 1.5 else { return }
-                if value.translation.width < -60 && page < Self.pages.count - 1 { withAnimation(.easeInOut(duration: 0.2)) { page += 1 } }
-                if value.translation.width > 60 && page > 0 { withAnimation(.easeInOut(duration: 0.2)) { page -= 1 } }
+                let direction = layoutDirection == .rightToLeft ? -value.translation.width : value.translation.width
+                if direction < -60 && page < Self.pages.count - 1 { withAnimation(.easeInOut(duration: 0.2)) { page += 1 } }
+                if direction > 60 && page > 0 { withAnimation(.easeInOut(duration: 0.2)) { page -= 1 } }
             })
 
             VStack(spacing: 14) {
@@ -98,7 +100,7 @@ struct OnboardingView: View {
                 } label: {
                     HStack {
                         Spacer()
-                        Text(page == Self.pages.count - 1 ? "Create account" : "Continue").fontWeight(.semibold)
+                        Text(LocalizedStringKey(page == Self.pages.count - 1 ? "Create account" : "Continue")).fontWeight(.semibold)
                         Spacer()
                         Image(systemName: "arrow.right").accessibilityHidden(true)
                     }

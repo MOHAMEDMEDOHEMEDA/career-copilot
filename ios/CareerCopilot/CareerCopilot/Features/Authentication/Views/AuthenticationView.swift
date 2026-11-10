@@ -48,7 +48,7 @@ struct AuthenticationView: View {
                     HStack {
                         Spacer()
                         if model.isLoading { ProgressView("Signing in") }
-                        else { Text(model.isRegistering ? "Create account" : "Sign in").fontWeight(.semibold) }
+                        else { Text(LocalizedStringKey(model.isRegistering ? "Create account" : "Sign in")).fontWeight(.semibold) }
                         Spacer()
                     }
                     .frame(minHeight: 44)
@@ -60,11 +60,28 @@ struct AuthenticationView: View {
                         .frame(minHeight: 44)
                         .disabled(model.isLoading)
                 }
-                GoogleSignInButton {
-                    Task { await model.googleSignIn() }
+                HStack(spacing: 12) {
+                    Rectangle().fill(.white.opacity(0.14)).frame(height: 1)
+                    Text("or continue with")
+                        .font(.caption.weight(.medium))
+                        .foregroundStyle(CareerStyle.muted)
+                        .fixedSize()
+                    Rectangle().fill(.white.opacity(0.14)).frame(height: 1)
                 }
-                .disabled(model.isLoading)
-                Button(model.isRegistering ? "Already have an account? Sign in" : "New here? Create an account") {
+                .accessibilityHidden(true)
+
+                HStack {
+                    Spacer()
+                    GoogleSignInButton(scheme: .light, style: .icon, state: model.isLoading ? .disabled : .normal) {
+                        Task { await model.googleSignIn() }
+                    }
+                    .clipShape(Circle())
+                    .frame(minWidth: 48, minHeight: 48)
+                    .accessibilityLabel("Sign in with Google")
+                    .disabled(model.isLoading)
+                    Spacer()
+                }
+                Button(LocalizedStringKey(model.isRegistering ? "Already have an account? Sign in" : "New here? Create an account")) {
                     model.isRegistering.toggle()
                 }
                 .frame(minHeight: 44, alignment: .leading)

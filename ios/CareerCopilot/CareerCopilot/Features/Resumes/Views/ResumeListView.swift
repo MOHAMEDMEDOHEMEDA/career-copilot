@@ -15,7 +15,7 @@ struct ResumeListView: View {
                     GradientIcon(symbol: "person.fill")
                     VStack(alignment: .leading, spacing: 3) {
                         Text("Welcome back").font(.subheadline).foregroundStyle(.secondary)
-                        Text(model.profile?.email ?? "Your workspace").font(.headline).lineLimit(1)
+                        Text(model.profile?.displayName ?? model.profile?.email ?? "Your workspace").font(.headline).lineLimit(1)
                     }
                     Spacer()
                 }

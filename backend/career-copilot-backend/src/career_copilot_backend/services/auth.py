@@ -20,6 +20,13 @@ class EmailAlreadyRegistered(Exception):
     pass
 
 
+def update_display_name(session: Session, user: User, name: str) -> User:
+    user.display_name = name
+    session.commit()
+    session.refresh(user)
+    return user
+
+
 def register_user(session: Session, email: str, password: str) -> User:
     user = User(email=email.lower(), password_hash=password_hasher.hash(password))
     session.add(user)

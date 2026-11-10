@@ -17,6 +17,7 @@ from career_copilot_backend.knowledge.embeddings import EmbeddingError, OllamaEm
 from career_copilot_backend.knowledge.index import retrieve
 from career_copilot_backend.llm.alternatives import FallbackProvider
 from career_copilot_backend.llm.provider import LLMProvider, ProviderError
+from career_copilot_backend.llm.usage import capture_usage
 from career_copilot_backend.models import (
     AdaptiveInterviewJob,
     AdaptiveInterviewSession,
@@ -115,7 +116,18 @@ def process_adaptive_job(
                 vector = OllamaEmbedder(settings.ollama_base_url).embed(
                     [f"{turn.topic}: {turn.prompt}"], query=True
                 )[0]
-                for chunk in retrieve(db, vector, source_ids=eligible):
+                if settings.knowledge_hybrid_enabled:
+                    retrieved = retrieve(
+                        db, vector, source_ids=eligible,
+                        query_text=f"{turn.topic}: {turn.prompt}", hybrid=True,
+                        max_distance=settings.knowledge_vector_max_distance,
+                        keyword_max_distance=settings.knowledge_keyword_max_distance,
+                    )
+                elif settings.knowledge_vector_max_distance != 0.35:
+                    retrieved = retrieve(db, vector, source_ids=eligible, max_distance=settings.knowledge_vector_max_distance)
+                else:
+                    retrieved = retrieve(db, vector, source_ids=eligible)
+                for chunk in retrieved:
                     current = current_chunks.get(chunk.id)
                     if current is None or (
                         chunk.content,
@@ -279,9 +291,13 @@ def run_next_adaptive_job(
         job.lease_expires_at = now + timedelta(seconds=lease_seconds)
         job.attempts += 1
         job_id = job.id
+        interview = db.get(AdaptiveInterviewSession, job.session_id)
+        user_id = interview.user_id if interview else None
+        operation = f"adaptive_{job.kind}"
         db.commit()
     try:
-        result = handler(job_id)
+        with capture_usage(sessions, user_id, operation, job_id):
+            result = handler(job_id)
         error = None
     except Exception as exc:  # noqa: BLE001 - do not persist personal input or provider errors
         result = None

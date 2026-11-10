@@ -45,7 +45,7 @@ struct InterviewHomeView: View {
                                 Image(systemName: "bubble.left.and.text.bubble.right.fill").foregroundStyle(ChatStyle.cyan)
                                 VStack(alignment: .leading, spacing: 4) {
                                     Text(item.jobDescription).lineLimit(2).font(.headline).foregroundStyle(.white)
-                                    Text(item.status == "ready" ? "Ready to practice" : "Questions not generated yet").font(.caption).foregroundStyle(ChatStyle.muted)
+                                    Text(LocalizedStringKey(item.status == "ready" ? "Ready to practice" : "Questions not generated yet")).font(.caption).foregroundStyle(ChatStyle.muted)
                                 }
                                 Spacer(); Image(systemName: "chevron.right").foregroundStyle(ChatStyle.muted)
                             }.contentShape(Rectangle())

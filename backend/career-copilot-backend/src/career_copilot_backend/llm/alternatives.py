@@ -9,6 +9,7 @@ from pydantic import ValidationError
 from career_copilot_backend.core.config import settings
 from career_copilot_backend.llm.openrouter import OpenRouterProvider
 from career_copilot_backend.llm.provider import LLMProvider, ProviderError
+from career_copilot_backend.llm.usage import provider_attempt, record_response
 from career_copilot_backend.schemas.adaptive_interview import (
     AdaptiveEvaluation,
     AdaptiveQuestion,
@@ -74,7 +75,9 @@ class GeminiProvider:
                 "maxOutputTokens": max_output_tokens, "thinkingConfig": {"thinkingBudget": 0},
             },
         }
-        body = await _post_json(GEMINI_URL, payload, {"x-goog-api-key": self._api_key}, self._client)
+        with provider_attempt("gemini", GEMINI_MODEL) as event:
+            body = await _post_json(GEMINI_URL, payload, {"x-goog-api-key": self._api_key}, self._client)
+            record_response(event, body, "gemini")
         try:
             candidate = body["candidates"][0]
             if candidate.get("finishReason") == "MAX_TOKENS":
@@ -104,7 +107,9 @@ class OllamaProvider:
             "messages": [{"role": "system", "content": system_instruction}, {"role": "user", "content": untrusted_text}],
             "options": {"num_predict": max_output_tokens, "temperature": 0},
         }
-        body = await _post_json(self._url, payload, {}, self._client)
+        with provider_attempt("ollama", self._model) as event:
+            body = await _post_json(self._url, payload, {}, self._client)
+            record_response(event, body, "ollama")
         try:
             if body.get("done_reason") == "length":
                 raise ProviderError("Provider exhausted output limit", code="output_limit")

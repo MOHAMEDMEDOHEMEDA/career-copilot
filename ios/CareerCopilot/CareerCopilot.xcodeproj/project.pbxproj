@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		E10000000000000000000001 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = E20000000000000000000001; };
+		E10000000000000000000002 /* InfoPlist.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = E20000000000000000000002; };
 		D10000000000000000000006 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D20000000000000000000006; };
 		D10000000000000000000005 /* InterviewDictation.swift in Sources */ = {isa = PBXBuildFile; fileRef = D20000000000000000000005; };
 		D10000000000000000000001 /* InterviewModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = D20000000000000000000001; };
@@ -48,6 +50,8 @@
 /* End PBXTargetDependency section */
 
 /* Begin PBXFileReference section */
+		E20000000000000000000001 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
+		E20000000000000000000002 /* InfoPlist.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = InfoPlist.xcstrings; sourceTree = "<group>"; };
 		D20000000000000000000006 /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
 		D20000000000000000000005 /* InterviewDictation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InterviewDictation.swift; sourceTree = "<group>"; };
 		D20000000000000000000001 /* InterviewModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InterviewModels.swift; sourceTree = "<group>"; };
@@ -102,6 +106,8 @@
 		A30000000000000000000002 /* CareerCopilot */ = {
 			isa = PBXGroup;
 			children = (
+				E20000000000000000000001 /* Localizable.xcstrings */,
+				E20000000000000000000002 /* InfoPlist.xcstrings */,
 				B00000000000000000000001 /* App */,
 				B00000000000000000000002 /* Core */,
 				B00000000000000000000005 /* DesignSystem */,
@@ -499,6 +505,7 @@
 			buildPhases = (
 				A40000000000000000000001 /* Sources */,
 				A40000000000000000000002,
+				E40000000000000000000001 /* Resources */,
 			);
 			buildRules = (
 			);
@@ -524,6 +531,7 @@
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
+				ar,
 				Base,
 			);
 			mainGroup = A30000000000000000000001;
@@ -537,6 +545,10 @@
 			);
 		};
 /* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		E40000000000000000000001 /* Resources */ = {isa = PBXResourcesBuildPhase; buildActionMask = 2147483647; files = (E10000000000000000000001 /* Localizable.xcstrings in Resources */, E10000000000000000000002 /* InfoPlist.xcstrings in Resources */, ); runOnlyForDeploymentPostprocessing = 0; };
+/* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		C40000000000000000000001 = {isa = PBXSourcesBuildPhase; buildActionMask = 2147483647; files = (C10000000000000000000001, ); runOnlyForDeploymentPostprocessing = 0; };
