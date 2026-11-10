@@ -9,6 +9,7 @@ enum ChatStyle {
 }
 
 struct ChatHomeView: View {
+    @Environment(\.layoutDirection) private var layoutDirection
     @ObservedObject var model: ChatViewModel
     @State private var selected: ChatConversation?
     @State private var showNewChat = false
@@ -18,7 +19,7 @@ struct ChatHomeView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 24) {
-                Text("YOUR CAREER COMPANION").font(.caption.weight(.semibold)).tracking(1.3).foregroundStyle(ChatStyle.cyan)
+                Text("YOUR CAREER COMPANION").font(.caption.weight(.semibold)).tracking(layoutDirection == .rightToLeft ? 0 : 1.3).foregroundStyle(ChatStyle.cyan)
                 Text("Let’s make your\nnext move.").font(.largeTitle.bold()).foregroundStyle(.white)
                 Text("Keep your career questions in one place.").font(.subheadline).foregroundStyle(ChatStyle.muted)
 
@@ -106,6 +107,12 @@ struct ChatHomeView: View {
 
 #Preview("Career chat") {
     NavigationStack { ChatHomeView(model: ChatViewModel(clientFactory: { _ in ChatPreviewService() })) }
+}
+
+#Preview("Career chat · Arabic") {
+    NavigationStack { ChatHomeView(model: ChatViewModel(clientFactory: { _ in ChatPreviewService() })) }
+        .environment(\.locale, Locale(identifier: "ar"))
+        .environment(\.layoutDirection, .rightToLeft)
 }
 
 struct ChatPreviewService: ChatServicing {

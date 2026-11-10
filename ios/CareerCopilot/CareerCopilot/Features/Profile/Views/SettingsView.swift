@@ -2,6 +2,7 @@ import SwiftUI
 
 struct SettingsView: View {
     @ObservedObject var model: AppViewModel
+    @Environment(\.layoutDirection) private var layoutDirection
     @AppStorage("appLanguage") private var appLanguage = "system"
     @State private var displayName = ""
     @State private var nameSaved = false
@@ -20,6 +21,7 @@ struct SettingsView: View {
                 .listRowBackground(CareerStyle.card)
                 Section("Backend") {
                     TextField("Backend URL", text: $model.baseURL)
+                        .environment(\.layoutDirection, .leftToRight)
                         .textInputAutocapitalization(.never)
                         .keyboardType(.URL)
                         .autocorrectionDisabled()
@@ -48,6 +50,7 @@ struct SettingsView: View {
                     .listRowBackground(CareerStyle.card)
                     Section("Account") {
                         Text(profile.email)
+                            .environment(\.layoutDirection, .leftToRight)
                         if model.isLoading { ProgressView("Updating account") }
                         Button("Link Google account") { Task { await model.googleSignIn(link: true) } }
                             .disabled(model.isLoading)
@@ -57,6 +60,9 @@ struct SettingsView: View {
                     .listRowBackground(CareerStyle.card)
                 }
             }
+            // Recreate the native form when switching RTL/LTR so its hosted
+            // controls do not retain a mirrored transform from the previous language.
+            .id(layoutDirection)
             .scrollContentBackground(.hidden)
             .background(CareerStyle.gradient.ignoresSafeArea())
             .listRowBackground(CareerStyle.card)
@@ -161,4 +167,12 @@ struct AIUsageView: View {
     let model = AppViewModel()
     model.profile = Profile(email: "alex@example.com")
     return SettingsView(model: model)
+}
+
+#Preview("Settings · Arabic") {
+    let model = AppViewModel()
+    model.profile = Profile(email: "alex@example.com", displayName: "أحمد")
+    return SettingsView(model: model)
+        .environment(\.locale, Locale(identifier: "ar"))
+        .environment(\.layoutDirection, .rightToLeft)
 }

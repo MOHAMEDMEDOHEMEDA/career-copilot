@@ -3,6 +3,7 @@ import AVFoundation
 import UIKit
 
 struct InterviewSessionView: View {
+    @Environment(\.layoutDirection) private var layoutDirection
     @ObservedObject var model: InterviewViewModel
     let interview: InterviewSession
     @State private var selected: InterviewQuestion?
@@ -11,7 +12,7 @@ struct InterviewSessionView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 20) {
-                Text("PRACTICE SESSION").font(.caption.weight(.semibold)).tracking(1.3).foregroundStyle(ChatStyle.cyan)
+                Text("PRACTICE SESSION").font(.caption.weight(.semibold)).tracking(layoutDirection == .rightToLeft ? 0 : 1.3).foregroundStyle(ChatStyle.cyan)
                 Text("Let’s get you ready.").font(.largeTitle.bold()).foregroundStyle(.white)
                 Text(interview.jobDescription).lineLimit(4).foregroundStyle(ChatStyle.muted)
                 if model.loadingQuestions && !model.hasLoadedQuestions {
@@ -65,6 +66,7 @@ struct InterviewSessionView: View {
 }
 
 struct InterviewAnswerView: View {
+    @Environment(\.layoutDirection) private var layoutDirection
     @Environment(\.dismiss) private var dismiss
     @ObservedObject var model: InterviewViewModel
     let sessionID: UUID
@@ -80,7 +82,7 @@ struct InterviewAnswerView: View {
             ScrollView {
                 VStack(alignment: .leading, spacing: 18) {
                     if let question {
-                        Text("QUESTION \(question.sequence)").font(.caption.weight(.semibold)).tracking(1).foregroundStyle(ChatStyle.cyan)
+                        Text("QUESTION \(question.sequence)").font(.caption.weight(.semibold)).tracking(layoutDirection == .rightToLeft ? 0 : 1).foregroundStyle(ChatStyle.cyan)
                         Text(question.prompt).font(.title2.bold()).foregroundStyle(.white)
                         Text("Your answer").font(.headline).foregroundStyle(.white)
                         TextEditor(text: $answer).scrollContentBackground(.hidden).foregroundStyle(.white).padding(8).frame(minHeight: 180).background(ChatStyle.surface, in: RoundedRectangle(cornerRadius: 16)).accessibilityLabel("Your answer")
@@ -157,6 +159,7 @@ struct InterviewFeedbackView: View {
 }
 
 struct AdaptiveSessionView: View {
+    @Environment(\.layoutDirection) private var layoutDirection
     @ObservedObject var model: AdaptiveInterviewViewModel
     let sessionID: UUID
     @State private var showingAnswer = false
@@ -170,7 +173,7 @@ struct AdaptiveSessionView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 18) {
                 if let session = model.session {
-                    Text("\(session.seniority.uppercased()) · \(session.interviewType.uppercased())").font(.caption.weight(.semibold)).tracking(1).foregroundStyle(ChatStyle.cyan)
+                    Text("\(session.seniority.uppercased()) · \(session.interviewType.uppercased())").font(.caption.weight(.semibold)).tracking(layoutDirection == .rightToLeft ? 0 : 1).foregroundStyle(ChatStyle.cyan)
                     Text(session.role).font(.largeTitle.bold()).foregroundStyle(.white)
                     if let report = model.report { AdaptiveReportView(report: report) }
                     else if session.status == "completed" { Text("Your interview is complete.").foregroundStyle(.white) }

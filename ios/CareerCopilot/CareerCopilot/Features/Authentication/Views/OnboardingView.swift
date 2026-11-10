@@ -59,7 +59,7 @@ struct OnboardingView: View {
                         .frame(maxWidth: .infinity)
                         .padding(.top, 14)
                     VStack(alignment: .leading, spacing: 12) {
-                        Text(LocalizedStringKey(item.eyebrow)).font(.caption.weight(.semibold)).tracking(1.3).foregroundStyle(CareerStyle.accent)
+                        Text(LocalizedStringKey(item.eyebrow)).font(.caption.weight(.semibold)).tracking(layoutDirection == .rightToLeft ? 0 : 1.3).foregroundStyle(CareerStyle.accent)
                         Text(LocalizedStringKey(item.title)).font(.largeTitle.bold()).foregroundStyle(.white).fixedSize(horizontal: false, vertical: true)
                         Text(LocalizedStringKey(item.description)).font(.body).foregroundStyle(CareerStyle.muted).fixedSize(horizontal: false, vertical: true)
                     }

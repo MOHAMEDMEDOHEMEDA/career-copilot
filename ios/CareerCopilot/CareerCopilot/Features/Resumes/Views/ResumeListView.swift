@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct ResumeListView: View {
+    @Environment(\.layoutDirection) private var layoutDirection
     @ObservedObject var model: AppViewModel
     @ObservedObject var resumeModel: ResumeViewModel
     @Binding var showImporter: Bool
@@ -22,7 +23,7 @@ struct ResumeListView: View {
 
                 VStack(alignment: .leading, spacing: 8) {
                     Text("YOUR CAREER WORKSPACE")
-                        .font(.caption.weight(.semibold)).tracking(1.2).foregroundStyle(CareerStyle.accent)
+                        .font(.caption.weight(.semibold)).tracking(layoutDirection == .rightToLeft ? 0 : 1.2).foregroundStyle(CareerStyle.accent)
                     Text("Make your next move.").font(.title.bold())
                     Text("Choose where you’d like to start.").font(.subheadline).foregroundStyle(CareerStyle.muted)
                 }

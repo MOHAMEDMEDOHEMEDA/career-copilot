@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct InterviewHomeView: View {
+    @Environment(\.layoutDirection) private var layoutDirection
     @ObservedObject var model: InterviewViewModel
     @ObservedObject var resumeModel: ResumeViewModel
     @State private var selected: InterviewSession?
@@ -10,7 +11,7 @@ struct InterviewHomeView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 22) {
-                Text("INTERVIEW PRACTICE").font(.caption.weight(.semibold)).tracking(1.3).foregroundStyle(ChatStyle.cyan)
+                Text("INTERVIEW PRACTICE").font(.caption.weight(.semibold)).tracking(layoutDirection == .rightToLeft ? 0 : 1.3).foregroundStyle(ChatStyle.cyan)
                 Text("Practice with\npurpose.").font(.largeTitle.bold()).foregroundStyle(.white)
                 Text("Prepare for a role with tailored questions and thoughtful feedback.").foregroundStyle(ChatStyle.muted)
                 NavigationLink {
@@ -117,6 +118,7 @@ struct NewInterviewView: View {
 }
 
 struct AdaptiveHomeView: View {
+    @Environment(\.layoutDirection) private var layoutDirection
     @ObservedObject var resumeModel: ResumeViewModel
     @StateObject private var model: AdaptiveInterviewViewModel
     @State private var selected: AdaptiveSession?
@@ -131,7 +133,7 @@ struct AdaptiveHomeView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 20) {
-                Text("ADAPTIVE PRACTICE").font(.caption.weight(.semibold)).tracking(1).foregroundStyle(ChatStyle.cyan)
+                Text("ADAPTIVE PRACTICE").font(.caption.weight(.semibold)).tracking(layoutDirection == .rightToLeft ? 0 : 1).foregroundStyle(ChatStyle.cyan)
                 Text("Practice your next answer.").font(.largeTitle.bold()).foregroundStyle(.white)
                 Text("Get one question at a time, with follow-ups based on your answers.").foregroundStyle(ChatStyle.muted)
                 Button { showingSetup = true } label: { Label("Start adaptive interview", systemImage: "plus").frame(maxWidth: .infinity).padding(8) }.careerPrimaryButton().disabled(model.loading)
